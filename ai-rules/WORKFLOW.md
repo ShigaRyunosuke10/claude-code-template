@@ -11,8 +11,8 @@
 **テンプレート**: [.claude/workflows/case-a-existing-project.md](../.claude/workflows/case-a-existing-project.md)
 
 **6つのPhase**:
-1. Planning（要件定義・計画）- project-planner → sub-planner
-2. Implementation（実装）- impl-dev-backend → impl-dev-frontend → integrator
+1. Planning（要件定義・計画）- planner（統合）
+2. Implementation（実装）- impl-dev-backend → impl-dev-frontend → code-reviewer（整合性）
 3. Testing（テスト）- qa-unit → qa-integration → E2E
 4. Quality Assurance（品質保証）- lint-fix → sec-scan
 5. Documentation（ドキュメント更新）- Serenaメモリ → 公式Docs
@@ -27,12 +27,12 @@
 **テンプレート**: [.claude/workflows/case-b-new-project.md](../.claude/workflows/case-b-new-project.md)
 
 **6つのPhase**:
-1. Architecture Design（アーキテクチャ設計）- project-planner
+1. Architecture Design（アーキテクチャ設計）- planner
 2. Project Initialization（プロジェクト初期化）- impl-dev-backend + impl-dev-frontend
 3. Core Features（コア機能実装）- 認証システム + マスターデータ管理
 4. Testing Infrastructure（テスト基盤構築）- qa-unit + qa-integration + E2E
 5. Documentation（ドキュメント整備）- Serenaメモリ + 公式Docs + 開発ガイド
-6. Deployment Infrastructure（デプロイ基盤構築）- Docker + CI/CD
+6. Deployment Infrastructure（デプロイ基盤構築）- deployment-agent
 
 **推定時間**: 42-84時間（1-2週間、中規模プロジェクト）
 
@@ -143,24 +143,15 @@ mcp__github__list_issues(
 )
 ```
 
-**1.3 マクロ計画（Epic分解）**
+**1.3 統合計画（Epic + タスク分解 + API契約）**
 
 ```bash
-Task:project-planner(prompt: "ユーザーロール管理機能を追加したい")
+Task:planner(prompt: "ユーザーロール管理機能を追加したい")
 ```
 
 **出力**: `epic-user-role-management.md`
 - Epic分解（3-5個のストーリー）
-- 優先度設定
-- マイルストーン策定
-
-**1.4 ミクロ計画（タスク分解）**
-
-```bash
-Task:sub-planner(prompt: "epic-user-role-management.mdのタスク詳細化")
-```
-
-**出力**: `epic-user-role-management-tasks.md`
+- 優先度設定・マイルストーン策定
 - タスクごとのDoD（Done定義）
 - API契約（FE/BE）
 - 依存関係マップ
@@ -287,12 +278,12 @@ Task:impl-dev-frontend(prompt: "Task 3: ユーザーロール表示UI実装")
 **2.3 FE/BE統合チェック**
 
 ```bash
-Task:integrator(prompt: "ユーザーロールAPIの整合性チェック")
+Task:code-reviewer(prompt: "ユーザーロールAPIの整合性チェック - FE/BE型定義同期確認")
 ```
 
 **出力**: `integration-report.md`
 - API契約一致確認
-- 型定義同期
+- 型定義同期（TypeScript ↔ Pydantic）
 - 不整合修正提案
 
 **stop条件**: Critical不整合 > 0件で停止
@@ -688,15 +679,13 @@ mcp__github__merge_pull_request(
 ## エージェント依存関係マップ
 
 ```
-project-planner（マクロ計画）
-  ↓
-sub-planner（ミクロ計画）
+planner（統合計画）
   ↓
   ├─ impl-dev-backend（バックエンド） → qa-unit（ユニット） → qa-integration（統合）
   │                                                                     ↓
   └─ impl-dev-frontend（フロントエンド） → qa-unit（ユニット） ──────┤
                                                                         ↓
-                                                                   integrator（整合性）
+                                                              code-reviewer（整合性）
                                                                         ↓
                                                               playwright-test-healer
                                                                         ↓

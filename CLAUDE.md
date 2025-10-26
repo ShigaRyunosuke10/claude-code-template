@@ -127,6 +127,140 @@ git checkout -b <type>-<機能名>
 
 ---
 
+## 要件変更フロー（開発途中の機能変更・追加）
+
+### トリガー
+ユーザーが開発途中に自然言語で以下のような発言をした場合、メインClaude Agentが要件変更と判断してフローを開始します。
+
+**要件変更フローが必要なケース**:
+- 「新機能を追加したい」
+- 「機能の仕様を変更したい」
+- 「設計を見直したい」
+- アーキテクチャに影響する変更
+
+**通常の会話で対応（要件変更フロー不要）**:
+- パラメータ変更（ポート番号、タイムアウト値など）
+- UI微調整（色、サイズ、配置）
+- バグ修正
+- ドキュメント修正
+- 小さなリファクタリング
+
+---
+
+### フロー
+
+#### Phase 0: 作業の一時保存
+
+**メインClaude Agentが実行**:
+1. 現在の作業状態を確認
+2. キリの良いところまで進める（必要なら）
+   - 例: 実装中の関数を完成させる
+   - 例: 現在のテストケースを完了させる
+3. 一時保存を推奨
+   ```bash
+   git add .
+   git commit -m "wip: 要件変更前の一時保存"
+   ```
+
+---
+
+#### Phase 1: 要件ヒアリング（Case A相当）
+
+**メインClaude Agentが質問**:
+1. 変更・追加したい機能は何ですか？（具体的に）
+2. 想定ユーザーは誰ですか？（管理者/一般ユーザー/etc.）
+3. 既存機能との関連は？（独立/既存機能拡張/既存機能変更）
+4. 優先度は？（高/中/低）
+5. 期限はありますか？
+
+---
+
+#### Phase 2: planner実行
+
+```bash
+Task:planner(prompt: "以下の要件に基づいて変更計画を立ててください
+- 変更内容: {回答1}
+- 想定ユーザー: {回答2}
+- 既存機能との関連: {回答3}
+- 優先度: {回答4}
+- 期限: {回答5}
+")
+```
+
+**planner内部動作**:
+1. 要件不足チェック実行
+2. **要件不足検出時**:
+   ```markdown
+   # 📋 Requirements Validation Report
+
+   ## ❌ 要件不足検出
+
+   ### 不足している情報
+   1. **機能の目的・ビジネス価値** が不明確
+   2. **技術的実現可能性** の判断に必要な情報不足
+
+   ### 追加で質問すべき項目
+   - Q1: この機能で解決したい課題は何ですか？
+   - Q2: 既存のどの機能に影響しますか？
+
+   ## 📌 次のアクション
+   メインClaude Agent: 上記の質問をユーザーに行ってください。
+   回答取得後、再度 Task:planner を実行してください。
+   ```
+3. メインAgentが追加質問 → planner再実行
+4. 要件充足 → 変更計画生成
+
+---
+
+#### Phase 3: 計画確認・承認
+
+**メインClaude Agentが実行**:
+1. plannerが生成した変更計画をユーザーに提示
+2. 既存実装への影響を説明
+3. ユーザーの承認を得る
+
+---
+
+#### Phase 4: 作業再開
+
+**再開パターン**:
+
+**A. 中断作業の続きから再開**（計画変更なし）
+```bash
+# 例: Task 2/5 完了 → 要件変更（新機能追加） → Task 3 から再開
+Task:impl-dev-backend(prompt: "Task 3: ...")
+```
+
+**B. 計画変更に準拠して再開**（実装計画変更あり）
+```bash
+# 例: Task 2/5 完了 → 要件変更（仕様変更） → Task 3 が不要に → Task 4 から再開
+# planner が新しい実装順序を提示
+Task:impl-dev-backend(prompt: "変更後の Task 4: ...")
+```
+
+**C. 最初から実装し直し**（大幅な設計変更）
+```bash
+# 例: 既存実装を破棄 → 新設計で実装開始
+git checkout -b feat-redesigned-feature
+Task:impl-dev-backend(prompt: "新設計の Task 1: ...")
+```
+
+---
+
+### ベストプラクティス
+
+**要件変更前の確認**:
+- [ ] 現在の作業をキリの良いところで止める
+- [ ] git commit で一時保存（ブランチも考慮）
+- [ ] 既存実装への影響範囲を理解する
+
+**要件変更後の確認**:
+- [ ] 変更計画を十分に理解する
+- [ ] 既存テストが壊れていないか確認
+- [ ] ドキュメントの更新が必要か確認
+
+---
+
 ## エージェント一覧
 
 ### 汎用エージェント（横断的・14体）
@@ -235,27 +369,27 @@ git commit & PR作成 → マージ
 ### エージェント使用例（Case C: デプロイ）
 
 ```bash
-# Phase 1: デプロイ先決定
+# Phase 0: デプロイ要件定義・プラットフォーム推奨
 # プロジェクト開始時に実行
-Task:infra-validator(prompt: "Vercel + Supabase構成で要件確認")
+Task:deployment-agent(prompt: "Vercel + Supabase構成で要件確認とプラットフォーム推奨")
 
-# Phase 2: 初回デプロイ
-Task:deploy-manager(prompt: "Vercel + Supabase構成で初回デプロイ実行")
+# Phase 1: 設定ファイル自動生成
+Task:deployment-agent(prompt: "Vercel + Supabase構成で設定ファイルを生成（Dockerfile, CI/CD, .env等）")
 
-# Phase 3: CI/CD設定
-Task:deploy-manager(prompt: "Vercel用のGitHub Actions設定を生成")
+# Phase 2: デプロイ前検証
+Task:deployment-agent(prompt: "デプロイ前最終チェック - 環境変数・セキュリティ検証")
 
-# Phase 4: デプロイ前検証
-Task:infra-validator(prompt: "デプロイ前最終チェック")
+# Phase 3: 初回デプロイ
+Task:deployment-agent(prompt: "Vercel + Supabase構成で初回デプロイ実行")
 
-# Phase 5: デプロイ実行（自動）
-# mainブランチへのpush/マージで自動デプロイ
+# Phase 4: CI/CD設定
+Task:deployment-agent(prompt: "Vercel用のGitHub Actions設定を生成")
 
-# Phase 6: デプロイ後確認
-Task:deploy-manager(prompt: "デプロイ後ヘルスチェック実行")
+# Phase 5: デプロイ後確認
+Task:deployment-agent(prompt: "デプロイ後ヘルスチェック実行")
 
 # トラブル時: ロールバック
-Task:deploy-manager(prompt: "前バージョンへロールバック")
+Task:deployment-agent(prompt: "前バージョンへロールバック")
 ```
 
 ---

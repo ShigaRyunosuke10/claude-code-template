@@ -27,34 +27,22 @@
 
 ## Phase 1: 要件定義・計画（Planning）
 
-### 1.1 マクロ計画（Epic分解）
+### 1.1 統合計画（Epic + タスク分解 + API契約）
 
-**エージェント**: `project-planner`
+**エージェント**: `planner`（旧 project-planner + sub-planner 統合）
 
 ```bash
-Task:project-planner(prompt: "ユーザーロール管理機能を追加したい")
+Task:planner(prompt: "ユーザーロール管理機能を追加したい")
 ```
 
 **出力**: `epic-user-role-management.md`
 - Epic分解（3-5個のストーリー）
-- 優先度設定
-- マイルストーン策定
-
-**依存関係**: なし
-
-### 1.2 ミクロ計画（タスク分解）
-
-**エージェント**: `sub-planner`
-**依存**: `project-planner`完了後
-
-```bash
-Task:sub-planner(prompt: "epic-user-role-management.mdのタスク詳細化")
-```
-
-**出力**: `epic-user-role-management-tasks.md`
+- 優先度設定・マイルストーン策定
 - タスクごとのDoD
 - API契約（FE/BE）
 - 依存関係マップ
+
+**依存関係**: なし
 
 **stop条件**: タスク数 > 20件で警告（分割推奨）
 
@@ -99,16 +87,16 @@ Task:impl-dev-frontend(prompt: "Task 3: ユーザーロール表示UI実装")
 
 ### 2.3 FE/BE統合チェック
 
-**エージェント**: `integrator`
+**エージェント**: `code-reviewer`（integrator機能を統合）
 **依存**: `impl-dev-frontend` + `impl-dev-backend`完了後
 
 ```bash
-Task:integrator(prompt: "ユーザーロールAPIの整合性チェック")
+Task:code-reviewer(prompt: "ユーザーロールAPIの整合性チェック - FE/BE型定義同期確認")
 ```
 
 **出力**: `integration-report.md`
 - API契約一致確認
-- 型定義同期
+- 型定義同期（TypeScript ↔ Pydantic）
 - 不整合修正提案
 
 **stop条件**: Critical不整合 > 0件で停止
@@ -256,15 +244,13 @@ mcp__github__merge_pull_request(
 ## エージェント依存関係マップ
 
 ```
-project-planner
-  ↓
-sub-planner
+planner（統合）
   ↓
   ├─ impl-dev-backend → qa-unit → qa-integration
   │                                    ↓
   └─ impl-dev-frontend → qa-unit ──────┤
                                        ↓
-                                  integrator
+                                code-reviewer（FE/BE整合性）
                                        ↓
                                    /e2e-full
                                        ↓

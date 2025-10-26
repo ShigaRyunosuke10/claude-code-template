@@ -6,10 +6,10 @@
 
 ### 0.1 技術スタック決定
 
-**エージェント**: `infra-validator`
+**エージェント**: `deployment-agent`
 
 ```bash
-Task:infra-validator(prompt: "新規プロジェクトの技術スタック要件定義を支援")
+Task:deployment-agent(prompt: "新規プロジェクトの技術スタック要件定義を支援")
 ```
 
 **エージェントが対話形式で質問**:
@@ -30,10 +30,10 @@ Task:infra-validator(prompt: "新規プロジェクトの技術スタック要�
 
 ### 0.2 インフラ構成決定
 
-**エージェント**: `infra-validator`
+**エージェント**: `deployment-agent`
 
 ```bash
-Task:infra-validator(prompt: "Phase 0.1の技術スタックに基づいてインフラ構成を決定")
+Task:deployment-agent(prompt: "Phase 0.1の技術スタックに基づいてインフラ構成を決定")
 ```
 
 **エージェントが自動判断**:
@@ -49,10 +49,10 @@ Task:infra-validator(prompt: "Phase 0.1の技術スタックに基づいてイ�
 
 ### 0.3 プロジェクト初期ファイル自動生成
 
-**エージェント**: `deploy-manager`
+**エージェント**: `deployment-agent`
 
 ```bash
-Task:deploy-manager(prompt: "Phase 0で決定した構成に基づいてプロジェクト初期ファイルを生成")
+Task:deployment-agent(prompt: "Phase 0で決定した構成に基づいてプロジェクト初期ファイルを生成")
 ```
 
 **自動生成されるファイル**:
@@ -93,10 +93,10 @@ docker-compose.yml          # frontend + backend + postgres
 
 ### 1.1 プロジェクト構想
 
-**エージェント**: `project-planner`
+**エージェント**: `planner`
 
 ```bash
-Task:project-planner(prompt: "Next.js + FastAPI + Supabaseで勤怠管理システムを構築したい")
+Task:planner(prompt: "Next.js + FastAPI + Supabaseで勤怠管理システムを構築したい")
 ```
 
 **出力**: `project-overview.md`
@@ -107,10 +107,10 @@ Task:project-planner(prompt: "Next.js + FastAPI + Supabaseで勤怠管理シス�
 
 ### 1.2 システムアーキテクチャ設計
 
-**エージェント**: `project-planner`
+**エージェント**: `planner`
 
 ```bash
-Task:project-planner(prompt: "システムアーキテクチャ設計書を作成")
+Task:planner(prompt: "システムアーキテクチャ設計書を作成")
 ```
 
 **出力**: `system_architecture.md`
@@ -195,7 +195,7 @@ Task:impl-dev-frontend(prompt: "認証UI実装
 **Phase 3.1.3: 統合チェック**
 
 ```bash
-Task:integrator(prompt: "認証システムの整合性チェック")
+Task:code-reviewer(prompt: "認証システムの整合性チェック - FE/BE型定義同期確認")
 ```
 
 ### 3.2 マスターデータ管理
@@ -355,7 +355,7 @@ DEPLOYMENT.md - 本番環境デプロイ手順書
 
 ```
 【Phase 1: 設計】
-project-planner (アーキテクチャ設計)
+planner (アーキテクチャ設計)
   ↓
 【Phase 2: 初期化】
 impl-dev-backend (バックエンド初期化)
@@ -363,9 +363,9 @@ impl-dev-backend (バックエンド初期化)
 impl-dev-frontend (フロントエンド初期化)
   ↓
 【Phase 3: コア機能】
-impl-dev-backend (認証API) → impl-dev-frontend (認証UI) → integrator
+impl-dev-backend (認証API) → impl-dev-frontend (認証UI) → code-reviewer (整合性)
   ↓
-impl-dev-backend (CRUD API) → impl-dev-frontend (UI) → integrator
+impl-dev-backend (CRUD API) → impl-dev-frontend (UI) → code-reviewer (整合性)
   ↓
 【Phase 4: テスト基盤】
 qa-unit (ユニットテスト基盤)
@@ -380,7 +380,7 @@ mcp__serena__write_memory (AIメモリ作成)
 人間向けドキュメント作成
   ↓
 【Phase 6: デプロイ】
-Docker本番ビルド + CI/CD設定
+deployment-agent (Docker本番ビルド + CI/CD設定)
 ```
 
 ---
@@ -414,10 +414,10 @@ Docker本番ビルド + CI/CD設定
 
 ```bash
 # 1. プロジェクト構想
-Task:project-planner(prompt: "プロジェクト概要・技術スタック・フェーズ分割")
+Task:planner(prompt: "プロジェクト概要・技術スタック・フェーズ分割")
 
 # 2. システムアーキテクチャ設計
-Task:project-planner(prompt: "システムアーキテクチャ設計書作成")
+Task:planner(prompt: "システムアーキテクチャ設計書作成")
 
 # 3. AIメモリ初期化
 mcp__serena__write_memory(memory_name: "project/project_overview.md", ...)
