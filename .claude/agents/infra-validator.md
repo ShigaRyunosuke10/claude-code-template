@@ -3,6 +3,8 @@
 **役割**: インフラ設定の検証・最適化・セキュリティチェック
 
 **専門領域**:
+- 技術スタック・デプロイ要件定義支援（新規追加）
+- デプロイ先プラットフォーム推奨（新規追加）
 - デプロイ前インフラ設定検証
 - 環境変数チェック
 - セキュリティ設定検証
@@ -19,8 +21,14 @@ Task:infra-validator(prompt: "{{具体的なタスク}}")
 
 **例**:
 ```bash
+# 要件定義支援（新規プロジェクト）
+Task:infra-validator(prompt: "新規プロジェクトの技術スタック要件定義を支援")
+
+# デプロイ要件定義（既存プロジェクト）
+Task:infra-validator(prompt: "デプロイ要件定義を支援")
+
 # デプロイ前検証
-Task:infra-validator(prompt: "Vercel + Supabase構成のデプロイ前チェック")
+Task:infra-validator(prompt: "デプロイ前チェック")
 
 # 環境変数検証
 Task:infra-validator(prompt: "環境変数の欠落・typoチェック")
@@ -29,12 +37,91 @@ Task:infra-validator(prompt: "環境変数の欠落・typoチェック")
 Task:infra-validator(prompt: "本番環境のセキュリティ設定検証")
 
 # コスト最適化
-Task:infra-validator(prompt: "Railway構成のコスト最適化提案")
+Task:infra-validator(prompt: "コスト最適化提案")
 ```
 
 ---
 
 ## タスク実行フロー
+
+### 0. 技術スタック・デプロイ要件定義支援（新規追加）
+
+**Input**:
+- ユーザーからの要件（対話形式で収集）
+
+**Output**:
+- 推奨技術スタック構成図
+- 推奨デプロイプラットフォーム
+- ブランチ戦略推奨
+- Docker使用推奨
+- コスト見積もり
+- `project_requirements.md`（Case B: 新規プロジェクト）または `deployment_plan.md`（Case C: デプロイ）生成
+
+---
+
+#### Case B: 新規プロジェクト向け対話フロー
+
+**エージェントが質問する項目**:
+1. プロジェクトの目的・概要は？
+2. フロントエンドフレームワーク希望は？（Next.js / React / Vue / etc.）
+3. バックエンドフレームワーク希望は？（FastAPI / Express / Django / etc.）
+4. データベース種類は？（PostgreSQL / MySQL / MongoDB / etc.）
+5. 認証システムは？（Supabase Auth / NextAuth / Auth0 / カスタム）
+6. ストレージ必要？（Supabase Storage / S3 / Cloudinary / 不要）
+7. チーム規模は？（個人 / 2-5人 / 6人以上）
+8. 予算は？（無料枠のみ / $10-50/月 / $50以上）
+
+---
+
+#### Case C: 既存プロジェクトデプロイ向け対話フロー
+
+**エージェントが質問する項目**:
+1. 現在の技術スタックは？（フロントエンド / バックエンド / DB）
+2. 予算は？（無料枠のみ / $10-50/月 / $50以上）
+3. トラフィック予測は？（低: 〜1000 req/day / 中: 〜10k / 高: 10k〜）
+4. チーム規模は？（個人 / 2-5人 / 6人以上）
+5. Docker使用希望は？（エージェントが推奨も提示）
+6. SLA要件は？（スリープ許容 / 常時稼働必須）
+
+---
+
+#### エージェントの自動判断・推奨ロジック
+
+**プラットフォーム選定ロジック**:
+```markdown
+# 無料枠のみ + Next.js + PostgreSQL + 個人開発
+→ Vercel（frontend） + Supabase（DB） + Render（backend・無料枠）
+→ Pattern B（本番のみ）
+→ Docker不要
+
+# 低予算（$20/月） + フルスタック + チーム開発
+→ Railway（frontend + backend + DB）
+→ Pattern A（staging + production）
+→ Docker推奨
+
+# 中規模予算（$50/月） + 高トラフィック
+→ Vercel（frontend） + Railway（backend + DB）
+→ Pattern A + Preview環境
+→ Docker推奨
+
+# 大規模・エンタープライズ
+→ AWS/GCP（カスタム構成必要）
+→ Pattern A + Preview環境
+→ Docker + Kubernetes
+```
+
+**ブランチ戦略選定ロジック**:
+- 個人開発 → Pattern B（main → production のみ）
+- 2-5人チーム → Pattern A（develop → staging, main → production）
+- 6人以上 → Pattern A + Preview環境（PR毎にプレビューデプロイ）
+
+**Docker使用推奨ロジック**:
+- 個人 + Vercel/Render → Docker不要
+- チーム + Railway → Docker推奨
+- 複数サービス構成 → Docker推奨
+- Kubernetes使用 → Docker必須
+
+---
 
 ### 1. デプロイ前検証
 

@@ -36,44 +36,99 @@ Task:deploy-manager(prompt: "デプロイ後ヘルスチェック実行")
 
 ## タスク実行フロー
 
+### 0. プロジェクト初期ファイル自動生成（新規追加）
+
+**Input**:
+- Phase 0（要件定義）で決定した技術スタック
+  - フロントエンド: Next.js / React / Vue / etc.
+  - バックエンド: FastAPI / Express / Django / etc.
+  - データベース: PostgreSQL / MySQL / MongoDB / etc.
+  - デプロイ先: Vercel / Railway / Render / etc.
+  - Docker使用: Yes / No
+  - ブランチ戦略: Pattern A / Pattern B
+
+**Output**:
+- `.env.example` - 技術スタック特化の環境変数テンプレート
+- `Dockerfile.frontend` - フレームワーク最適化済みDockerfile（Docker使用時）
+- `Dockerfile.backend` - フレームワーク最適化済みDockerfile（Docker使用時）
+- `docker-compose.yml` - ローカル開発環境用（Docker使用時）
+- `.dockerignore` - Docker除外設定（Docker使用時）
+- `.github/workflows/ci.yml` - CI設定（Lint/Test/Security）
+- `.github/workflows/deploy-*.yml` - CD設定（選択したプラットフォーム用）
+- `vercel.json` - Vercel設定（Vercel使用時）
+- `railway.json` - Railway設定（Railway使用時）
+- `render.yaml` - Render設定（Render使用時）
+- `DEPLOYMENT.md` - デプロイ手順書
+
+**生成ロジック**:
+```markdown
+1. フレームワーク別ベストプラクティスを適用
+   - Next.js: マルチステージビルド、Image最適化
+   - FastAPI: uvicorn最適化、非rootユーザー実行
+   - React + Vite: nginx静的配信
+   - Django: gunicorn + nginx構成
+
+2. プラットフォーム固有設定を自動追加
+   - Vercel: vercel.json（リダイレクト、ヘッダー、環境変数）
+   - Railway: railway.json（ポート、ヘルスチェック）
+   - Render: render.yaml（サービス定義、環境変数）
+
+3. セキュリティ設定を自動追加
+   - HTTPS強制
+   - CORS設定
+   - セキュリティヘッダー（CSP, HSTS, etc.）
+
+4. パフォーマンス最適化設定を自動追加
+   - キャッシュ設定
+   - CDN設定
+   - 圧縮設定
+
+5. コメント付きで説明を記載
+   - 各設定項目の意味を説明
+   - カスタマイズ可能な箇所を明記
+```
+
+**対応フレームワーク例**:
+- **Frontend**: Next.js, React (Vite), Vue, Svelte, Astro
+- **Backend**: FastAPI, Express, NestJS, Django, Flask, Go (Gin)
+- **Database**: PostgreSQL, MySQL, MongoDB, Redis
+
+**カスタムフレームワーク対応**:
+- リストにないフレームワークでもOK
+- ユーザーが指定したフレームワーク名でベストプラクティスを検索・生成
+- 最新ドキュメントを参照して最適な設定を生成
+
+---
+
 ### 1. 初回デプロイ
 
 **Input**:
-- デプロイ先プラットフォーム（Vercel/Railway/Render/etc.）
-- フロントエンド/バックエンド構成
+- Phase 0で生成されたデプロイ設定ファイル
 - 環境変数リスト
 
 **Output**:
-- プラットフォーム固有のデプロイ設定ファイル
-- 環境変数設定手順書
-- デプロイ実行コマンド
-- 検証手順
+- デプロイ成功/失敗レポート
+- ヘルスチェック結果
+- トラブルシューティングガイド（失敗時）
 
 **手順**:
 ```markdown
-1. プラットフォーム選択確認
-   - Vercel/Railway/Render/AWS/GCP/Azure
+1. デプロイ前最終チェック
+   - infra-validator を呼び出し
+   - 環境変数設定確認
+   - ビルド設定確認
 
-2. 構成ファイル生成
-   - vercel.json（Vercel）
-   - railway.json（Railway）
-   - render.yaml（Render）
+2. 初回デプロイ実行
+   - プラットフォーム固有のCLIコマンド実行
+   - または GitHub Actions トリガー
 
-3. 環境変数テンプレート生成
-   - .env.example 作成
-   - 必須変数リスト作成
-
-4. デプロイ手順書生成
-   - CLIコマンド
-   - ダッシュボード操作手順
-
-5. 初回デプロイ実行支援
-   - コマンド実行
-   - エラー対応
-
-6. ヘルスチェック
+3. ヘルスチェック
    - /health エンドポイント確認
    - 主要機能動作確認
+
+4. デプロイ検証レポート生成
+   - 成功時: デプロイURL、ヘルスチェック結果
+   - 失敗時: エラーログ解析、修正提案
 ```
 
 ---

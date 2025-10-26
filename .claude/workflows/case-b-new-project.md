@@ -2,6 +2,93 @@
 
 ゼロから新規プロジェクトを立ち上げる際のエージェント連携フロー。
 
+## Phase 0: 技術スタック・インフラ要件定義（Requirements & Tech Stack）
+
+### 0.1 技術スタック決定
+
+**エージェント**: `infra-validator`
+
+```bash
+Task:infra-validator(prompt: "新規プロジェクトの技術スタック要件定義を支援")
+```
+
+**エージェントが対話形式で質問**:
+1. プロジェクトの目的・概要は？
+2. フロントエンドフレームワーク希望は？（Next.js / React / Vue / etc.）
+3. バックエンドフレームワーク希望は？（FastAPI / Express / Django / etc.）
+4. データベース種類は？（PostgreSQL / MySQL / MongoDB / etc.）
+5. 認証システムは？（Supabase Auth / NextAuth / Auth0 / カスタム）
+6. ストレージ必要？（Supabase Storage / S3 / Cloudinary / 不要）
+7. チーム規模は？（個人 / 2-5人 / 6人以上）
+8. 予算は？（無料枠のみ / $10-50/月 / $50以上）
+
+**Output**:
+- 推奨技術スタック構成図
+- プラットフォーム推奨（Vercel / Railway / Render / etc.）
+- コスト見積もり
+- `project_requirements.md` 生成
+
+### 0.2 インフラ構成決定
+
+**エージェント**: `infra-validator`
+
+```bash
+Task:infra-validator(prompt: "Phase 0.1の技術スタックに基づいてインフラ構成を決定")
+```
+
+**エージェントが自動判断**:
+- Docker使用有無（チーム規模・デプロイ先から判断）
+- ブランチ戦略（Pattern A: staging有 / Pattern B: 本番のみ）
+- CI/CD構成（GitHub Actions / GitLab CI / etc.）
+- モニタリング構成（Sentry / DataDog / etc.）
+
+**Output**:
+- インフラ構成図
+- デプロイ戦略
+- `infrastructure_plan.md` 生成
+
+### 0.3 プロジェクト初期ファイル自動生成
+
+**エージェント**: `deploy-manager`
+
+```bash
+Task:deploy-manager(prompt: "Phase 0で決定した構成に基づいてプロジェクト初期ファイルを生成")
+```
+
+**自動生成されるファイル**:
+- `.env.example` - 技術スタック特化の環境変数テンプレート
+- `Dockerfile.frontend` - 選択したフロントエンドフレームワーク用（Docker使用時）
+- `Dockerfile.backend` - 選択したバックエンドフレームワーク用（Docker使用時）
+- `docker-compose.yml` - ローカル開発環境用（Docker使用時）
+- `.dockerignore` - Docker除外設定（Docker使用時）
+- `.github/workflows/ci.yml` - CI設定（Lint/Test/Build）
+- `.github/workflows/deploy-*.yml` - CD設定（選択したプラットフォーム用）
+- `.gitignore` - Git除外設定
+- `CLAUDE.md` - プロジェクト固有のClaude Code設定（プレースホルダー置換済み）
+- `README.md` - プロジェクト概要・セットアップガイド
+
+**例（Next.js + FastAPI + PostgreSQL + Docker + Vercel）**:
+```bash
+# 生成される構成
+frontend/
+├── Dockerfile              # Next.js最適化済み
+├── package.json            # Next.js 14 + TailwindCSS
+└── .env.example            # NEXT_PUBLIC_* 環境変数
+
+backend/
+├── Dockerfile              # FastAPI最適化済み
+├── requirements.txt        # FastAPI + Supabase依存関係
+└── .env.example            # DATABASE_URL, SECRET_KEY等
+
+docker-compose.yml          # frontend + backend + postgres
+.github/workflows/
+├── ci.yml                  # ESLint + pytest + Security Scan
+├── deploy-vercel.yml       # Vercel自動デプロイ
+└── deploy-railway.yml      # Railway自動デプロイ（バックエンド）
+```
+
+---
+
 ## Phase 1: アーキテクチャ設計（Architecture Design）
 
 ### 1.1 プロジェクト構想

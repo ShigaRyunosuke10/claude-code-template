@@ -4,238 +4,136 @@
 
 ---
 
-## Phase 1: デプロイ先決定（プロジェクト開始時・必須）
+## Phase 0: デプロイ要件定義（プロジェクト開始時・必須）
 
-### Step 1: 要件に基づくプラットフォーム選択
+### 0.1 デプロイ要件定義
 
-**質問リスト**:
-1. フロントエンド・バックエンド構成は？
-2. データベースは必要か？
-3. 予算は？（無料枠 / 有料）
-4. スケール予定は？
-5. チーム開発 or 個人開発？
+**エージェント**: `infra-validator`
 
-### Step 2: プラットフォーム別推奨
-
-#### Option A: Vercel + Supabase（推奨・個人/小規模チーム）
-**適用例**:
-- Next.js + FastAPI/Express
-- PostgreSQL必要
-- 無料枠で開始したい
-
-**メリット**:
-- ✅ 無料枠が充実
-- ✅ 自動デプロイ（GitHubプッシュで即反映）
-- ✅ セットアップ簡単
-
-**デメリット**:
-- ⚠️ バックエンドは別途デプロイ必要（Railway/Renderなど）
-
-**構成**:
-```
-Frontend: Vercel
-Backend: Railway or Render
-Database: Supabase（PostgreSQL）
-```
-
----
-
-#### Option B: Railway（推奨・フルスタック）
-**適用例**:
-- フロントエンド + バックエンド + DB 一括管理
-- Docker対応
-- シンプルな構成
-
-**メリット**:
-- ✅ フルスタック対応（1プラットフォームで完結）
-- ✅ Docker対応
-- ✅ 自動デプロイ
-
-**デメリット**:
-- ⚠️ 無料枠が少ない（$5/月〜）
-
-**構成**:
-```
-Frontend + Backend + Database: すべてRailway
-```
-
----
-
-#### Option C: Render（推奨・バランス型）
-**適用例**:
-- Railway同様のフルスタック
-- 無料枠重視
-
-**メリット**:
-- ✅ 無料枠あり
-- ✅ フルスタック対応
-- ✅ 自動デプロイ
-
-**デメリット**:
-- ⚠️ 無料枠はスリープあり（アクセスがないと停止）
-
-**構成**:
-```
-Frontend + Backend + Database: すべてRender
-```
-
----
-
-#### Option D: AWS/GCP/Azure（大規模/エンタープライズ）
-**適用例**:
-- 大規模サービス
-- 高度なインフラ要件
-- 予算が潤沢
-
-**メリット**:
-- ✅ スケーラビリティ無限
-- ✅ あらゆる要件に対応
-
-**デメリット**:
-- ⚠️ セットアップ複雑
-- ⚠️ コスト高い
-- ⚠️ インフラ知識必須
-
-**構成**:
-```
-テンプレートでは対象外（プロジェクト固有設定が必要）
-```
-
----
-
-## Phase 2: デプロイ環境構成
-
-### Pattern A: ステージング + 本番（チーム開発推奨）
-
-**ブランチ戦略**:
-```
-main ブランチ        → 本番環境（example.com）
-develop ブランチ     → ステージング環境（staging.example.com）
-feature/* ブランチ   → ローカル開発のみ
-```
-
-**フロー**:
-```
-1. feature/* で開発
-2. develop へPR → マージ → ステージング自動デプロイ
-3. ステージングで検証
-4. main へPR → マージ → 本番自動デプロイ
-```
-
-**コスト**:
-- インフラ費用: 2倍（staging + production）
-- メリット: 本番でのバグリスク最小
-
----
-
-### Pattern B: 本番のみ（個人開発推奨）
-
-**ブランチ戦略**:
-```
-main ブランチ        → 本番環境（example.com）
-feature/* ブランチ   → ローカル開発のみ
-```
-
-**フロー**:
-```
-1. feature/* で開発
-2. main へPR → マージ → 本番自動デプロイ
-```
-
-**コスト**:
-- インフラ費用: 最小
-- メリット: シンプル・高速デプロイ
-
----
-
-## Phase 3: デプロイ実装
-
-### Step 1: インフラ設定
-
-**エージェント使用**:
 ```bash
-Task:infra-validator(prompt: "{{PLATFORM}}のインフラ設定を検証")
+Task:infra-validator(prompt: "デプロイ要件定義を支援")
+```
+
+**エージェントが対話形式で質問**:
+1. 現在の技術スタックは？（フロントエンド / バックエンド / DB）
+2. 予算は？（無料枠のみ / $10-50/月 / $50以上）
+3. トラフィック予測は？（低: 〜1000 req/day / 中: 〜10k / 高: 10k〜）
+4. チーム規模は？（個人 / 2-5人 / 6人以上）
+5. Docker使用希望は？（エージェントが推奨も提示）
+6. SLA要件は？（スリープ許容 / 常時稼働必須）
+
+**エージェントが自動判断・推奨**:
+- 最適デプロイプラットフォーム（Vercel / Railway / Render / AWS / etc.）
+- ブランチ戦略（Pattern A: staging有 / Pattern B: 本番のみ）
+- Docker使用有無
+- CI/CD構成
+- コスト見積もり
+
+**Output**:
+- 推奨デプロイ構成図
+- プラットフォーム比較表（コスト・機能・制約）
+- `deployment_plan.md` 生成
+
+**判断ロジック例**:
+```markdown
+# エージェントの推奨ロジック
+
+## 無料枠のみ + Next.js + PostgreSQL + 個人開発
+→ Vercel（frontend） + Supabase（DB） + Render（backend・無料枠）
+→ Pattern B（本番のみ）
+→ Docker不要
+
+## 低予算（$20/月） + フルスタック + チーム開発
+→ Railway（frontend + backend + DB）
+→ Pattern A（staging + production）
+→ Docker推奨
+
+## 大規模・高トラフィック + エンタープライズ
+→ AWS/GCP（カスタム構成必要）
+→ Pattern A + Preview環境
+→ Docker + Kubernetes
+```
+
+### 0.2 デプロイ設定自動生成
+
+**エージェント**: `deploy-manager`
+
+```bash
+Task:deploy-manager(prompt: "Phase 0.1のデプロイ計画に基づいて設定ファイルを生成")
+```
+
+**自動生成されるファイル**:
+- `.env.production.example` - 本番環境変数テンプレート
+- `.env.staging.example` - ステージング環境変数テンプレート（Pattern A時）
+- `Dockerfile.production` - 本番用Dockerfile（Docker使用時）
+- `docker-compose.prod.yml` - 本番用Docker Compose（Docker使用時）
+- `.github/workflows/deploy-*.yml` - 選択したプラットフォーム用CI/CD設定
+- `vercel.json` - Vercel設定（Vercel使用時）
+- `railway.json` - Railway設定（Railway使用時）
+- `render.yaml` - Render設定（Render使用時）
+- `DEPLOYMENT.md` - デプロイ手順書
+
+**例（Vercel + Supabase + Render + Pattern B）**:
+```bash
+# 生成される構成
+.env.production.example     # 本番環境変数
+.github/workflows/
+├── deploy-vercel.yml       # フロントエンド自動デプロイ
+└── deploy-render.yml       # バックエンド自動デプロイ
+vercel.json                 # Vercel最適化設定
+render.yaml                 # Render設定
+DEPLOYMENT.md               # 初回デプロイ手順書
+```
+
+---
+
+## Phase 1: 環境変数・シークレット設定
+
+**エージェント**: `infra-validator`
+
+```bash
+Task:infra-validator(prompt: "Phase 0で選択したプラットフォームの環境変数設定を検証")
 ```
 
 **実行内容**:
-- プラットフォーム固有の設定ファイル作成
-- 環境変数テンプレート作成
-- デプロイスクリプト検証
+- 必須環境変数の欠落チェック
+- プラットフォーム別設定手順書生成（CLI or ダッシュボード）
+- セキュリティチェック（APIキー・シークレットが環境変数管理されているか）
+
+**Output**:
+- 環境変数設定手順書
+- GitHub Secrets設定手順書
 
 ---
 
-### Step 2: CI/CD設定
+## Phase 2: 初回デプロイ
 
-**GitHub Actions テンプレート選択**:
+**エージェント**: `deploy-manager`
 
-#### Vercel の場合
 ```bash
-# .github/workflows/deploy-vercel.yml を使用
-# 自動生成: Task:deploy-manager(prompt: "Vercel用CI/CD設定")
+Task:deploy-manager(prompt: "初回デプロイ実行")
 ```
 
-#### Railway の場合
-```bash
-# .github/workflows/deploy-railway.yml を使用
-# 自動生成: Task:deploy-manager(prompt: "Railway用CI/CD設定")
-```
+**実行内容**:
+1. デプロイ前最終チェック（`infra-validator`を呼び出し）
+2. プラットフォーム固有のデプロイコマンド実行
+3. ヘルスチェック実行
+4. デプロイ検証レポート生成
 
-#### Render の場合
-```bash
-# .github/workflows/deploy-render.yml を使用
-# 自動生成: Task:deploy-manager(prompt: "Render用CI/CD設定")
-```
+**Output**:
+- デプロイ成功 / 失敗レポート
+- ヘルスチェック結果
+- トラブルシューティングガイド（失敗時）
 
 ---
 
-### Step 3: 初回デプロイ
+## Phase 3: 継続的デプロイ
 
-**手順**:
+### 自動デプロイフロー
+
+**Phase 0で生成されたGitHub Actionsが自動実行**:
 ```bash
-1. インフラ設定完了確認
-   Task:infra-validator(prompt: "デプロイ前最終チェック")
-
-2. 環境変数設定
-   - プラットフォームのダッシュボードで設定
-   - .env.example をガイドとして使用
-
-3. 初回デプロイ実行
-   Task:deploy-manager(prompt: "初回デプロイ実行")
-
-4. デプロイ検証
-   - ヘルスチェックURL確認
-   - E2Eテスト実行（本番環境）
-```
-
----
-
-## Phase 4: 継続的デプロイ
-
-### 通常デプロイフロー
-
-**Pattern A（ステージング有）**:
-```bash
-# Step 1: feature → develop
-git checkout -b feature-new-function
-# 開発...
-git add .
-git commit -m "feat: new function"
-git push origin feature-new-function
-
-# PR作成 → develop へマージ
-# → ステージング環境に自動デプロイ
-
-# Step 2: ステージング検証
-# E2Eテスト実行、動作確認
-
-# Step 3: develop → main
-# PR作成 → main へマージ
-# → 本番環境に自動デプロイ
-```
-
-**Pattern B（本番のみ）**:
-```bash
-# Step 1: feature → main
+# 開発フロー
 git checkout -b feature-new-function
 # 開発...
 git add .
@@ -243,60 +141,46 @@ git commit -m "feat: new function"
 git push origin feature-new-function
 
 # PR作成 → main へマージ
-# → 本番環境に自動デプロイ
+# → GitHub Actions が自動デプロイ実行
+# → ヘルスチェック自動実行
+# → デプロイ成功通知（Slack/Discord等）
 ```
+
+**ブランチ戦略はPhase 0で決定済み**:
+- Pattern A（staging有）: develop → staging, main → production
+- Pattern B（本番のみ）: main → production
 
 ---
 
-### ロールバック手順
+## Phase 4: ロールバック・モニタリング
 
-**緊急時のロールバック**:
+### 4.1 ロールバック
+
+**エージェント**: `deploy-manager`
+
 ```bash
-# Method 1: Git revert（推奨）
-git revert HEAD
-git push origin main
-# → 前のバージョンに自動デプロイ
-
-# Method 2: プラットフォームUI
-# Vercel/Railway/Render のダッシュボードから
-# 前のデプロイバージョンを選択してロールバック
-
-# Method 3: エージェント使用
 Task:deploy-manager(prompt: "前バージョンへロールバック")
 ```
 
----
+**実行内容**:
+- Git revert実行
+- 自動デプロイトリガー
+- ヘルスチェック
+- ロールバック成功確認
 
-## Phase 5: モニタリング
+### 4.2 デプロイ後ヘルスチェック
 
-### デプロイ後チェックリスト
+**エージェント**: `deploy-manager`
 
-**必須確認項目**:
-- [ ] ヘルスチェックURL（`/health`）が200を返す
-- [ ] フロントエンドが正常表示
-- [ ] 主要APIエンドポイントが動作
-- [ ] データベース接続OK
-- [ ] 環境変数が正しく設定されている
-
-**エージェント使用**:
 ```bash
 Task:deploy-manager(prompt: "デプロイ後ヘルスチェック実行")
 ```
 
----
-
-## エージェント一覧
-
-### deploy-manager
-- デプロイ実行
-- ロールバック
-- ヘルスチェック
-- CI/CD設定生成
-
-### infra-validator
-- インフラ設定検証
-- 環境変数チェック
-- セキュリティスキャン（本番環境用）
+**チェック項目**:
+- ヘルスチェックエンドポイント（/health）
+- 主要機能動作確認
+- データベース接続確認
+- 環境変数設定確認
 
 ---
 
@@ -304,39 +188,41 @@ Task:deploy-manager(prompt: "デプロイ後ヘルスチェック実行")
 
 ### デプロイ失敗時
 
-**Step 1: ログ確認**
-```bash
-# プラットフォームのログを確認
-# Vercel: Vercel Dashboard → Deployments → Logs
-# Railway: Railway Dashboard → Deployments → Logs
-# Render: Render Dashboard → Logs
-```
+**エージェント**: `deploy-manager`
 
-**Step 2: ローカルで再現**
-```bash
-# 本番環境と同じ環境変数でローカル起動
-# エラーを再現して修正
-```
-
-**Step 3: エージェント支援**
 ```bash
 Task:deploy-manager(prompt: "デプロイエラー解析: {{ERROR_MESSAGE}}")
 ```
+
+**エージェントが実行**:
+1. プラットフォームログ解析
+2. エラー原因特定
+3. 修正提案
+4. ローカル再現手順生成
+
+---
+
+## エージェント連携
+
+### infra-validator（要件定義・検証）
+- Phase 0: デプロイ要件定義・プラットフォーム推奨
+- Phase 1: 環境変数検証・セキュリティチェック
+
+### deploy-manager（実行・管理）
+- Phase 0: 設定ファイル自動生成
+- Phase 2: 初回デプロイ実行
+- Phase 3: 継続的デプロイ管理
+- Phase 4: ロールバック・ヘルスチェック・トラブルシューティング
 
 ---
 
 ## ベストプラクティス
 
-### 環境変数管理
-- ✅ `.env.example` をリポジトリにコミット
-- ✅ 実際の `.env` は `.gitignore` で除外
-- ✅ 本番環境の環境変数はプラットフォームのダッシュボードで管理
-- ❌ 環境変数をコードにハードコードしない
-
-### デプロイタイミング
-- ✅ 営業時間外にデプロイ（トラブル対応可能な時間帯）
-- ✅ 金曜夜は避ける（週末にトラブル対応したくない）
-- ✅ 大きな変更前にバックアップ
+### エージェント動的生成の利点
+- ✅ テンプレートファイル不要（メンテナンス負荷ゼロ）
+- ✅ あらゆるプラットフォームに対応可能
+- ✅ 最新ベストプラクティスを自動適用
+- ✅ プロジェクト固有要件に柔軟対応
 
 ### セキュリティ
 - ✅ HTTPS必須
