@@ -59,69 +59,38 @@ sed -i 's/{{BACKEND_PORT}}/8000/g' CLAUDE.md
 (Get-Content CLAUDE.md) -replace '{{BACKEND_PORT}}', '8000' | Set-Content CLAUDE.md
 ```
 
-### Step 3: プロジェクト固有の設定を追加（必要に応じて）
+### Step 3: プロジェクト固有ディレクトリ作成
 
-#### 3.1 MCPサーバー追加（オプション）
+プロジェクト固有の機能・ルール・ワークフローを管理するためのディレクトリを作成します。
 
-プロジェクト固有のMCPサーバー（例: Supabase, Firebase等）を [.mcp.json](./.mcp.json) に追加します。
+```bash
+# プロジェクト固有ディレクトリ作成
+mkdir -p .claude/project/{agents,workflows,commands,rules}
+mkdir -p ai-rules-project
 
-```json
-{
-  "mcpServers": {
-    "context7": { ... },
-    "playwright": { ... },
-    "github": { ... },
-    "desktop-commander": { ... },
-    "serena": { ... },
-    // ↓ 新規追加
-    "supabase": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--access-token",
-        "${SUPABASE_ACCESS_TOKEN}",
-        "--project-ref",
-        "${SUPABASE_PROJECT_REF}"
-      ]
-    }
-  }
-}
+# .gitkeep 作成（空ディレクトリをGit管理）
+touch .claude/project/agents/.gitkeep
+touch .claude/project/workflows/.gitkeep
+touch .claude/project/commands/.gitkeep
+touch .claude/project/rules/.gitkeep
+touch ai-rules-project/.gitkeep
 ```
 
-#### 3.2 開発環境セクションを追加（オプション）
-
-[CLAUDE.md](./CLAUDE.md) に以下のセクションを追加します（基本設定の後）:
-
-```markdown
-## 開発環境
-
-### 必須ツール
-- **Node.js**: v18.x以上
-- **Python**: 3.13.x
-- **Docker**: 20.x以上
-- **PostgreSQL**: 14.x（Supabase）
-
-### ローカル起動
-\```bash
-# バックエンド（Docker）
-docker-compose up -d
-
-# フロントエンド
-cd frontend
-npm install
-npm run dev
-
-# アクセス
-# - フロントエンド: http://localhost:{{FRONTEND_PORT}}
-# - バックエンド: http://localhost:{{BACKEND_PORT}}
-# - API Docs: http://localhost:{{BACKEND_PORT}}/docs
-\```
-
-### テストユーザー
-- Email: test@example.com
-- Password: TestPassword123!
+**ディレクトリ構造**:
+```
+my-project/
+├── .claude/
+│   ├── agents/          # テンプレート（14体）- 変更禁止
+│   ├── workflows/       # テンプレート（Case A/B/C）- 変更禁止
+│   ├── commands/        # テンプレート - 変更禁止
+│   └── project/         # ★ プロジェクト固有
+│       ├── agents/      # プロジェクト固有エージェント
+│       ├── workflows/   # プロジェクト固有ワークフロー
+│       ├── commands/    # プロジェクト固有コマンド
+│       └── rules/       # プロジェクト固有ルール
+│
+├── ai-rules/            # テンプレート - 変更禁止
+└── ai-rules-project/    # ★ プロジェクト固有ルール
 ```
 
 ### Step 4: Git初期化
@@ -243,6 +212,98 @@ Task:deployment-agent(prompt: "デプロイ後ヘルスチェック実行")
 
 # トラブル時: ロールバック
 Task:deployment-agent(prompt: "前バージョンへロールバック")
+```
+
+---
+
+## 📝 プロジェクト固有設定の追加方法
+
+テンプレートを使い始めた後、プロジェクト特有の機能・ルール・ワークフローを追加する方法。
+
+詳細: [CLAUDE.md](./CLAUDE.md) の「プロジェクト固有設定」セクション
+
+### 1. プロジェクト固有エージェントの追加
+
+**使用例**: 決済処理専用エージェントを追加する場合
+
+```bash
+# ファイル作成
+touch .claude/project/agents/payment-processor.md
+```
+
+**ファイル内容** (`.claude/project/agents/payment-processor.md`):
+```markdown
+# payment-processor
+
+決済処理専用エージェント
+
+## 責任
+- Stripe API連携
+- 決済ログ記録
+- 決済エラーハンドリング
+
+## 使用タイミング
+- 決済機能の実装・変更時
+
+## 呼び出し方法
+\`\`\`bash
+Task:payment-processor(prompt: "Stripe決済フローの実装")
+\`\`\`
+```
+
+**CLAUDE.md更新**（「プロジェクト固有設定」セクション）:
+```markdown
+### プロジェクト固有エージェント
+
+- **payment-processor** - 決済処理専用エージェント
+  - 詳細: [.claude/project/agents/payment-processor.md](./.claude/project/agents/payment-processor.md)
+  - 責任: Stripe API連携、決済ログ記録
+```
+
+### 2. プロジェクト固有ワークフローの追加
+
+**使用例**: 決済フローを追加する場合
+
+```bash
+# ファイル作成
+touch .claude/project/workflows/payment-flow.md
+```
+
+**CLAUDE.md更新**:
+```markdown
+### プロジェクト固有ワークフロー
+
+- **決済フロー** - Stripe連携の標準ワークフロー
+  - 詳細: [.claude/project/workflows/payment-flow.md](./.claude/project/workflows/payment-flow.md)
+  - 使用タイミング: 決済機能の追加・変更時
+```
+
+### 3. 不要なテンプレート機能の明記
+
+**CLAUDE.md更新**:
+```markdown
+### 不要なテンプレート機能（このプロジェクトでは使用しない）
+
+- ❌ **deployment-agent** - デプロイは手動運用のため不使用
+- ❌ **Case C ワークフロー** - デプロイワークフロー不使用
+```
+
+**重要**:
+- テンプレートファイル（`.claude/agents/`, `.claude/workflows/`, `ai-rules/`）は**絶対に削除・変更しない**
+- 不要な機能はCLAUDE.mdに明記するだけ
+
+### 4. プロジェクト固有の削除
+
+プロジェクト固有機能が不要になった場合:
+
+```bash
+# ファイル削除
+rm .claude/project/agents/payment-processor.md
+
+# CLAUDE.md から該当箇所を削除
+
+# Git commit
+git commit -m "chore: payment-processor削除（決済機能廃止のため）"
 ```
 
 ---

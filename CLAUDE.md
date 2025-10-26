@@ -102,6 +102,86 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 
 ---
 
+## ★ プロジェクト固有設定
+
+このプロジェクト特有の機能・ルール・ワークフローを管理します。
+
+詳細: [ai-rules/PROJECT_CUSTOMIZATION.md](./ai-rules/PROJECT_CUSTOMIZATION.md)
+
+### 参照の優先順位
+
+1. **プロジェクト固有** → `.claude/project/`, `ai-rules-project/`
+2. **テンプレート（共通）** → `.claude/`, `ai-rules/`
+
+### 編集方針
+
+**複数ファイル持てる場合**（エージェント、ワークフロー、ルール等）:
+- テンプレートは変更禁止
+- プロジェクト固有は `.claude/project/` または `ai-rules-project/` に配置
+
+**一つしか持てないファイル**（設定ファイル等）:
+- 直接編集OK
+- 例: `.mcp.json`, `CLAUDE.md`, `.claude/settings.json`, `.gitignore`
+
+### プロジェクト固有エージェント
+
+現在登録なし。プロジェクト固有のエージェントが必要な場合は `.claude/project/agents/` に追加してください。
+
+**例**:
+```markdown
+- **payment-processor** - 決済処理専用エージェント
+  - 詳細: [.claude/project/agents/payment-processor.md](./.claude/project/agents/payment-processor.md)
+  - 責任: Stripe API連携、決済ログ記録
+```
+
+### プロジェクト固有ワークフロー
+
+現在登録なし。プロジェクト固有のワークフローが必要な場合は `.claude/project/workflows/` に追加してください。
+
+**例**:
+```markdown
+- **決済フロー** - Stripe連携の標準ワークフロー
+  - 詳細: [.claude/project/workflows/payment-flow.md](./.claude/project/workflows/payment-flow.md)
+  - 使用タイミング: 決済機能の追加・変更時
+```
+
+### プロジェクト固有コマンド
+
+現在登録なし。プロジェクト固有のコマンドが必要な場合は `.claude/project/commands/` に追加してください。
+
+**例**:
+```markdown
+- **/payment-check** - 決済データ整合性チェック
+  - 詳細: [.claude/project/commands/payment-check.md](./.claude/project/commands/payment-check.md)
+```
+
+### プロジェクト固有ルール
+
+現在登録なし。プロジェクト固有のルールが必要な場合は `.claude/project/rules/` または `ai-rules-project/` に追加してください。
+
+**例**:
+```markdown
+- **決済セキュリティルール** - PCI DSS準拠
+  - 詳細: [.claude/project/rules/PAYMENT_RULES.md](./.claude/project/rules/PAYMENT_RULES.md)
+- **カスタム開発規約**
+  - 詳細: [ai-rules-project/CUSTOM_CONVENTIONS.md](./ai-rules-project/CUSTOM_CONVENTIONS.md)
+```
+
+### 不要なテンプレート機能（このプロジェクトでは使用しない）
+
+現在登録なし。使用しないテンプレート機能があれば明記してください（ファイルは削除せず無視）。
+
+**例**:
+```markdown
+- ❌ **deployment-agent** - デプロイは手動運用のため不使用
+- ❌ **Case C ワークフロー** - デプロイワークフロー不使用
+- ❌ **playwright-test-*** - E2Eテストは別ツール使用
+```
+
+**重要**: テンプレートファイル（`.claude/agents/`, `.claude/workflows/`, `ai-rules/`）は**絶対に削除・変更しない**でください。
+
+---
+
 ## ドキュメント構造
 
 ### 開発プロセス

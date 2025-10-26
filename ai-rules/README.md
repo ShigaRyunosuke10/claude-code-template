@@ -12,7 +12,8 @@ ai-rules/
 ├── WORKFLOW.md                 # 開発フロー詳細
 ├── REQUIREMENTS_CHANGE.md      # 要件変更フロー
 ├── SESSION_COMPLETION.md       # セッション完了手順
-└── CONVENTIONS.md              # 命名規則・コミット規約
+├── CONVENTIONS.md              # 命名規則・コミット規約
+└── PROJECT_CUSTOMIZATION.md    # プロジェクト固有設定管理ガイド
 ```
 
 ---
@@ -90,6 +91,7 @@ git checkout -b <type>-<機能名>
 - [REQUIREMENTS_CHANGE.md](./REQUIREMENTS_CHANGE.md) - 要件変更フロー（開発途中の機能追加・仕様変更）
 - [SESSION_COMPLETION.md](./SESSION_COMPLETION.md) - セッション完了手順（Serenaメモリ・Git・PR）
 - [CONVENTIONS.md](./CONVENTIONS.md) - 命名規則・コミット規約
+- [PROJECT_CUSTOMIZATION.md](./PROJECT_CUSTOMIZATION.md) - プロジェクト固有設定管理ガイド（テンプレートとの分離方法）
 
 ### ツール設定
 - [../.claude/settings.json](../.claude/settings.json) - Permissions & Hooks
