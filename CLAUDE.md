@@ -11,9 +11,9 @@
 
 ## セッション開始フロー（必須）
 
-### 0. ワークフロー選択
+### 0. ワークフロー選択と要件定義
 
-**Case A: 既存プロジェクト機能拡張**
+#### Case A: 既存プロジェクト機能拡張
 - テンプレート: [.claude/workflows/case-a-existing-project.md](./.claude/workflows/case-a-existing-project.md)
 - 詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
 
@@ -23,6 +23,78 @@
 **Case C: デプロイ**
 - テンプレート: [.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md)
 - 詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
+
+**重要**: 各Caseで、ワークフローファイルを読む前に、あなた（メインClaude Agent）が要件ヒアリングを実施してください。
+
+---
+
+#### Case A: 要件ヒアリング手順
+
+ユーザーに以下を質問してください:
+1. 追加したい機能は何ですか？（具体的に）
+2. 想定ユーザーは誰ですか？（管理者/一般ユーザー/etc.）
+3. 既存機能との関連は？（独立/既存機能拡張）
+4. 優先度は？（高/中/低）
+5. 期限はありますか？
+
+回答を `planner` エージェントに渡して計画立案を依頼します。
+
+---
+
+#### Case B: 要件ヒアリング手順
+
+**Phase 0: 技術スタック・インフラ要件定義**
+
+ユーザーに以下を順番に質問してください:
+1. プロジェクトの目的・概要は？
+2. フロントエンドフレームワーク希望は？（Next.js / React / Vue / etc.）
+3. バックエンドフレームワーク希望は？（FastAPI / Express / Django / etc.）
+4. データベース種類は？（PostgreSQL / MySQL / MongoDB / etc.）
+5. 認証システムは？（Supabase Auth / NextAuth / Auth0 / カスタム）
+6. ストレージ必要？（Supabase Storage / S3 / Cloudinary / 不要）
+7. チーム規模は？（個人 / 2-5人 / 6人以上）
+8. 予算は？（無料枠のみ / $10-50/月 / $50以上）
+
+回答を `deployment-agent` に渡して推奨構成を取得:
+```bash
+Task:deployment-agent(prompt: "以下の要件に基づいてデプロイ構成を推奨してください
+- フロントエンド: {回答2}
+- バックエンド: {回答3}
+- データベース: {回答4}
+- 認証: {回答5}
+- ストレージ: {回答6}
+- チーム規模: {回答7}
+- 予算: {回答8}
+")
+```
+
+---
+
+#### Case C: 要件ヒアリング手順
+
+**Phase 0: デプロイ要件定義**
+
+ユーザーに以下を順番に質問してください:
+1. 現在の技術スタックは？（フロントエンド / バックエンド / DB）
+2. 予算は？（無料枠のみ / $10-50/月 / $50以上）
+3. トラフィック予測は？（低: 〜1000 req/day / 中: 〜10k / 高: 10k〜）
+4. チーム規模は？（個人 / 2-5人 / 6人以上）
+5. Docker使用希望は？（Yes / No / おまかせ）
+6. SLA要件は？（スリープ許容 / 常時稼働必須）
+
+回答を `deployment-agent` に渡して推奨構成を取得:
+```bash
+Task:deployment-agent(prompt: "以下の要件に基づいてデプロイ構成を推奨してください
+- 技術スタック: {回答1}
+- 予算: {回答2}
+- トラフィック: {回答3}
+- チーム規模: {回答4}
+- Docker: {回答5}
+- SLA: {回答6}
+")
+```
+
+---
 
 ### 1. 計画フェーズ（実装前・必須）
 
@@ -57,16 +129,14 @@ git checkout -b <type>-<機能名>
 
 ## エージェント一覧
 
-### 汎用エージェント（横断的・16体）
+### 汎用エージェント（横断的・14体）
 
 #### 計画（Planning）
-- **project-planner** - マクロ計画立案（Epic分解・優先度設定）
-- **sub-planner** - ミクロ計画立案（タスク分解・DoD定義）
+- **planner** - 要件からEpic+詳細タスク+API契約を一括生成（project-planner + sub-planner統合）
 
 #### 実装（Implementation）
 - **impl-dev-frontend** - フロントエンド実装（React/Next.js/TypeScript）
 - **impl-dev-backend** - バックエンド実装（Python/FastAPI）
-- **integrator** - FE/BE整合性チェック（型定義同期）
 
 #### テスト（Testing）
 - **qa-unit** - ユニットテスト作成（pytest/Jest）
@@ -75,8 +145,9 @@ git checkout -b <type>-<機能名>
 #### 品質保証（Quality Assurance）
 - **lint-fix** - Lint/フォーマット（ESLint/Prettier/Black/Ruff）
 - **sec-scan** - セキュリティスキャン（脆弱性検出・レポート作成）
-- **code-reviewer** - AI設計レビュー（アーキテクチャ・ロジック・パフォーマンス）
+- **code-reviewer** - AI設計レビュー（アーキテクチャ・ロジック・パフォーマンス・型定義整合性）
   - 自動修正: Critical (10回, 7回目で相談), High (3回), Medium (1回)
+  - FE/BE型定義整合性チェック（旧integrator機能を統合）
   - 未解決問題: [reports/technical-debt.md](./reports/technical-debt.md) 自動記録
 
 #### Playwright専用（E2Eテスト）
@@ -103,8 +174,8 @@ Task:playwright-test-healer(prompt: "Phase 2 Conservative Healing実行")
 - **release-manager** - CHANGELOG/タグ生成・リリースノート作成
 
 #### デプロイ（Deployment）
-- **deploy-manager** - デプロイ実行・ロールバック・ヘルスチェック
-- **infra-validator** - インフラ設定検証・セキュリティチェック
+- **deployment-agent** - デプロイ全般（要件定義→推奨→ファイル生成→デプロイ実行→検証）
+  - deploy-manager + infra-validator統合
 
 #### プロジェクト固有スラッシュコマンド
 - **/docs-sync** - ドキュメント同期（Serenaメモリ → 公式Docs）
@@ -113,14 +184,26 @@ Task:playwright-test-healer(prompt: "Phase 2 Conservative Healing実行")
 ### エージェント使用例（Case A: 機能追加）
 
 ```bash
+# Phase 0: 要件ヒアリング（あなたが実行）
+# 1. 追加したい機能は何ですか？→ ユーザーロール管理機能
+# 2. 想定ユーザーは誰ですか？→ 管理者
+# 3. 既存機能との関連は？→ 既存ユーザー管理の拡張
+# 4. 優先度は？→ 高
+# 5. 期限はありますか？→ 2週間後
+
 # Phase 1: Planning
-Task:project-planner(prompt: "ユーザーロール管理機能を追加")
-Task:sub-planner(prompt: "epic-user-role-management.mdのタスク詳細化")
+Task:planner(prompt: "以下の要件に基づいて計画を立ててください
+- 機能: ユーザーロール管理機能
+- 想定ユーザー: 管理者
+- 既存機能との関連: 既存ユーザー管理の拡張
+- 優先度: 高
+- 期限: 2週間後
+")
 
 # Phase 2: Implementation
 Task:impl-dev-backend(prompt: "ユーザーロールAPI実装")
 Task:impl-dev-frontend(prompt: "ユーザーロール表示UI実装")
-Task:integrator(prompt: "ユーザーロールAPIの整合性チェック")
+# Phase 2.3: FE/BE整合性チェックは code-reviewer が自動実行
 
 # Phase 3: Testing
 Task:qa-unit(prompt: "get_user_role関数のユニットテスト作成")

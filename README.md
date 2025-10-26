@@ -12,9 +12,9 @@
 このテンプレートは、Claude Code（エージェントベース開発環境）を使った新規プロジェクト開発のスタートポイントです。
 
 **含まれる設定**:
-- ✅ **14体の汎用エージェント** - 計画、実装、テスト、品質保証、リリース
+- ✅ **14体の汎用エージェント** - 計画、実装、テスト、品質保証、デプロイ、リリース
 - ✅ **Phase Rollout System** - AI自律E2Eテストシステム（3段階デプロイ）
-- ✅ **ワークフローテンプレート** - Case A（機能拡張）/ Case B（新規立ち上げ）
+- ✅ **ワークフローテンプレート** - Case A（機能拡張）/ Case B（新規立ち上げ）/ Case C（デプロイ）
 - ✅ **5つの横断的MCPサーバー** - GitHub, Serena, Playwright, Desktop Commander, Context7
 - ✅ **Permissions & Hooks** - 安全な開発環境
 - ✅ **AI開発ルール** - 命名規則、コミット規約、開発フロー
@@ -161,14 +161,21 @@ git push -u origin main
 
 ```bash
 # Claude Codeで以下のフローを実行
-Task:project-planner(prompt: "新機能の計画立案")
-Task:sub-planner(prompt: "タスク詳細化")
+# Phase 0: 要件ヒアリング（メインClaude Agentが実行）
+
+# Phase 1: Planning
+Task:planner(prompt: "新機能の計画立案 + タスク詳細化")
+
+# Phase 2: Implementation
 Task:impl-dev-backend(prompt: "バックエンド実装")
 Task:impl-dev-frontend(prompt: "フロントエンド実装")
-Task:integrator(prompt: "整合性チェック")
+
+# Phase 3: Testing
 Task:qa-unit(prompt: "ユニットテスト作成")
 Task:qa-integration(prompt: "統合テスト作成")
-/pre-commit-check
+
+# Phase 4: Quality Assurance
+/pre-commit-check  # lint-fix → sec-scan → code-reviewer (型定義整合性チェック含む)
 /docs-sync
 ```
 
@@ -178,8 +185,10 @@ Task:qa-integration(prompt: "統合テスト作成")
 
 ```bash
 # Claude Codeで以下のフローを実行
+# Phase 0: 要件ヒアリング（メインClaude Agentが実行）
+
 # Phase 1: アーキテクチャ設計
-Task:project-planner(prompt: "プロジェクト構想・技術スタック選定")
+Task:planner(prompt: "プロジェクト構想・技術スタック選定 + タスク詳細化")
 
 # Phase 2: プロジェクト初期化
 Task:impl-dev-backend(prompt: "バックエンド初期セットアップ")
@@ -188,18 +197,52 @@ Task:impl-dev-frontend(prompt: "フロントエンド初期セットアップ")
 # Phase 3: コア機能実装（認証システム優先）
 Task:impl-dev-backend(prompt: "認証API実装")
 Task:impl-dev-frontend(prompt: "認証UI実装")
-Task:integrator(prompt: "認証システム整合性チェック")
 
 # Phase 4: テスト基盤構築
 Task:qa-unit(prompt: "ユニットテスト基盤セットアップ")
 Task:qa-integration(prompt: "統合テスト基盤セットアップ")
 
-# Phase 5: ドキュメント整備
-mcp__serena__write_memory(memory_name: "project/project_overview.md", ...)
+# Phase 5: Quality Assurance
+/pre-commit-check  # lint-fix → sec-scan → code-reviewer (型定義整合性チェック含む)
+
+# Phase 6: ドキュメント整備
 /docs-sync
 
-# Phase 6: デプロイ基盤構築
-# Docker本番ビルド + CI/CD設定
+# Phase 7: デプロイ基盤構築
+Task:deployment-agent(prompt: "デプロイ構成推奨 + 設定ファイル生成 + 初回デプロイ")
+```
+
+### Case C: デプロイを実行する場合
+
+[.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md) を参照
+
+```bash
+# Claude Codeで以下のフローを実行
+# Phase 0: デプロイ要件定義（メインClaude Agentが実行）
+
+# Phase 1: プラットフォーム推奨・設定ファイル生成
+Task:deployment-agent(prompt: "以下の要件に基づいてデプロイ構成を推奨
+- フロントエンド: Next.js
+- バックエンド: FastAPI
+- データベース: PostgreSQL (Supabase)
+- チーム規模: 個人
+- 予算: 無料枠のみ
+")
+
+# Phase 2: デプロイ前検証
+Task:deployment-agent(prompt: "デプロイ前検証を実行")
+
+# Phase 3: 初回デプロイ
+Task:deployment-agent(prompt: "初回デプロイ実行")
+
+# Phase 4: ヘルスチェック
+Task:deployment-agent(prompt: "デプロイ後ヘルスチェック実行")
+
+# Phase 5: CI/CD設定（継続的デプロイ）
+# GitHub Actionsが自動実行（main ブランチへのpush時）
+
+# トラブル時: ロールバック
+Task:deployment-agent(prompt: "前バージョンへロールバック")
 ```
 
 ---
@@ -210,11 +253,9 @@ mcp__serena__write_memory(memory_name: "project/project_overview.md", ...)
 claude-code-template/
 ├── .claude/
 │   ├── agents/               # 14体のエージェント定義
-│   │   ├── project-planner.md
-│   │   ├── sub-planner.md
+│   │   ├── planner.md               # 統合: project-planner + sub-planner
 │   │   ├── impl-dev-frontend.md
 │   │   ├── impl-dev-backend.md
-│   │   ├── integrator.md
 │   │   ├── qa-unit.md
 │   │   ├── qa-integration.md
 │   │   ├── playwright-test-planner.md
@@ -222,9 +263,10 @@ claude-code-template/
 │   │   ├── playwright-test-healer.md
 │   │   ├── lint-fix.md
 │   │   ├── sec-scan.md
-│   │   ├── code-reviewer.md
+│   │   ├── code-reviewer.md         # 統合: integrator機能を含む
 │   │   ├── doc-writer.md
-│   │   └── release-manager.md
+│   │   ├── release-manager.md
+│   │   └── deployment-agent.md      # 統合: deploy-manager + infra-validator
 │   ├── commands/             # スラッシュコマンド
 │   │   ├── docs-sync.md
 │   │   ├── e2e-full.md
@@ -239,7 +281,8 @@ claude-code-template/
 │   │   └── switch-phase.sh
 │   ├── workflows/            # ワークフローテンプレート
 │   │   ├── case-a-existing-project.md
-│   │   └── case-b-new-project.md
+│   │   ├── case-b-new-project.md
+│   │   └── case-c-deployment.md
 │   └── settings.json         # Permissions & Hooks
 ├── ai-rules/
 │   ├── WORKFLOW.md           # 開発フロー詳細
