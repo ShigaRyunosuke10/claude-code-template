@@ -1,0 +1,50 @@
+# Railway Deployment Template
+#
+# Setup Instructions:
+# 1. Rename this file: deploy-railway.yml.template → deploy-railway.yml
+# 2. Add GitHub Secrets:
+#    - RAILWAY_TOKEN: Railway API token (https://railway.app/account/tokens)
+#    - RAILWAY_SERVICE: Railway service name or ID
+# 3. Adjust branch triggers as needed (main, develop, etc.)
+
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main          # Production deployment
+      # - develop     # Staging deployment (uncomment if using Pattern A)
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (if using Node.js)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway link ${{ secrets.RAILWAY_SERVICE }}
+          railway up
+
+      - name: Health Check
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+          curl -f https://{{YOUR_DOMAIN}}.railway.app/health || exit 1

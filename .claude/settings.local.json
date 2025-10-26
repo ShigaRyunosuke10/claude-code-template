@@ -33,7 +33,13 @@
       "Bash(Format-Table)",
       "Bash(awk:*)",
       "Bash(xargs:*)",
-      "Read(//c/Users/shiga/Desktop/Dev/**)"
+      "Read(//c/Users/shiga/Desktop/Dev/**)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git remote:*)",
+      "Bash(Remove-Item -Recurse -Force backend, frontend, .serena, docs, reports, reference, nginx, .git -ErrorAction SilentlyContinue)",
+      "Bash(rm:*)",
+      "Bash(git clone:*)"
     ],
     "deny": [],
     "ask": []

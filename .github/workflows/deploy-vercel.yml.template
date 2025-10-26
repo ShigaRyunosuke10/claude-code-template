@@ -1,0 +1,55 @@
+# Vercel Deployment Template
+#
+# Setup Instructions:
+# 1. Rename this file: deploy-vercel.yml.template → deploy-vercel.yml
+# 2. Add GitHub Secrets:
+#    - VERCEL_TOKEN: Vercel API token (https://vercel.com/account/tokens)
+#    - VERCEL_ORG_ID: Vercel organization ID
+#    - VERCEL_PROJECT_ID: Vercel project ID
+# 3. Adjust branch triggers as needed (main, develop, etc.)
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main          # Production deployment
+      # - develop     # Staging deployment (uncomment if using Pattern A)
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+
+      - name: Health Check
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+          curl -f https://{{YOUR_DOMAIN}}.vercel.app/health || exit 1

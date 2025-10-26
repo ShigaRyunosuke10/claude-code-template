@@ -52,6 +52,18 @@
         "start-mcp-server"
       ],
       "env": {}
+    },
+    "supabase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_7694acde651701a69b18e33b9832a6e89fc5fcee",
+        "--project-ref",
+        "wwyrthkizkcgndyorcww"
+      ]
     }
   }
 }

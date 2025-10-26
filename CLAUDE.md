@@ -20,6 +20,10 @@
 **Case B: 新規プロジェクト立ち上げ**
 - テンプレート: [.claude/workflows/case-b-new-project.md](./.claude/workflows/case-b-new-project.md)
 
+**Case C: デプロイ**
+- テンプレート: [.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md)
+- 詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
+
 ### 1. 計画フェーズ（実装前・必須）
 
 **目的**: 手戻り防止、見通しの良い開発
@@ -53,7 +57,7 @@ git checkout -b <type>-<機能名>
 
 ## エージェント一覧
 
-### 汎用エージェント（横断的・14体）
+### 汎用エージェント（横断的・16体）
 
 #### 計画（Planning）
 - **project-planner** - マクロ計画立案（Epic分解・優先度設定）
@@ -98,6 +102,10 @@ Task:playwright-test-healer(prompt: "Phase 2 Conservative Healing実行")
 - **doc-writer** - ドキュメント更新（差分ベース）
 - **release-manager** - CHANGELOG/タグ生成・リリースノート作成
 
+#### デプロイ（Deployment）
+- **deploy-manager** - デプロイ実行・ロールバック・ヘルスチェック
+- **infra-validator** - インフラ設定検証・セキュリティチェック
+
 #### プロジェクト固有スラッシュコマンド
 - **/docs-sync** - ドキュメント同期（Serenaメモリ → 公式Docs）
 - **/pre-commit-check** - コミット前チェック（lint-fix → sec-scan → code-reviewer）
@@ -139,6 +147,32 @@ Task:doc-writer(prompt: "変更箇所のドキュメント更新")
 # Phase 6: Release
 Task:release-manager(prompt: "v1.3.0リリース準備")
 git commit & PR作成 → マージ
+```
+
+### エージェント使用例（Case C: デプロイ）
+
+```bash
+# Phase 1: デプロイ先決定
+# プロジェクト開始時に実行
+Task:infra-validator(prompt: "Vercel + Supabase構成で要件確認")
+
+# Phase 2: 初回デプロイ
+Task:deploy-manager(prompt: "Vercel + Supabase構成で初回デプロイ実行")
+
+# Phase 3: CI/CD設定
+Task:deploy-manager(prompt: "Vercel用のGitHub Actions設定を生成")
+
+# Phase 4: デプロイ前検証
+Task:infra-validator(prompt: "デプロイ前最終チェック")
+
+# Phase 5: デプロイ実行（自動）
+# mainブランチへのpush/マージで自動デプロイ
+
+# Phase 6: デプロイ後確認
+Task:deploy-manager(prompt: "デプロイ後ヘルスチェック実行")
+
+# トラブル時: ロールバック
+Task:deploy-manager(prompt: "前バージョンへロールバック")
 ```
 
 ---
@@ -405,9 +439,10 @@ mcp__github__merge_pull_request(
 
 ### ツール設定
 - [.claude/settings.json](./.claude/settings.json) - Permissions & Hooks設定
-- [.claude/workflows/](././claude/workflows/) - ワークフローテンプレート（Case A/B）
-- [.claude/agents/](./.claude/agents/) - 汎用エージェント（14体）
+- [.claude/workflows/](././claude/workflows/) - ワークフローテンプレート（Case A/B/C）
+- [.claude/agents/](./.claude/agents/) - 汎用エージェント（16体）
 - [.claude/commands/](./.claude/commands/) - プロジェクト固有スラッシュコマンド
+- [.github/workflows/](./.github/workflows/) - CI/CDテンプレート（Vercel/Railway/Render）
 
 ### AI向け技術詳細（WHY/HOW for AI）
 - [.serena/memories/specifications/](./.serena/memories/specifications/) - 技術仕様（API/DB/アーキテクチャ）
@@ -520,4 +555,6 @@ AI完全自律E2Eテストシステムを、Observer → Conservative → Full A
 - **命名規則**: [ai-rules/CONVENTIONS.md](./ai-rules/CONVENTIONS.md)
 - **Case A テンプレート**: [.claude/workflows/case-a-existing-project.md](./.claude/workflows/case-a-existing-project.md)
 - **Case B テンプレート**: [.claude/workflows/case-b-new-project.md](./.claude/workflows/case-b-new-project.md)
+- **Case C テンプレート**: [.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md)
 - **Phase Rollout Guide**: [.claude/phases/ROLLOUT_GUIDE.md](./.claude/phases/ROLLOUT_GUIDE.md)
+- **GitHub Actions**: [.github/workflows/README.md](./.github/workflows/README.md)
