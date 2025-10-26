@@ -139,6 +139,13 @@ Write:next_session_prompt.md
 
 ## ③ Git commit & PR作成（必須）
 
+### 🚨 重要: 両リポジトリへのコミット&プッシュ
+
+**テンプレート開発時は必ず両方のリポジトリにコミット&プッシュしてください**:
+
+1. **テンプレートリポジトリ** (`claude-code-template/`)
+2. **開発用リポジトリ** (`claude-code-dev/`) - サブモジュール更新
+
 ### コミット前チェック
 
 **🚨 重要**: コミット前に `/pre-commit-check` を実行してください（`test:` と `docs:` 以外は必須）
@@ -158,10 +165,16 @@ Write:next_session_prompt.md
 - `refactor:` - リファクタリング（**レビュー必須**）
 - `test:` - テストコードのみ修正（**レビュースキップ**）
 - `docs:` - ドキュメントのみ修正（**レビュースキップ**）
+- `chore:` - テンプレート更新・ビルド設定等（**レビュースキップ**）
 
 ### 実行コマンド
 
+#### ① テンプレートリポジトリへのコミット&プッシュ
+
 ```bash
+# テンプレートディレクトリに移動
+cd claude-code-template
+
 # ブランチ作成（未作成の場合）
 git checkout -b <type>-<機能名>
 
@@ -178,7 +191,35 @@ git commit -m "feat: {内容}
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
 
-git push -u origin <type>-<機能名>
+git push origin main
+```
+
+#### ② 開発用リポジトリへのサブモジュール更新
+
+```bash
+# 開発用リポジトリのルートに移動
+cd ..
+
+# サブモジュール更新
+git submodule update --remote claude-code-template
+
+# 変更をステージング
+git add claude-code-template
+
+# コミット & プッシュ
+git commit -m "chore: テンプレート更新（{内容}）
+
+サブモジュール claude-code-template を最新版に更新
+
+## 更新内容
+
+{テンプレートリポジトリのコミットメッセージ概要}
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+git push origin main
 ```
 
 ### PR作成
@@ -217,6 +258,7 @@ mcp__github__merge_pull_request(
 - **mainブランチへの直接pushは絶対禁止**（ドキュメント更新含む）
 - `docs:` コミットは `/pre-commit-check` 不要（Hook発動しない）
 - `test:` コミットも `/pre-commit-check` 不要（ループ防止）
+- **テンプレート開発時**: 必ず両リポジトリ（template + dev）にコミット&プッシュ
 
 ---
 
@@ -230,6 +272,7 @@ mcp__github__merge_pull_request(
 - [ ] 全テスト合格確認
 - [ ] Git commit & PR作成完了
 - [ ] mainブランチへの直接push回避確認
+- [ ] **テンプレート開発時**: 両リポジトリ（template + dev）へのコミット&プッシュ完了
 
 ---
 

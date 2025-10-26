@@ -66,7 +66,9 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 2. **next_session_prompt.md更新**
 3. **Git commit & PR作成**（`/pre-commit-check` 実行）
 
-**⚠️ 重要**: mainブランチへの直接pushは禁止
+**⚠️ 重要**:
+- mainブランチへの直接pushは禁止
+- **テンプレート開発時**: 必ず両リポジトリ（`claude-code-template/` + `claude-code-dev/`）にコミット&プッシュ
 
 ---
 
