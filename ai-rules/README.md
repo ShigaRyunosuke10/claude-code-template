@@ -1,57 +1,104 @@
-# AI Rules - nissei プロジェクト
+# AI Rules - {{PROJECT_NAME}}
 
-プラグインベースの開発ガイドライン
+エージェントベースの開発ガイドライン
+
+---
 
 ## 📁 ファイル構成
 
 ```
 ai-rules/
-├── README.md        # 本ファイル
-├── WORKFLOW.md      # 開発フロー
-└── CONVENTIONS.md   # 命名規則・コミット規約
+├── README.md                   # 本ファイル（概要・クイックスタート）
+├── WORKFLOW.md                 # 開発フロー詳細
+├── REQUIREMENTS_CHANGE.md      # 要件変更フロー
+├── SESSION_COMPLETION.md       # セッション完了手順
+└── CONVENTIONS.md              # 命名規則・コミット規約
 ```
+
+---
 
 ## 🚀 クイックスタート
 
 ### 1. セッション開始
-- `next_session_prompt.md` があれば読む
-- なければSerenaメモリ確認
 
-### 2. ブランチ作成
 ```bash
-git checkout -b feat-<機能名>
+# 引き継ぎ情報確認
+# 優先順位: next_session_prompt.md → Serenaメモリ
+mcp__serena__activate_project(project: "{{PROJECT_NAME}}")
+mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 ```
 
-### 3. 実装
+### 2. ワークフロー選択
+
+- **Case A: 既存プロジェクト機能拡張** → [../.claude/workflows/case-a-existing-project.md](../.claude/workflows/case-a-existing-project.md)
+- **Case B: 新規プロジェクト立ち上げ** → [../.claude/workflows/case-b-new-project.md](../.claude/workflows/case-b-new-project.md)
+- **Case C: デプロイ** → [../.claude/workflows/case-c-deployment.md](../.claude/workflows/case-c-deployment.md)
+
+### 3. 計画フェーズ（必須）
+
+詳細: [WORKFLOW.md](./WORKFLOW.md)
+
+1. **Explore**: 関連ファイルを読む
+2. **Analyze**: 影響範囲を分析
+3. **Plan**: TodoWriteで実装計画作成
+4. **Approve**: ユーザーに計画提示して承認
+
+### 4. ブランチ作成
+
+```bash
+git checkout -b <type>-<機能名>
+# Type: feat-, fix-, refactor-, docs-
+```
+
+### 5. 実装
+
 [CONVENTIONS.md](./CONVENTIONS.md) に従って命名
 
-### 4. テスト
-```
-/nissei:e2e-full
+### 6. コミット前チェック
+
+```bash
+/pre-commit-check
 ```
 
-### 5. リリース前チェック
-```
-/nissei:release-check
-```
-- ユニットテスト自動生成
-- AI自動レビュー
-- セキュリティスキャン
-- 依存関係監査
-- パフォーマンス分析
-- E2Eテスト
+### 7. PR作成・マージ
 
-### 6. PR作成・マージ
 [WORKFLOW.md](./WORKFLOW.md) の「PR作成」を参照
 
-### 7. マージ後
-```
-/nissei:docs-sync
-```
+### 8. セッション完了
+
+詳細: [SESSION_COMPLETION.md](./SESSION_COMPLETION.md)
+
+1. Serenaメモリ更新
+2. next_session_prompt.md更新
+3. Git commit & PR作成
+
+---
 
 ## ⚠️ 重要
 
-- mainブランチへの直接作業禁止
-- コミット前にE2Eテスト必須
-- PR作成後にcode-reviewer実行必須
-- マージ後にdocs-updater実行必須
+- **mainブランチへの直接作業禁止**
+- **コミット前に `/pre-commit-check` 必須**（`test:` と `docs:` 以外）
+- **PR作成後に自動レビュー実行**
+- **マージ後に `/docs-sync` 実行推奨**
+
+---
+
+## 📚 詳細ドキュメント
+
+### 開発プロセス
+- [WORKFLOW.md](./WORKFLOW.md) - 開発フロー詳細（Phase 1-6）
+- [REQUIREMENTS_CHANGE.md](./REQUIREMENTS_CHANGE.md) - 要件変更フロー（開発途中の機能追加・仕様変更）
+- [SESSION_COMPLETION.md](./SESSION_COMPLETION.md) - セッション完了手順（Serenaメモリ・Git・PR）
+- [CONVENTIONS.md](./CONVENTIONS.md) - 命名規則・コミット規約
+
+### ツール設定
+- [../.claude/settings.json](../.claude/settings.json) - Permissions & Hooks
+- [../.claude/workflows/](../.claude/workflows/) - ワークフローテンプレート（Case A/B/C）
+- [../.claude/agents/](../.claude/agents/) - エージェント定義（14体）
+
+---
+
+## 🔗 関連リンク
+
+- **CLAUDE.md**: [../CLAUDE.md](../CLAUDE.md) - 基本設定・セッション開始フロー
+- **README.md**: [../README.md](../README.md) - プロジェクト概要・セットアップ
