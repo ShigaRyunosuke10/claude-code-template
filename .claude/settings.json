@@ -1,0 +1,225 @@
+{
+  "$schema": "https://claude.com/schemas/settings.json",
+  "description": "Claude Code設定 - Permissions & Hooks",
+
+  "permissions": {
+    "defaultMode": "allow",
+    "allowScopes": [
+      "Read:**/*",
+      "Edit:**/*.{tsx,ts,py,md,json}",
+      "Write:**/*.{tsx,ts,py,md,json}",
+      "Glob:**",
+      "Grep:**",
+      "Task:*",
+      "Bash:git*",
+      "Bash:npm*",
+      "Bash:docker*",
+      "mcp__github__*",
+      "mcp__serena__*",
+      "mcp__playwright__*",
+      "mcp__supabase__*",
+      "mcp__desktop-commander__*",
+      "mcp__context7__*"
+    ],
+    "denyScopes": [
+      "Bash:rm -rf /*",
+      "Bash:git push --force main",
+      "Bash:git reset --hard HEAD~*",
+      "Write:.env*",
+      "Edit:.env*"
+    ]
+  },
+
+  "hooks": {
+    "preToolUse": [
+      {
+        "name": "prevent-main-branch-direct-commit",
+        "description": "mainブランチへの直接コミット防止",
+        "matcher": {
+          "toolName": "Bash",
+          "argsPattern": "git commit.*"
+        },
+        "action": {
+          "type": "block",
+          "message": "❌ mainブランチへの直接コミットは禁止されています"
+        }
+      },
+      {
+        "name": "pre-commit-quality-check",
+        "description": "コミット前の品質チェック推奨（Auto-Fix付き）",
+        "matcher": {
+          "toolName": "Bash",
+          "argsPattern": "git commit -m \"(?!test:|docs:).*\""
+        },
+        "action": {
+          "type": "suggest",
+          "message": "💡 コミット前に /pre-commit-check 実行を推奨\n\n【Claude Agent向け】\n自動で /pre-commit-check を実行してから git commit してください\n\n【Auto-Fix機能】\n- Critical: 7回目で相談、最大10回\n- High: 3回まで（未解決ならTechnical Debt登録）\n- Medium: 1回のみ\n\n【レビュー対象】\n- アプリケーションコードのみ\n- テストコード（test:）とドキュメント（docs:）は自動スキップ\n\n【Technical Debt】\n未解決問題: reports/technical-debt.md"
+        }
+      }
+    ],
+    "postToolUse": [
+      {
+        "name": "auto-test-suggestion",
+        "description": "実装後のテスト推奨",
+        "matcher": {
+          "toolName": "Write",
+          "argsPattern": "**/app/**/*.{ts,tsx,py}"
+        },
+        "action": {
+          "type": "suggest",
+          "message": "💡 テスト実行を推奨: Task:qa-unit または /e2e-full"
+        }
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -c \"[console]::beep(800,200); [console]::beep(1000,200); [console]::beep(1200,200)\""
+          }
+        ]
+      }
+    ]
+  },
+
+  "stopConditions": [
+    {
+      "name": "critical-test-failure",
+      "description": "重大なテスト失敗で自動停止",
+      "threshold": 10,
+      "action": {
+        "type": "halt",
+        "message": "🛑 E2Eテスト10件以上失敗。修正が必要です。"
+      }
+    },
+    {
+      "name": "identical-error-streak",
+      "description": "同一エラーが3連続",
+      "threshold": 3,
+      "action": {
+        "type": "halt",
+        "message": "🛑 同じエラーが3回連続しました。HEALING開始。"
+      }
+    },
+    {
+      "name": "high-failure-rate",
+      "description": "失敗率30%超",
+      "window": 10,
+      "threshold": 0.3,
+      "action": {
+        "type": "halt",
+        "message": "🛑 直近10ケースで失敗率30%超。HEALING開始。"
+      }
+    },
+    {
+      "name": "timeout-cascade",
+      "description": "タイムアウト連鎖",
+      "pattern": "waitForURL|waitForSelector",
+      "count": 5,
+      "window": "3min",
+      "action": {
+        "type": "halt",
+        "message": "🛑 タイムアウトが5回/3分発生。HEALING開始。"
+      }
+    },
+    {
+      "name": "spec-total-failure",
+      "description": "spec全滅",
+      "failureRate": 0.8,
+      "minTests": 5,
+      "action": {
+        "type": "halt",
+        "message": "🛑 1つのspecで80%以上失敗。QUARANTINE開始。"
+      }
+    }
+  ],
+
+  "agents": [
+    {
+      "name": "project-planner",
+      "role": "全体設計・Epic分解・マイルストーン管理",
+      "scope": [".serena/memories/project/epics/*.md"],
+      "dependsOn": []
+    },
+    {
+      "name": "sub-planner",
+      "role": "機能詳細・DoD・API契約定義",
+      "scope": [".serena/memories/project/tasks/*.md"],
+      "dependsOn": ["project-planner"]
+    },
+    {
+      "name": "impl-dev-frontend",
+      "role": "UI/UX実装（React/Next.js）",
+      "scope": ["frontend/src/**", "frontend/components/**", "frontend/app/**"],
+      "dependsOn": ["sub-planner"]
+    },
+    {
+      "name": "impl-dev-backend",
+      "role": "API/DB実装（FastAPI/Supabase）",
+      "scope": ["backend/app/**"],
+      "dependsOn": ["sub-planner"]
+    },
+    {
+      "name": "integrator",
+      "role": "FE/BE整合性チェック（型定義同期）",
+      "scope": ["frontend/src/types/**", "backend/app/schemas/**"],
+      "dependsOn": ["impl-dev-frontend", "impl-dev-backend"]
+    },
+    {
+      "name": "qa-unit",
+      "role": "ユニットテスト（pytest/Jest）",
+      "scope": ["backend/tests/unit/**", "frontend/src/**/*.test.ts"],
+      "dependsOn": ["impl-dev-frontend", "impl-dev-backend"]
+    },
+    {
+      "name": "qa-integration",
+      "role": "統合テスト（API統合・DBトランザクション）",
+      "scope": ["backend/tests/integration/**"],
+      "dependsOn": ["integrator"]
+    },
+    {
+      "name": "playwright-test-planner",
+      "role": "E2E探索・テスト計画作成",
+      "scope": ["frontend/specs/*.md"],
+      "dependsOn": ["integrator"]
+    },
+    {
+      "name": "playwright-test-generator",
+      "role": "テストコード自動生成",
+      "scope": ["frontend/e2e/*.spec.ts", "frontend/e2e/pages/*.ts"],
+      "dependsOn": ["playwright-test-planner"]
+    },
+    {
+      "name": "playwright-test-healer",
+      "role": "自己修復 + AI自律実行システム",
+      "scope": ["frontend/e2e/*.spec.ts", ".serena/memories/testing/**"],
+      "dependsOn": ["playwright-test-generator"]
+    },
+    {
+      "name": "lint-fix",
+      "role": "Lint/フォーマット（ESLint/Prettier/Black/Ruff）",
+      "scope": ["変更済みファイルのみ"],
+      "dependsOn": []
+    },
+    {
+      "name": "sec-scan",
+      "role": "セキュリティスキャン（脆弱性検出）",
+      "scope": ["reports/security-scan.md"],
+      "dependsOn": []
+    },
+    {
+      "name": "doc-writer",
+      "role": "ドキュメント更新（差分ベース）",
+      "scope": ["docs/**", "README.md", ".serena/memories/**"],
+      "dependsOn": ["integrator", "playwright-test-healer"]
+    },
+    {
+      "name": "release-manager",
+      "role": "CHANGELOG/タグ生成・リリースノート作成",
+      "scope": ["CHANGELOG.md"],
+      "dependsOn": ["doc-writer"]
+    }
+  ]
+}

@@ -1,8 +1,48 @@
-# このテンプレートはローカル使用専用です
-# GitHubにアップロードしないでください
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# すべてのファイルを除外（テンプレートなので）
-*
+# Environment files
+.env
+.env.local
+.env*.local
 
-# ただし、このファイル自体は追跡
-!.gitignore
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.ruff_cache/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+.~*

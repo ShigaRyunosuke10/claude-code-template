@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -c \"[console]::beep(1000,800)\")",
+      "Bash(git log:*)",
+      "Bash(cat:*)",
+      "Read(//c/Users/shiga/AppData/Roaming/Code/User/**)",
+      "Bash(powershell:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git restore:*)",
+      "Bash(curl:*)",
+      "Bash(docker logs:*)",
+      "Bash(./.claude/scripts/switch-phase.sh:*)",
+      "SlashCommand(/e2e-full)",
+      "Bash(git branch:*)",
+      "Bash(bash:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(timeout:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker-compose exec:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(npm run dev:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose stop:*)",
+      "Bash(docker-compose rm:*)",
+      "Bash(taskkill:*)",
+      "Bash(Get-Process node -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object Id, ProcessName, StartTime)",
+      "Bash(Format-Table)",
+      "Bash(awk:*)",
+      "Bash(xargs:*)",
+      "Read(//c/Users/shiga/Desktop/Dev/**)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": true
+}

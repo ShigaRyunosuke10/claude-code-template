@@ -1,0 +1,176 @@
+{
+  "$schema": "https://claude.com/schemas/settings.json",
+  "description": "Phase 3: Full Autonomous（Week 5+）- 全機能有効化",
+  "phase": 3,
+  "phaseName": "Full Autonomous",
+  "duration": "Week 5+",
+  "enabled": true,
+
+  "features": {
+    "stopRuleDetection": true,
+    "autoHealing": true,
+    "learningMemory": true,
+    "quarantine": true,
+    "telemetry": true
+  },
+
+  "healerConfig": {
+    "mode": "full-autonomous",
+    "knownFixesEnabled": true,
+    "conservativeFixesEnabled": true,
+    "hypothesisFixesEnabled": true,
+    "maxHealingAttempts": 3,
+    "smokeTestRequired": true
+  },
+
+  "stopConditions": [
+    {
+      "name": "identical-error-streak",
+      "enabled": true,
+      "threshold": 3,
+      "action": {
+        "type": "halt",
+        "message": "🤖 [AUTO] 同一エラー3連続 → 完全自律修復開始"
+      }
+    },
+    {
+      "name": "high-failure-rate",
+      "enabled": true,
+      "window": 10,
+      "threshold": 0.3,
+      "action": {
+        "type": "halt",
+        "message": "🤖 [AUTO] 失敗率30%超 → 完全自律修復開始"
+      }
+    },
+    {
+      "name": "timeout-cascade",
+      "enabled": true,
+      "pattern": "waitForURL|waitForSelector",
+      "count": 5,
+      "window": "3min",
+      "action": {
+        "type": "halt",
+        "message": "🤖 [AUTO] タイムアウト連鎖 → 完全自律修復開始"
+      }
+    },
+    {
+      "name": "spec-total-failure",
+      "enabled": true,
+      "failureRate": 0.8,
+      "minTests": 5,
+      "action": {
+        "type": "halt",
+        "message": "⚠️ [QUARANTINE] spec全滅 → 検疫開始"
+      }
+    },
+    {
+      "name": "insurance-failure-limit",
+      "enabled": true,
+      "threshold": 10,
+      "action": {
+        "type": "halt",
+        "message": "🤖 [AUTO] 全体失敗10件超 → 完全自律修復開始"
+      }
+    }
+  ],
+
+  "healingStrategy": {
+    "knownFixes": {
+      "enabled": true,
+      "source": ".serena/memories/testing/e2e_patterns.json",
+      "enforcedOnly": false,
+      "minSuccessRate": 0.7,
+      "priority": 1
+    },
+    "conservativeFixes": {
+      "enabled": true,
+      "methods": [
+        "selectorFallback",
+        "timeoutExtension",
+        "waitForLoadState"
+      ],
+      "priority": 2
+    },
+    "hypothesisFixes": {
+      "enabled": true,
+      "maxAttemptsPerTest": 1,
+      "methods": [
+        "nthSelector",
+        "pageReload",
+        "retry"
+      ],
+      "priority": 3
+    }
+  },
+
+  "smokeTest": {
+    "enabled": true,
+    "tag": "@smoke",
+    "passThreshold": 1.0,
+    "onFailAction": "quarantine"
+  },
+
+  "quarantine": {
+    "enabled": true,
+    "outputPath": ".serena/memories/testing/quarantine/",
+    "medianDuration": "3days",
+    "notifyHuman": true,
+    "autoEscalate": true
+  },
+
+  "learningMemory": {
+    "enabled": true,
+    "outputPath": ".serena/memories/testing/e2e_patterns.json",
+    "minOccurrencesForPattern": 2,
+    "enforceThreshold": 3,
+    "pruneOldPatterns": true,
+    "maxPatternsStored": 100
+  },
+
+  "safetyGuards": {
+    "falsePositiveRateThreshold": 0.01,
+    "resourceProtection": {
+      "maxCpuPercent": 80,
+      "maxMemoryPercent": 90
+    },
+    "infiniteFixPrevention": {
+      "maxFixesPerTest": 3,
+      "maxFixesPerSession": 50
+    }
+  },
+
+  "telemetry": {
+    "enabled": true,
+    "metrics": [
+      "healingAttempts",
+      "healingSuccessRate",
+      "knownFixApplicationCount",
+      "conservativeFixApplicationCount",
+      "hypothesisFixApplicationCount",
+      "smokeTestResults",
+      "mttr",
+      "wastedExecution",
+      "recurrenceRate",
+      "falsePositiveRate",
+      "quarantineMedian"
+    ],
+    "outputPath": ".serena/memories/testing/phase3_telemetry.json",
+    "reportingInterval": "daily"
+  },
+
+  "objectives": [
+    "完全自律修復の実現（人間介入なし）",
+    "MTTR ≤30分の安定達成",
+    "Recurrence Rate <5%（再発率低減）",
+    "False Positive Rate <1%（誤修正防止）"
+  ],
+
+  "successCriteria": {
+    "healingSuccessRate": ">=90%",
+    "mttr": "<=30min",
+    "recurrenceRate": "<5%",
+    "falsePositiveRate": "<1%",
+    "quarantineMedian": "<=3days"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://claude.com/schemas/settings.json",
+  "description": "Phase 1: Observer Mode（Week 1-2）- 停止ルール検知のみ、修復なし",
+  "phase": 1,
+  "phaseName": "Observer Mode",
+  "duration": "Week 1-2",
+  "enabled": true,
+
+  "features": {
+    "stopRuleDetection": true,
+    "autoHealing": false,
+    "learningMemory": true,
+    "quarantine": true,
+    "telemetry": true
+  },
+
+  "healerConfig": {
+    "mode": "observer",
+    "knownFixesEnabled": false,
+    "conservativeFixesEnabled": false,
+    "hypothesisFixesEnabled": false,
+    "maxHealingAttempts": 0
+  },
+
+  "stopConditions": [
+    {
+      "name": "identical-error-streak",
+      "enabled": true,
+      "threshold": 3,
+      "action": {
+        "type": "log",
+        "message": "📊 [OBSERVER] 同一エラー3連続を検知（修復はPhase 2以降）"
+      }
+    },
+    {
+      "name": "high-failure-rate",
+      "enabled": true,
+      "window": 10,
+      "threshold": 0.3,
+      "action": {
+        "type": "log",
+        "message": "📊 [OBSERVER] 失敗率30%超を検知（修復はPhase 2以降）"
+      }
+    },
+    {
+      "name": "timeout-cascade",
+      "enabled": true,
+      "pattern": "waitForURL|waitForSelector",
+      "count": 5,
+      "window": "3min",
+      "action": {
+        "type": "log",
+        "message": "📊 [OBSERVER] タイムアウト連鎖を検知（修復はPhase 2以降）"
+      }
+    },
+    {
+      "name": "spec-total-failure",
+      "enabled": true,
+      "failureRate": 0.8,
+      "minTests": 5,
+      "action": {
+        "type": "log",
+        "message": "📊 [OBSERVER] spec全滅を検知（検疫はPhase 2以降）"
+      }
+    },
+    {
+      "name": "insurance-failure-limit",
+      "enabled": true,
+      "threshold": 10,
+      "action": {
+        "type": "log",
+        "message": "📊 [OBSERVER] 全体失敗10件超を検知（修復はPhase 2以降）"
+      }
+    }
+  ],
+
+  "telemetry": {
+    "enabled": true,
+    "metrics": [
+      "stopRuleHitCount",
+      "errorSignatureFrequency",
+      "testDuration",
+      "failurePatterns"
+    ],
+    "outputPath": ".serena/memories/testing/phase1_telemetry.json"
+  },
+
+  "objectives": [
+    "停止ルール5種の検知精度を測定",
+    "エラーパターンの収集とLearning Memory基盤構築",
+    "False Positive Rate（誤検知率）の測定",
+    "Telemetry KPIベースライン確立"
+  ],
+
+  "successCriteria": {
+    "stopRuleDetectionAccuracy": ">95%",
+    "falsePositiveRate": "<5%",
+    "telemetryDataCompleteness": "100%",
+    "errorPatternsCaptured": ">=10"
+  }
+}
