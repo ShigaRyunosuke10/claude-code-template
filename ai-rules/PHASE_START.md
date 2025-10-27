@@ -960,70 +960,155 @@ Claude: 「✅ Phase完了！」
 
 **目的**:
 - プロジェクトの技術スタックを決定
-- 必要なライブラリ・フレームワーク・サービスを選定
+- デプロイプラットフォームを推奨
+- 外部サービス設定手順をドキュメント化
 - 技術スタックをSerenaメモリに保存
 
-**実行エージェント**: planner
+**実行エージェント**: planner + deployment-agent
 
 ---
 
-### Step 1: 要件からの技術スタック抽出
+### Step 1: deployment-agent 実行
 
-**planner が実行**:
+**planner が deployment-agent を呼び出し**:
 ```bash
-# Phase 0.1で生成された要件サマリーを読み込み
+Task:deployment-agent(prompt: "要件定義書を基にデプロイ要件をヒアリングし、技術スタックとデプロイプラットフォームを推奨してください")
+```
+
+**deployment-agent の実行内容**:
+
+#### 1-1. 要件サマリー読み込み
+```bash
 mcp__serena__read_memory(memory_name: "project/requirements_summary.md")
 ```
 
-**抽出内容**:
-- フロントエンド要件（UI/UX、レスポンシブ対応等）
-- バックエンド要件（API、認証、ファイルアップロード等）
-- データベース要件（RDB、NoSQL、リアルタイム更新等）
-- インフラ要件（ホスティング、CI/CD等）
+#### 1-2. デプロイ要件ヒアリング
 
----
+deployment-agent が以下をユーザーに質問：
 
-### Step 2: 技術スタック候補の提案
-
-**planner が生成**:
 ```markdown
-## 技術スタック候補
+## デプロイ要件ヒアリング
+
+Phase 0.2で技術スタックを決定します。以下の質問にお答えください：
+
+### 1. 予算
+- A. 無料枠のみ
+- B. $10-50/月
+- C. $50以上/月
+- D. おまかせ
+
+### 2. トラフィック予測
+- A. 低（〜1000 req/day）
+- B. 中（〜10k req/day）
+- C. 高（10k〜 req/day）
+- D. おまかせ
+
+### 3. チーム規模
+- A. 個人開発
+- B. 2-5人
+- C. 6人以上
+
+### 4. Docker使用希望
+- A. Yes（Docker Compose使用）
+- B. No（直接デプロイ）
+- C. おまかせ
+
+### 5. SLA要件
+- A. スリープ許容（無料枠）
+- B. 常時稼働必須
+```
+
+#### 1-3. 技術スタック推奨
+
+deployment-agent が要件に基づいて技術スタックを推奨：
+
+**例（無料枠 + 個人開発 + 低トラフィック）**:
+```markdown
+## 推奨技術スタック
 
 ### フロントエンド
-- **推奨**: Next.js 14 (App Router)
-  - 理由: React + SSR + ルーティング統合
-- **代替案**: Vite + React
+- **フレームワーク**: Next.js 14.2.5 (App Router)
+- **ホスティング**: Vercel（無料枠）
 
 ### バックエンド
-- **推奨**: FastAPI (Python)
-  - 理由: 高速、型安全、自動ドキュメント生成
-- **代替案**: Express.js (Node.js)
+- **フレームワーク**: FastAPI (Python 3.12)
+- **ホスティング**: Render（無料枠・スリープあり）
 
 ### データベース
-- **推奨**: Supabase (PostgreSQL + Auth + Storage)
-  - 理由: バックエンド機能統合、リアルタイム対応
-- **代替案**: Firebase
+- **サービス**: Supabase（無料枠）
+  - PostgreSQL 15
+  - Auth + Storage統合
 
-### インフラ
-- **推奨**: Vercel (Frontend) + Railway (Backend)
-  - 理由: 簡単デプロイ、自動SSL、環境変数管理
+### CI/CD
+- GitHub Actions（無料枠）
+
+【推奨理由】
+- 全て無料枠で構築可能
+- Vercel + Supabaseは相性が良い
+- Renderの無料枠はスリープするが、個人開発には十分
+```
+
+#### 1-4. ユーザー承認
+
+```markdown
+上記の技術スタックで進めてよろしいでしょうか？
+
+【選択肢】
+A. 承認（このまま進める）
+B. 一部変更したい
+C. 全面的に見直したい
+```
+
+#### 1-5. deployment_plan.md 生成
+
+deployment-agent が以下のドキュメントを生成：
+
+**`.serena/memories/deployment/deployment_plan.md`**:
+```markdown
+# デプロイプラン
+
+生成日時: 2025-10-27
+
+## 技術スタック
+
+### フロントエンド
+- Next.js 14.2.5 + Vercel
+
+### バックエンド
+- FastAPI + Render
+
+### データベース
+- Supabase (PostgreSQL + Auth + Storage)
+
+## デプロイフロー
+
+### Phase 1開始前の準備
+1. Supabaseプロジェクト作成
+2. Vercelプロジェクト接続
+3. Renderプロジェクト作成
+
+### Phase 1〜N
+- GitHub Push → GitHub Actions → 自動テスト → 自動デプロイ
+
+## 外部サービス設定手順
+
+詳細: [ENV_SETUP_GUIDE.md](../../ai-rules/ENV_SETUP_GUIDE.md)
 ```
 
 ---
 
-### Step 3: 技術スタックの決定
+### Step 2: 技術スタックの確定
 
-**決定方法**:
-1. ユーザーに提案を提示
-2. ユーザーが承認または修正
-3. 確定した技術スタックをSerenaメモリに保存
+**planner が Serenaメモリに保存**:
 
-**Serenaメモリ保存**:
 ```bash
 mcp__serena__write_memory(
   memory_name: "system/tech_stack.md",
   content: "
 # 技術スタック
+
+生成日時: 2025-10-27
+決定者: deployment-agent + planner
 
 ## フロントエンド
 - **フレームワーク**: Next.js 14.2.5 (App Router)
@@ -1032,29 +1117,44 @@ mcp__serena__write_memory(
 - **UI コンポーネント**: shadcn/ui
 - **状態管理**: Zustand 4.5
 - **HTTP クライアント**: Axios 1.7
+- **ホスティング**: Vercel（無料枠）
 
 ## バックエンド
 - **フレームワーク**: FastAPI 0.111
 - **言語**: Python 3.12
 - **バリデーション**: Pydantic v2
 - **非同期**: asyncio + httpx
+- **ホスティング**: Render（無料枠）
 
 ## データベース
 - **メインDB**: Supabase (PostgreSQL 15)
 - **認証**: Supabase Auth
 - **ストレージ**: Supabase Storage
+- **ホスティング**: Supabase（無料枠）
 
-## インフラ
-- **Frontend Hosting**: Vercel
-- **Backend Hosting**: Railway
-- **CI/CD**: GitHub Actions
+## CI/CD
+- **プラットフォーム**: GitHub Actions
+- **トリガー**: main ブランチへの Push
+
+## 選択理由
+- 無料枠で構築可能
+- 個人開発に最適
+- Vercel + Supabase + Renderの組み合わせは相性が良い
+
+## Phase 1開始前の準備
+1. Supabaseプロジェクト作成（手動）
+2. Vercelプロジェクト接続（手動）
+3. Renderプロジェクト作成（手動）
+4. 環境変数設定（手動）
+
+詳細: deployment_plan.md
 "
 )
 ```
 
 ---
 
-### Step 4: system_state.md 初期化
+### Step 3: system_state.md 初期化
 
 **実行内容**:
 ```bash
@@ -1088,247 +1188,594 @@ mcp__serena__write_memory(
 
 ---
 
-### Step 5: 次のPhaseへ
+### Step 4: 次のPhaseへ
 
 **planner が報告**:
 ```markdown
 ✅ Phase 0.2: 技術スタック決定 完了
 
 【決定内容】
-- Frontend: Next.js 14 + TypeScript
-- Backend: FastAPI + Python 3.12
-- Database: Supabase (PostgreSQL)
-- Hosting: Vercel + Railway
+- Frontend: Next.js 14 + TypeScript + Vercel
+- Backend: FastAPI + Python 3.12 + Render
+- Database: Supabase (PostgreSQL + Auth + Storage)
+- CI/CD: GitHub Actions
 
 【成果物】
 - .serena/memories/system/tech_stack.md
 - .serena/memories/system/system_state.md
+- .serena/memories/deployment/deployment_plan.md
+
+【Phase 1開始前の準備（手動）】
+Phase 0完了後、Phase 1開始前に以下の外部サービス作成が必要です：
+1. Supabaseプロジェクト作成
+2. Vercelプロジェクト接続
+3. Renderプロジェクト作成
+4. 環境変数設定
+
+詳細な手順は deployment_plan.md および ENV_SETUP_GUIDE.md を参照してください。
 
 【次のステップ】
-Phase 0.3: 環境変数・MCP設定チェックを開始します。
+Phase 0.3: 技術スタック検証・MCP設定を開始します。
 ```
 
 ---
 
-## Phase 0.3: 環境変数・MCP設定チェック（自動・Phase 0 のみ）
+## Phase 0.3: 技術スタック検証・MCP設定（自動・Phase 0 のみ）
 
 **実行タイミング**: Phase 0.2（技術スタック決定）の直後
 
-**目的**: 技術スタックに基づいて必要な環境変数・MCP設定を一斉チェック・設定
+**目的**:
+- 技術スタックの最新情報を確認・ベストプラクティス取得
+- 技術スタックに対応するMCPサーバーを自動検索
+- 環境変数テンプレートファイルを自動生成
 
-**実行エージェント**: planner（メイン） + tech-stack-validator（サブエージェント）
-
-詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ENV_SETUP_GUIDE.md)
-
----
-
-### Step 1: tech-stack-validator を呼び出し
-
-**planner が実行**:
-
-```markdown
-tech-stack-validator エージェントを呼び出して、環境変数設定ガイドを生成させます。
-
-**タスク内容**:
-1. system/tech_stack.md を読み込み
-2. 必要な環境変数を特定
-3. 最新の設定方法を調査（WebSearch）
-4. ai-rules/ENV_SETUP_GUIDE.md を具体的な手順に書き換え
-5. 必要な環境変数リストを返却
-
-Task tool を使用して tech-stack-validator を起動してください。
-```
-
-**tech-stack-validator への指示**:
-
-```
-以下のタスクを実行し、結果を報告してください：
-
-1. Serenaメモリから技術スタックを読み込む
-   mcp__serena__read_memory(memory_name: "system/tech_stack.md")
-
-2. 技術スタックから必要な環境変数を特定
-   - データベース（Supabase, PostgreSQL, MySQL等）
-   - 認証（Auth0, Firebase Auth, AWS Cognito等）
-   - 決済（Stripe, PayPal等）
-   - インフラ（Vercel, AWS, GCP等）
-   - AI/MCP（OpenAI, Anthropic等）
-
-3. 各サービスの最新設定方法を調査
-   - WebSearch で公式ドキュメント検索（例: "Supabase environment variables setup 2025"）
-   - MCP Registry を参照（https://github.com/modelcontextprotocol/registry）
-
-4. ai-rules/ENV_SETUP_GUIDE.md を上書き
-   - 必須設定（GITHUB_TOKEN）は常に含める
-   - 技術スタック別設定セクションを追加
-   - 各サービスの取得方法、設定コマンド、検証方法を記載
-   - Windows/macOS/Linux 対応の設定手順
-
-5. 必要な環境変数リストを以下の形式で返却:
-   {
-     "required": ["GITHUB_TOKEN", "SUPABASE_ACCESS_TOKEN", ...],
-     "optional": ["OPENAI_API_KEY", ...],
-     "descriptions": {
-       "SUPABASE_ACCESS_TOKEN": "Supabaseデータベース操作",
-       ...
-     }
-   }
-```
+**実行エージェント**: planner + tech-stack-validator + mcp-finder
 
 ---
 
-### Step 2: tech-stack-validator の実行結果を受け取り
 
-**planner が確認**:
+### Step 1: tech-stack-validator 実行
 
-- tech-stack-validator が返した環境変数リストを取得
-- ENV_SETUP_GUIDE.md が更新されたことを確認
+**planner が tech-stack-validator を呼び出し**:
+```bash
+Task:tech-stack-validator(prompt: "Phase 0.2で決定した技術スタックを最新情報で検証してください")
+```
 
----
+**tech-stack-validator の実行内容**:
 
-### Step 3: 環境変数チェック
+#### 1-1. 技術スタック読み込み
+```bash
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+```
 
-**planner が実行**:
+#### 1-2. WebSearchで最新情報確認
+
+各技術の最新バージョン・ベストプラクティスを確認：
+
+- **Next.js**: 最新安定版、App Router推奨パターン
+- **FastAPI**: 最新バージョン、Pydantic v2対応
+- **Supabase**: 最新機能、Row Level Security推奨設定
+- **Vercel/Render**: デプロイ最新ベストプラクティス
+
+#### 1-3. セキュリティ脆弱性確認
+
+CVEデータベースで既知の脆弱性をチェック
+
+#### 1-4. tech_best_practices.md 生成
 
 ```bash
-# 必須: GITHUB_TOKEN
-echo $GITHUB_TOKEN | head -c 10
+mcp__serena__write_memory(
+  memory_name: "system/tech_best_practices.md",
+  content: "
+# 技術スタック ベストプラクティス
 
-# tech-stack-validator が返した required リストをチェック
-echo $SUPABASE_ACCESS_TOKEN | head -c 10
-echo $SUPABASE_PROJECT_REF
-# ...（動的に生成）
+生成日時: 2025-10-27
+有効期限: 2025-01-25（90日間キャッシュ）
 
-# optional リストをチェック
-echo $OPENAI_API_KEY | head -c 10
-# ...（動的に生成）
+## Next.js 14.2.5
+
+### 推奨設定
+- App Router使用
+- Server Components優先
+- Dynamic Imports for Client Components
+
+### セキュリティ
+- CSP設定推奨
+- 環境変数は NEXT_PUBLIC_ prefix
+
+### パフォーマンス
+- Image Optimization有効化
+- Metadata API使用
+
+## FastAPI 0.111
+
+### 推奨設定
+- Pydantic v2使用
+- async/await優先
+
+### セキュリティ
+- CORS設定必須
+- JWT検証ミドルウェア
+
+## Supabase
+
+### 推奨設定
+- Row Level Security (RLS)有効化
+- Realtime有効化
+
+### セキュリティ
+- Service Role Key絶対非公開
+- Anon Keyは公開可能だがRLSで保護
+
+参考: WebSearch結果（URL一覧）
+"
+)
 ```
 
 ---
 
-### Step 4: 未設定の環境変数をユーザーに案内
+### Step 2: mcp-finder 実行
+
+**planner が mcp-finder を呼び出し**:
+```bash
+Task:mcp-finder(prompt: "tech_stack.mdに基づいて必要なMCPサーバーを検索してください")
+```
+
+**mcp-finder の実行内容**:
+
+#### 2-1. 技術スタックから外部サービス抽出
+
+```bash
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+```
+
+抽出結果:
+- **Supabase** → Supabase MCP必要
+- **GitHub** → GitHub MCP必要（既に設定済み）
+- **Vercel** → 専用MCP不要（CLI直接使用）
+- **Render** → 専用MCP不要（CLI直接使用）
+
+#### 2-2. MCP検索
+
+Smithery.ai / npm / GitHub でMCP検索
+
+**検索結果例**:
+```markdown
+## 検出されたMCPサーバー（2件）
+
+### 1. Supabase MCP ⭐⭐⭐
+- **URL**: https://mcp.supabase.com/mcp
+- **認証**: OAuth（ブラウザログイン）
+- **信頼性**: 公式
+- **必要な設定**: なし（OAuth自動）
+
+### 2. GitHub MCP ⭐⭐⭐
+- **URL**: https://api.githubcopilot.com/mcp
+- **認証**: GitHub Copilot統合
+- **信頼性**: 公式
+- **必要な設定**: GitHub Copilot サブスクリプション
+```
+
+#### 2-3. mcp_setup_guide.md 更新
+
+既存の [MCP_SETUP_GUIDE.md](./MCP_SETUP_GUIDE.md) を技術スタックに応じて更新（必要に応じて）
+
+---
+
+### Step 3: 環境変数テンプレート作成
 
 **planner が実行**:
 
-未設定の環境変数がある場合、ENV_SETUP_GUIDE.md の内容を表示してユーザーに案内：
-
-```markdown
-## 🔧 環境変数・MCP設定が必要です
-
-技術スタック確定に基づき、以下の設定が必要です。
-
-詳細な設定手順は [ai-rules/ENV_SETUP_GUIDE.md](ai-rules/ENV_SETUP_GUIDE.md) をご覧ください。
-
-### 未設定の環境変数
-
-#### ❌ SUPABASE_ACCESS_TOKEN（必須）
-- 用途: Supabaseデータベース操作
-- 設定方法: ENV_SETUP_GUIDE.md の「データベース: Supabase」セクション参照
-
-#### ❌ SUPABASE_PROJECT_REF（必須）
-- 用途: Supabaseプロジェクト識別
-- 設定方法: ENV_SETUP_GUIDE.md の「データベース: Supabase」セクション参照
-
-#### ⚠️ OPENAI_API_KEY（任意・推奨）
-- 用途: エラーループ時のAI自動相談（Codex）
-- 設定方法: ENV_SETUP_GUIDE.md の「AI/MCP: OpenAI」セクション参照
-
-### 次のステップ
-
-1. ENV_SETUP_GUIDE.md を参照して環境変数を設定
-2. Claude Code を再起動
-3. Phase 0.3 を再実行
-
-**選択肢**:
-A. 今すぐ設定する（推奨） → 設定後に Phase 0.3 再実行
-B. 後で設定する → Phase 0 を一時中断
-C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
-```
-## 🔧 環境変数・MCP設定が必要です
-
-技術スタック確定に基づき、以下の設定が必要です。
-
-### 必須設定
-
-#### ✅ GITHUB_TOKEN
-- 状態: 設定済み
-
-### 技術スタック別設定（必須）
-
-#### ❌ SUPABASE_ACCESS_TOKEN（未設定）
-- 用途: Supabase データベース操作
-- 取得方法: https://app.supabase.com/ > Settings > API > Service Role Key
-- 設定コマンド:
-  ```powershell
-  $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
-  [System.Environment]::SetEnvironmentVariable('SUPABASE_ACCESS_TOKEN', 'sbp_...', 'User')
-  ```
-
-#### ❌ SUPABASE_PROJECT_REF（未設定）
-- 用途: Supabaseプロジェクト識別
-- 取得方法: https://app.supabase.com/ > Settings > General > Reference ID
-- 設定コマンド:
-  ```powershell
-  $env:SUPABASE_PROJECT_REF = "your-project-ref"
-  [System.Environment]::SetEnvironmentVariable('SUPABASE_PROJECT_REF', 'your-project-ref', 'User')
-  ```
-
-### 任意設定（推奨）
-
-#### ⚠️ OPENAI_API_KEY（任意・推奨）
-- 用途: エラーループ時のAI自動相談（Codex）
-  - Critical/High問題: 初回発生時に自動相談
-  - Medium問題: 3回失敗後に自動相談
-- 取得方法: https://platform.openai.com/api-keys
-- 設定コマンド: README.md「Step 0: 環境変数設定」参照
-
-- 用途: ライブラリドキュメント自動取得（90日キャッシュ）
-- 取得方法: https://context7.upstash.com/
-- 設定コマンド:
-  ```powershell
-  ```
-
-### 次のステップ
-
-1. 上記の環境変数を設定してください
-2. Claude Code を再起動してください
-3. Phase 0.3 を再実行します
-
-**選択肢**:
-A. 今すぐ設定する（推奨） → 設定後に Phase 0.3 再実行
-B. 後で設定する → Phase 0 を一時中断
-C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
-```
-
----
-
-### Step 5: 設定検証
+#### 3-1. 技術スタックから必要な環境変数を抽出
 
 ```bash
-# 環境変数確認
-echo "GITHUB_TOKEN: $(echo $GITHUB_TOKEN | head -c 10)"
-echo "SUPABASE_ACCESS_TOKEN: $(echo $SUPABASE_ACCESS_TOKEN | head -c 10)"
-echo "SUPABASE_PROJECT_REF: $SUPABASE_PROJECT_REF"
-echo "OPENAI_API_KEY: $(echo $OPENAI_API_KEY | head -c 10)"
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+```
 
-# .mcp.json検証
-cat .mcp.json | grep -E "SUPABASE|OPENAI|GITHUB"
+**抽出する環境変数**:
+- **アプリケーション用**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`（backend/frontend用）
+- **その他**: 技術スタックに応じて
+
+**注意**: MCP用環境変数は不要（GitHub/Supabase/Codex全てOAuth認証）
+
+#### 3-2. テンプレートファイル生成
+
+##### 1. `backend/.env.example`（FastAPI用）
+```bash
+Write: backend/.env.example
+```
+
+内容:
+```env
+# Supabase（Phase 1で設定）
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+
+# JWT
+JWT_SECRET=your-jwt-secret-here
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000
+
+# Server
+HOST=0.0.0.0
+PORT=8000
+ENV=development
+```
+
+##### 2. `frontend/.env.local.example`（Next.js用）
+```bash
+Write: frontend/.env.local.example
+```
+
+内容:
+```env
+# Supabase（Phase 1で設定）
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# API
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
+
+# Environment
+NEXT_PUBLIC_ENV=development
+```
+
+#### 3-3. .gitignore更新
+
+```bash
+Edit: .gitignore
+```
+
+追加内容:
+```
+# Environment variables
+.env
+.env.local
+backend/.env
+frontend/.env.local
+
+# Keep templates
+!.env.example
+!.env.local.example
 ```
 
 ---
 
-### 完了メッセージ
+### Step 4: Git commit
 
+```bash
+git add backend/.env.example frontend/.env.local.example .gitignore .serena/memories/
+git commit -m "feat: Phase 0.3完了（技術スタック検証・MCP設定）
+
+- tech-stack-validator実行: 最新情報確認・ベストプラクティス取得
+- mcp-finder実行: Supabase/GitHub MCP検出
+- backend/.env.example作成（FastAPI用）
+- frontend/.env.local.example作成（Next.js用）
+- .gitignore更新
+
+成果物:
+- .serena/memories/system/tech_best_practices.md
+- backend/.env.example
+- frontend/.env.local.example
+
+⚠️ Phase 0未完了: Phase 0.4（プロジェクト構造生成）が必要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+---
+
+### Step 5: 次のPhaseへ
+
+**planner が報告**:
 ```markdown
-✅ 環境変数・MCP設定チェック完了
+✅ Phase 0.3: 技術スタック検証・MCP設定 完了
 
-【設定済み環境変数】
-- GITHUB_TOKEN: ghp_ABC***
-- SUPABASE_ACCESS_TOKEN: sbp_XYZ***
-- SUPABASE_PROJECT_REF: your-project-ref
-- OPENAI_API_KEY: sk-123*** （任意）
+【実行内容】
+- tech-stack-validator: 技術スタック最新情報確認
+- mcp-finder: Supabase/GitHub MCP検出・設定
+- 環境変数テンプレート作成
+
+【成果物】
+- .serena/memories/system/tech_best_practices.md
+- backend/.env.example
+- frontend/.env.local.example
+- .gitignore更新
+
+【検出されたMCPサーバー】
+- Supabase MCP (OAuth認証)
+- GitHub MCP (GitHub Copilot統合)
+- Codex MCP (CLI事前ログイン)
 
 【次のステップ】
-Phase 0.2（技術スタック決定）を開始します。
+Phase 0.4: プロジェクト構造生成を開始します。
+
+⚠️ 重要: Phase 0.4では backend/, frontend/ ディレクトリを作成します
 ```
 
+---
+
+---
+
+## Phase 0.4: 環境変数設定・MCP接続確認（手動+検証・Phase 0 のみ）
+
+**実行タイミング**: Phase 0.3（環境変数テンプレート作成）の直後
+
+**目的**:
+- 実際の環境変数ファイル（.env等）に実キーを設定
+- 全MCP（GitHub/Codex/Supabase/Serena）の接続確認
+- **Phase 0完了条件**: 全MCP接続成功
+
+**実行エージェント**: planner（メイン） + ユーザー（手動作業）
+
+---
+
+### Step 0: 事前準備確認
+
+**AI が確認**:
+```markdown
+Phase 0.4を開始する前に、以下の事前準備が完了しているか確認してください：
+
+【必須】
+- ✅ GitHub Personal Access Token 取得済み
+- ✅ OpenAI API Key 取得済み
+- ✅ **Codex CLI インストール済み**（`codex --version`で確認）
+- ✅ **Codex CLI 認証済み**（`codex login --api-key "xxx"`実行済み）
+
+【技術スタック依存】
+- ✅ Supabaseプロジェクト作成済み（Supabase使用時）
+- ✅ Supabase APIキー取得済み
+
+準備が完了したら「準備完了しました」と返信してください。
+まだの場合は、[ai-rules/MCP_SETUP_GUIDE.md](./MCP_SETUP_GUIDE.md)を参照してください。
+```
+
+**ユーザー**: "準備完了しました"
+
+---
+
+### Step 1: 環境変数ファイル作成案内
+
+**AI が案内**:
+```markdown
+以下の環境変数ファイルを作成してください：
+
+### 1. `.env`（ルートディレクトリ・MCP用）
+
+**重要**: Supabase MCPはOAuth認証のため、Supabase環境変数は不要です。
+
+テンプレート（`.env.example`）をコピーして作成:
+\`\`\`bash
+cp .env.example .env
+\`\`\`
+
+実キーを設定:
+\`\`\`env
+GITHUB_TOKEN=ghp_your_actual_token_here
+# Supabase MCP用の環境変数は不要（OAuth認証）
+\`\`\`
+
+### 2. `backend/.env`（FastAPI用）
+
+テンプレート（`backend/.env.example`）をコピーして作成:
+\`\`\`bash
+cp backend/.env.example backend/.env
+\`\`\`
+
+実キーを設定:
+\`\`\`env
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_ANON_KEY=eyJhbGci...（実キー）
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...（実キー）
+JWT_SECRET=ランダム文字列（`python -c "import secrets; print(secrets.token_urlsafe(32))"`で生成）
+\`\`\`
+
+### 3. `frontend/.env.local`（Next.js用）
+
+テンプレート（`frontend/.env.local.example`）をコピーして作成:
+\`\`\`bash
+cp frontend/.env.local.example frontend/.env.local
+\`\`\`
+
+実キーを設定:
+\`\`\`env
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...（実キー）
+\`\`\`
+
+---
+
+設定が完了したら「環境変数設定完了しました」と返信してください。
+```
+
+**ユーザー**: "環境変数設定完了しました"
+
+---
+
+### Step 2: Claude Code再起動案内
+
+**AI が案内**:
+```markdown
+環境変数の変更を反映させるため、Claude Codeを再起動してください。
+
+【再起動手順】
+1. Claude Code を終了
+2. Claude Code を再起動
+3. このプロジェクトを開く
+
+再起動が完了したら「再起動しました」と返信してください。
+```
+
+**ユーザー**: "再起動しました"
+
+---
+
+### Step 2.5: Supabase OAuth認証（技術スタック依存）
+
+**AI が案内**:
+```markdown
+Supabase MCPを使用する場合、ブラウザでOAuth認証を行います。
+
+【自動起動】
+Claude Code起動時に、ブラウザでSupabaseログイン画面が自動的に開きます。
+
+【手順】
+1. ブラウザでSupabaseアカウントにログイン
+2. **重要**: 正しい組織（Organization）を選択
+   - プロジェクトが所属している組織を選択してください
+3. "Authorize"をクリックしてアクセス許可
+4. 認証完了（ブラウザを閉じてOK）
+
+ログイン画面が開かない場合は、以下を確認:
+- `.mcp.json` の `supabase` 設定が正しいか
+- Claude Codeが完全に再起動されたか
+
+認証が完了したら「Supabase認証完了しました」と返信してください。
+```
+
+**ユーザー**: "Supabase認証完了しました"
+
+---
+
+### Step 3: MCP接続確認（自動検証）
+
+**AI が実行**:
+
+#### 1. GitHub MCP接続確認
+```bash
+gh repo view --json name,owner,description
+```
+
+**成功例**:
+```json
+{"name":"project-name","owner":{"login":"username"},"description":"..."}
+```
+
+**失敗時**:
+```markdown
+❌ GitHub MCP接続失敗
+
+【原因】
+- GITHUB_TOKEN が設定されていない
+- GITHUB_TOKEN の権限不足
+
+【対処方法】
+1. `.env` の `GITHUB_TOKEN` を確認
+2. GitHub Settings > Developer settings > Personal access tokens で権限確認
+3. 必要な権限: `repo`, `read:org`
+```
+
+---
+
+#### 2. Codex MCP接続確認
+
+**重要**: Codex MCPは事前ログイン（`codex login`）済みのため、環境変数不要
+
+```bash
+# Codex MCP動作確認（簡単なプロンプト）
+# ※ MCPツールとして呼び出し
+```
+
+**成功**: Codex応答あり
+**失敗**: `codex login --api-key "xxx"` 案内
+
+---
+
+#### 3. Supabase MCP接続確認（技術スタック依存）
+
+**重要**: Supabase MCPはOAuth認証済みのため、環境変数不要です。
+
+```bash
+# Supabase MCPツール利用テスト（例: プロジェクト一覧取得）
+# ※ 実際のMCPツール名は実装に依存
+```
+
+**成功**: Supabaseプロジェクト情報取得
+
+**失敗時**:
+```markdown
+❌ Supabase MCP接続失敗
+
+【原因】
+- OAuth認証が完了していない
+- 認証時に誤った組織を選択した
+- ブラウザがブロックされている
+
+【対処方法】
+1. Claude Codeを再起動してOAuth認証をやり直す
+2. ブラウザで正しい組織（プロジェクトが所属している組織）を選択
+3. ポップアップブロッカーを無効化
+4. 詳細は [MCP_SETUP_GUIDE.md](./MCP_SETUP_GUIDE.md#3-supabase-mcp技術スタック依存) 参照
+```
+
+---
+
+#### 4. Serena MCP接続確認
+
+**重要**: Serena MCPは自動セットアップのため、特別な設定不要
+
+```bash
+# Serenaメモリ読み込みテスト
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+```
+
+**成功**: 技術スタック情報取得
+
+---
+
+### Step 4: 全MCP接続成功 → Phase 0.4完了
+
+**AI が報告**:
+```markdown
+✅ Phase 0.4: 環境変数設定・MCP接続確認 完了
+
+【接続確認結果】
+- ✅ GitHub MCP: 接続成功
+- ✅ Codex MCP: 接続成功
+- ✅ Supabase MCP: 接続成功（技術スタック依存）
+- ✅ Serena MCP: 接続成功
+
+【設定済み環境変数】
+- .env: GITHUB_TOKEN
+- backend/.env: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY等
+- frontend/.env.local: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY等
+
+【OAuth認証済みMCP】
+- Supabase MCP: ブラウザベースOAuth認証完了
+
+🎉 **Phase 0完了**: プロジェクト基盤構築が完了しました。Phase 1開始可能です。
+```
+
+---
+
+### Step 5: Git commit
+
+```bash
+git add .env backend/.env frontend/.env.local
+git commit -m "feat: Phase 0完了（環境変数設定・MCP接続確認）
+
+✅ Phase 0完了条件:
+- 環境変数設定済み（.env, backend/.env, frontend/.env.local）
+- GitHub MCP接続確認成功
+- Codex MCP接続確認成功
+- Supabase MCP接続確認成功
+- Serena MCP接続確認成功
+
+Phase 1開始可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+---
+
+## 関連ドキュメント
+
+- [MCP_SETUP_GUIDE.md](./MCP_SETUP_GUIDE.md) - 各MCP詳細設定手順
+- [ENV_SETUP_GUIDE.md](./ENV_SETUP_GUIDE.md) - 環境変数設定ガイド
+- [PHASE_COMPLETION.md](./PHASE_COMPLETION.md) - Phase完了手順
