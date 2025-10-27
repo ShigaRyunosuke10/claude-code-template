@@ -97,29 +97,86 @@ sed -i 's/{{BACKEND_PORT}}/8000/g' CLAUDE.md   # デフォルト値
 
 ---
 
-#### 3. GitHubリポジトリ作成
+#### 3. GitHubリポジトリ作成（GitHub MCP使用）
+
+**前提条件**:
+- **環境変数 `GITHUB_TOKEN` が設定されていること**
+- `.mcp.json` でGitHub MCPサーバーが有効化されていること
+
+**環境変数チェック**:
+```bash
+# GITHUB_TOKEN の存在確認
+echo $GITHUB_TOKEN | head -c 10
+
+# 未設定の場合は以下のメッセージを表示
+```
+
+**環境変数が未設定の場合**:
+```markdown
+❌ 環境変数 `GITHUB_TOKEN` が設定されていません。
+
+【設定手順】
+1. GitHubアクセストークンを取得:
+   https://github.com/settings/tokens?type=beta
+
+   必要なスコープ:
+   - Repository access: All repositories
+   - Repository permissions:
+     - Contents: Read and write
+     - Metadata: Read-only
+
+2. 環境変数を設定:
+
+   # Windows PowerShell
+   $env:GITHUB_TOKEN = "ghp_your_token_here"
+
+   # macOS/Linux
+   export GITHUB_TOKEN="ghp_your_token_here"
+
+   # 永続化（推奨）:
+   ~/.bashrc または ~/.zshrc に追加
+   export GITHUB_TOKEN="ghp_your_token_here"
+
+3. Claude Code を再起動
+
+詳細: README.md の「事前準備」セクションを参照
+```
+
+**選択肢**:
+```markdown
+A. 環境変数を設定してから再実行する（推奨）
+B. 後で手動でリポジトリを作成する
+C. 既存リポジトリを使う
+```
+
+**選択肢Aを選んだ場合**:
+→ Phase 0 を一時中断（ユーザーが環境変数設定後に再開）
+
+**選択肢B/Cを選んだ場合**:
+→ Step 3 をスキップ（Step 4 も スキップ）
+
+---
+
+**環境変数が設定済みの場合**:
 
 **実行内容**:
 ```bash
-# GitHub CLI でリポジトリ作成
-gh repo create {{REPO_NAME}} \
-  --{{public|private}} \
-  --source=. \
-  --description="{{説明文}}" \
-  --remote=origin
+# GitHub MCP でリポジトリ作成
+mcp__github__create_repository(
+  name: "{{REPO_NAME}}",
+  description: "{{説明文}}",
+  private: {{true|false}},
+  auto_init: false
+)
 
-# または
-gh repo create {{GITHUB_OWNER}}/{{REPO_NAME}} \
-  --{{public|private}} \
-  --description="{{説明文}}"
-
+# リモートURL追加
 git remote add origin https://github.com/{{GITHUB_OWNER}}/{{REPO_NAME}}.git
 ```
 
 **エラー時**:
-- GitHub CLI が未インストール → インストール手順を表示
-- 認証エラー → `gh auth login` を実行
+- 認証エラー → 環境変数 `GITHUB_TOKEN` の値を確認
 - リポジトリ名重複 → 別の名前を提案
+- GitHub MCP サーバーエラー → `.mcp.json` 設定を確認
 
 ---
 
