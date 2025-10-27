@@ -199,6 +199,7 @@ docs/
 - **serena** - コードベース解析
 - **playwright** - E2Eテスト
 - **codex** - AI コーディングアシスタント（環境変数: `OPENAI_API_KEY`）
+  - 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
 
 ### 技術スタック依存（Phase 0.2で追加）
 - **supabase** - Supabase DB操作（Supabase使用時）

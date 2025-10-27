@@ -186,3 +186,16 @@ async def test_complete_user_workflow(client):
 ## Handoff to
 - `impl-dev-backend`: 統合テスト失敗時の修正依頼
 - `playwright-test-planner`: E2Eテストへ引き継ぎ
+
+---
+
+## Codex AI相談フロー（テスト失敗ループ時）
+
+**トリガー**: 同一統合テストケース3回失敗時
+
+**手順**: [ai-rules/CODEX_CONSULTATION.md](../../ai-rules/CODEX_CONSULTATION.md) を参照
+
+**概要**:
+1. Codex AIに自動相談（`mcp__codex__codex()`）
+2. 推奨修正を適用 → テスト再実行
+3. Codex失敗時 → ユーザー相談

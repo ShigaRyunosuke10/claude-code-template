@@ -54,11 +54,15 @@ echo $OPENAI_API_KEY | head -c 10
 4. **用途**: エラーループ時のCodex AI自動相談
    - Critical/High問題: 初回発生時に自動相談
    - Medium問題: 3回失敗後に自動相談
+   - 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
 
 **技術スタック依存の設定（Phase 0.2で自動チェック）**:
 
-Phase 0.2 でテンプレートが技術スタックを決定後、必要な環境変数を自動的にチェックします。
+Phase 0.2 でテンプレートが技術スタックを決定後、`tech-stack-validator` が必要な環境変数を自動的にチェックします。
 設定が不足している場合は、テンプレートが設定方法を案内します。
+
+**自動生成される設定ガイド**:
+- `ai-rules/ENV_SETUP_GUIDE.md` - 技術スタック別の環境変数設定手順が自動生成されます
 
 **設定が必要になる可能性のある環境変数**:
 - `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` (Supabase使用時)
@@ -66,7 +70,7 @@ Phase 0.2 でテンプレートが技術スタックを決定後、必要な環�
 - `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` (Auth0使用時)
 - その他（Vercel, AWS, GCP等、技術スタック次第）
 
-詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
+詳細: [ai-rules/PHASE_START.md - Phase 0.2](./ai-rules/PHASE_START.md)、[ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
 
 ---
 
@@ -78,7 +82,7 @@ Phase 0.2 でテンプレートが技術スタックを決定後、必要な環�
 
 ### Step 2: プレースホルダーを置換（自動化）
 
-**Phase 0 開始時に自動実行されます**。手動での置換は不要です。
+**Phase 0.0 開始時に自動実行されます**。手動での置換は不要です。
 
 Claude Code がPhase 0（プロジェクト基盤構築）の最初に以下を自動実行します：
 
