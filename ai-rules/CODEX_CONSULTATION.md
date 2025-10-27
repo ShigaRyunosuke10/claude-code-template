@@ -472,3 +472,148 @@ Codex相談の結果を `.serena/memories/testing/e2e_patterns.json` に記録�
 - [Codex MCP GitHub](https://github.com/tuannvm/codex-mcp-server)
 - [OpenAI Codex CLI ドキュメント](https://developers.openai.com/codex/)
 - [Model Context Protocol 仕様](https://modelcontextprotocol.io/)
+
+---
+
+## 📊 深刻度別Codex相談基準
+
+エラーの深刻度に応じて、Codex相談のタイミングを調整します。
+
+### 深刻度分類
+
+| 深刻度 | 説明 | 例 |
+|--------|------|-----|
+| 🚨 **Critical** | ブロック（修正必須） | アーキテクチャ違反、セキュリティリスク、データ整合性、致命的バグ、型定義不一致 |
+| ⚠️ **High** | 強く推奨 | パフォーマンス問題、エラーハンドリング欠落、型安全性 |
+| 💡 **Medium** | 推奨 | 可読性、保守性、命名規則 |
+| 📝 **Low** | 提案 | ドキュメント欠落、スタイル改善 |
+
+詳細: [.claude/agents/code-reviewer.md](../.claude/agents/code-reviewer.md)
+
+---
+
+### Codex相談タイミング
+
+| 深刻度 | Codex相談タイミング | ユーザー相談 | 理由 |
+|--------|-------------------|------------|------|
+| 🚨 Critical | **初回発生時** | Codex 2回失敗後 | 致命的な問題は即座にAI支援 |
+| ⚠️ High | **初回発生時** | Codex 2回失敗後 | 重要な問題は早期解決 |
+| 💡 Medium | 3回失敗後 | Codex 2回失敗後 | 通常フロー |
+| 📝 Low | 相談なし（自動修正のみ） | - | 軽微な問題は自動対応 |
+
+---
+
+### 実装例
+
+#### code-reviewer: Critical/High問題検出時
+
+```typescript
+// Critical/High問題検出時は即座にCodex相談
+if (criticalIssues.length > 0 || highIssues.length > 0) {
+  for (const issue of [...criticalIssues, ...highIssues]) {
+    const codexPrompt = `
+# Codex AI相談リクエスト（深刻度: ${issue.severity}）
+
+## エラー詳細
+- **深刻度**: ${issue.severity}
+- **問題**: ${issue.title}
+- **影響**: ${issue.impact}
+
+## コード（該当箇所）
+**ファイル**: \`${issue.file}:${issue.line}\`
+
+\`\`\`${issue.language}
+${issue.currentCode}
+\`\`\`
+
+## 質問
+この${issue.category}（${issue.title}）の修正方法を教えてください。
+深刻度が${issue.severity}なので、優先的に対処したいです。
+    `;
+
+    const codexResponse = await mcp__codex__codex({ prompt: codexPrompt });
+    issue.codexRecommendation = codexResponse;
+  }
+}
+```
+
+#### impl-dev-backend/frontend: 深刻度判定
+
+```typescript
+// エラーの深刻度を判定
+function assessSeverity(error: Error, context: string): Severity {
+  // Critical判定
+  if (error.message.includes('NullPointerException') ||
+      error.message.includes('SecurityException') ||
+      error.message.includes('DataIntegrityViolation')) {
+    return 'Critical';
+  }
+  
+  // High判定
+  if (error.message.includes('PerformanceWarning') ||
+      error.message.includes('UnhandledPromiseRejection')) {
+    return 'High';
+  }
+  
+  // Medium判定
+  if (error.message.includes('DeprecationWarning') ||
+      error.message.includes('CodeStyleViolation')) {
+    return 'Medium';
+  }
+  
+  // Low判定
+  return 'Low';
+}
+
+// 深刻度に応じたCodex相談
+const severity = assessSeverity(error, codeContext);
+
+if (severity === 'Critical' || severity === 'High') {
+  // 初回発生時に即座にCodex相談
+  const codexResponse = await consultCodex(error, severity);
+  applyFix(codexResponse);
+} else if (severity === 'Medium') {
+  // 3回失敗後にCodex相談（従来フロー）
+  if (failedAttempts >= 3) {
+    const codexResponse = await consultCodex(error, severity);
+    applyFix(codexResponse);
+  }
+} else {
+  // Low: 自動修正のみ（Codex相談なし）
+  autoFix(error);
+}
+```
+
+---
+
+### Learning Memory記録（深刻度含む）
+
+```json
+{
+  "id": "pattern_020_critical_null_pointer",
+  "errorType": "application_bug",
+  "severity": "Critical",
+  "rootCause": "Null参照エラー（ユーザー認証後のセッション取得）",
+  "fixAttempts": [
+    {
+      "attempt": 1,
+      "action": "Codex AI相談（深刻度: Critical → 即座に相談）",
+      "codexRecommendation": "Optional chaining (?.) を使用してnullチェック",
+      "result": "success",
+      "fixedBy": "codex",
+      "timestamp": "2025-10-27T16:00:00Z"
+    }
+  ],
+  "resolved": true
+}
+```
+
+---
+
+### メリット
+
+1. **Critical/High問題の早期解決**: 致命的な問題は初回からAI支援
+2. **開発効率向上**: 重要な問題を優先的に解決
+3. **コスト最適化**: Low問題はCodex相談なし（自動修正のみ）
+4. **学習効果**: 深刻度別の相談履歴をLearning Memoryに蓄積
+

@@ -201,6 +201,7 @@ docs/
 - **context7** - ライブラリドキュメント取得
 - **codex** - AI コーディングアシスタント（エラーループ時の自動相談）
 
+**設定方法**: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)（技術スタック依存の環境変数設定ガイド）
 詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
 
 ---

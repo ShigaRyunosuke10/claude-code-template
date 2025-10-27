@@ -600,3 +600,161 @@ Claude: 「✅ Phase完了！」
 ```
 
 これが理想のセッションです。
+
+---
+
+## Phase 0.2: 環境変数・MCP設定チェック（NEW）
+
+**実行タイミング**: Phase 0.1（技術スタック決定）の直後
+
+**目的**: 技術スタックに基づいて必要な環境変数・MCP設定を一斉チェック・設定
+
+詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ENV_SETUP_GUIDE.md)
+
+---
+
+### Step 1: 技術スタック読み込み
+
+```bash
+# Serenaメモリから技術スタックを読み込み
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+```
+
+**取得情報**:
+- データベース種類（Supabase / PostgreSQL / MongoDB）
+- 認証方式（Auth0 / Supabase Auth / JWT）
+- 決済サービス（Stripe / PayPal）
+- デプロイ先（Vercel / AWS / Netlify）
+- AI機能有無（OpenAI / Anthropic）
+
+---
+
+### Step 2: 必要な環境変数を特定
+
+**技術スタック別マッピング**:
+
+| 技術スタック | 必要な環境変数 | 必須/任意 |
+|-------------|--------------|----------|
+| **全プロジェクト** | `GITHUB_TOKEN` | **必須** |
+| Supabase | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` | 必須 |
+| OpenAI (Codex) | `OPENAI_API_KEY` | 任意（推奨） |
+| Context7 | `CONTEXT7_API_KEY` | 任意（推奨） |
+| Auth0 | `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` | 必須 |
+| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` | 必須 |
+| Vercel | `VERCEL_TOKEN` | 必須 |
+
+---
+
+### Step 3: 環境変数チェック
+
+```bash
+# 必須: GITHUB_TOKEN
+echo $GITHUB_TOKEN | head -c 10
+
+# 技術スタック依存
+echo $SUPABASE_ACCESS_TOKEN | head -c 10
+echo $SUPABASE_PROJECT_REF
+echo $OPENAI_API_KEY | head -c 10
+echo $CONTEXT7_API_KEY | head -c 10
+```
+
+---
+
+### Step 4: 未設定の環境変数を一括案内
+
+**メインClaude Agentが表示**:
+
+```markdown
+## 🔧 環境変数・MCP設定が必要です
+
+技術スタック確定に基づき、以下の設定が必要です。
+
+### 必須設定
+
+#### ✅ GITHUB_TOKEN
+- 状態: 設定済み
+
+### 技術スタック別設定（必須）
+
+#### ❌ SUPABASE_ACCESS_TOKEN（未設定）
+- 用途: Supabase データベース操作
+- 取得方法: https://app.supabase.com/ > Settings > API > Service Role Key
+- 設定コマンド:
+  ```powershell
+  $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+  [System.Environment]::SetEnvironmentVariable('SUPABASE_ACCESS_TOKEN', 'sbp_...', 'User')
+  ```
+
+#### ❌ SUPABASE_PROJECT_REF（未設定）
+- 用途: Supabaseプロジェクト識別
+- 取得方法: https://app.supabase.com/ > Settings > General > Reference ID
+- 設定コマンド:
+  ```powershell
+  $env:SUPABASE_PROJECT_REF = "your-project-ref"
+  [System.Environment]::SetEnvironmentVariable('SUPABASE_PROJECT_REF', 'your-project-ref', 'User')
+  ```
+
+### 任意設定（推奨）
+
+#### ⚠️ OPENAI_API_KEY（任意・推奨）
+- 用途: エラーループ時のAI自動相談（Codex）
+  - Critical/High問題: 初回発生時に自動相談
+  - Medium問題: 3回失敗後に自動相談
+- 取得方法: https://platform.openai.com/api-keys
+- 設定コマンド: README.md「Step 0: 環境変数設定」参照
+
+#### ⚠️ CONTEXT7_API_KEY（任意・推奨）
+- 用途: ライブラリドキュメント自動取得（90日キャッシュ）
+- 取得方法: https://context7.upstash.com/
+- 設定コマンド:
+  ```powershell
+  $env:CONTEXT7_API_KEY = "your-api-key"
+  [System.Environment]::SetEnvironmentVariable('CONTEXT7_API_KEY', 'your-api-key', 'User')
+  ```
+
+### 次のステップ
+
+1. 上記の環境変数を設定してください
+2. Claude Code を再起動してください
+3. Phase 0.2 を再実行します
+
+**選択肢**:
+A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
+B. 後で設定する → Phase 0 を一時中断
+C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
+```
+
+---
+
+### Step 5: 設定検証
+
+```bash
+# 環境変数確認
+echo "GITHUB_TOKEN: $(echo $GITHUB_TOKEN | head -c 10)"
+echo "SUPABASE_ACCESS_TOKEN: $(echo $SUPABASE_ACCESS_TOKEN | head -c 10)"
+echo "SUPABASE_PROJECT_REF: $SUPABASE_PROJECT_REF"
+echo "OPENAI_API_KEY: $(echo $OPENAI_API_KEY | head -c 10)"
+echo "CONTEXT7_API_KEY: $(echo $CONTEXT7_API_KEY | head -c 10)"
+
+# .mcp.json検証
+cat .mcp.json | grep -E "SUPABASE|OPENAI|CONTEXT7|GITHUB"
+```
+
+---
+
+### 完了メッセージ
+
+```markdown
+✅ 環境変数・MCP設定チェック完了
+
+【設定済み環境変数】
+- GITHUB_TOKEN: ghp_ABC***
+- SUPABASE_ACCESS_TOKEN: sbp_XYZ***
+- SUPABASE_PROJECT_REF: your-project-ref
+- OPENAI_API_KEY: sk-123*** （任意）
+- CONTEXT7_API_KEY: ctx_789*** （任意）
+
+【次のステップ】
+Phase 0.3（技術スタック検証）を開始します。
+```
+

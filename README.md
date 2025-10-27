@@ -23,39 +23,40 @@
 
 ## 🚀 使い方
 
+### Step 0: 環境変数設定
 
-### Step 0.5: Codex CLI設定（オプション・推奨）
+**必須設定**:
 
-**重要**: エラーループ時のAI自動相談機能を利用するには、Codex CLIのセットアップが必要です。
+```bash
+# GitHub Personal Access Token（必須 - すべてのプロジェクト）
+export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-#### 1. Codex CLIインストール
+# 確認
+echo $GITHUB_TOKEN | head -c 10
+```
 
-\`\`\`bash
-npm install -g @openai/codex-cli
-\`\`\`
+**GitHubトークン取得方法**:
+1. [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
+2. "Generate new token (classic)" をクリック
+3. Scopes: `repo`, `workflow`, `admin:org`（プライベートリポジトリの場合は `repo` 全権限）
+4. トークンをコピーして環境変数に設定
 
-#### 2. OpenAI APIキー設定
+**技術スタック依存の設定（Phase 0.2で自動チェック）**:
 
-\`\`\`bash
-# 方法1: Codex CLI経由で設定
-codex auth login
+Phase 0.2 でテンプレートが技術スタックを決定後、必要な環境変数を自動的にチェックします。
+設定が不足している場合は、テンプレートが設定方法を案内します。
 
-# 方法2: 環境変数で設定
-export OPENAI_API_KEY="sk-..."
-\`\`\`
+**設定が必要になる可能性のある環境変数**:
+- `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` (Supabase使用時)
+- `OPENAI_API_KEY` (Codex AI相談機能使用時)
+- `CONTEXT7_API_KEY` (Context7ドキュメント取得使用時)
+- その他（Auth0, Stripe, Vercel, AWSなど技術スタック次第）
 
-#### 3. 動作確認
-
-\`\`\`bash
-codex --version
-\`\`\`
-
-#### 注意事項
-- Codex CLI未設定の場合、エラーループ時は従来通りユーザー相談になります
-- OpenAI APIキーが必要（有料）
-- 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
+詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
 
 ---
+
+
 
 ### Step 1: テンプレートをコピー
 
