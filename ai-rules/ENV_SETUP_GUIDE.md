@@ -144,7 +144,7 @@ Phase 0.2: 環境変数・MCP設定チェック（tech-stack-validator）
 tech-stack-validator が以下を実行:
     1. tech_stack.md 読み込み
     2. 必要な環境変数を特定
-    3. 最新設定方法を調査（WebSearch/Context7）
+    3. 最新設定方法を調査（WebSearch）
     4. 本ファイルを具体的なガイドに上書き
     5. 未設定変数をユーザーに案内
     6. 設定完了を検証
@@ -171,6 +171,5 @@ tech-stack-validator が以下を実行:
 - **WebSearch**: 公式ドキュメント最新情報
   - 例: "Supabase environment variables setup 2025"
   - 例: "Stripe API keys configuration Node.js"
-- **Context7 MCP**: ライブラリ・SDK公式ドキュメント
 - **MCP Registry**: 利用可能なMCPサーバー一覧
   - [MCP Registry](https://github.com/modelcontextprotocol/registry)

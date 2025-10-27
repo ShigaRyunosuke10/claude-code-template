@@ -725,12 +725,6 @@ WebSearch: "Stripe API keys setup Node.js 2025"
 WebSearch: "Stripe environment variables best practices"
 ```
 
-**Context7 MCP**:
-```bash
-# 例: Supabase
-
-# 例: Stripe
-```
 
 **MCP Registry**:
 - [MCP Registry](https://github.com/modelcontextprotocol/registry) を参照
@@ -821,57 +815,6 @@ echo $SUPABASE_PROJECT_REF
 - **取得方法**: https://platform.openai.com/api-keys
 - **設定手順**: （同上）
 
-### CONTEXT7_API_KEY
-- **用途**: ライブラリドキュメント自動取得（90日キャッシュ）
-- **設定手順**: （同上）
-
----
-
-## 検証コマンド一覧
-
-\```bash
-# 必須設定
-echo $GITHUB_TOKEN | head -c 10
-
-# 技術スタック別設定
-echo $SUPABASE_ACCESS_TOKEN | head -c 10
-echo $SUPABASE_PROJECT_REF
-# ...（動的に生成）
-
-# 任意設定
-echo $OPENAI_API_KEY | head -c 10
-echo $CONTEXT7_API_KEY | head -c 10
-\```
-```
-
----
-
-#### Step 5: 環境変数リストを返却
-
-plannerに返すJSON形式レポート：
-
-```json
-{
-  "required": [
-    "GITHUB_TOKEN",
-    "SUPABASE_ACCESS_TOKEN",
-    "SUPABASE_PROJECT_REF",
-    "STRIPE_SECRET_KEY",
-    "STRIPE_PUBLISHABLE_KEY"
-  ],
-  "optional": [
-    "OPENAI_API_KEY",
-    "CONTEXT7_API_KEY"
-  ],
-  "descriptions": {
-    "GITHUB_TOKEN": "GitHubリポジトリ作成、PR/Issue管理",
-    "SUPABASE_ACCESS_TOKEN": "Supabaseデータベース操作",
-    "SUPABASE_PROJECT_REF": "Supabaseプロジェクト識別",
-    "STRIPE_SECRET_KEY": "Stripe決済処理（サーバーサイド）",
-    "STRIPE_PUBLISHABLE_KEY": "Stripe決済UI（クライアントサイド）",
-    "OPENAI_API_KEY": "Codex AI相談（エラーループ時）",
-    "CONTEXT7_API_KEY": "ライブラリドキュメント自動取得"
-  },
   "guide_path": "ai-rules/ENV_SETUP_GUIDE.md",
   "updated_at": "2025-01-15 10:30:00"
 }

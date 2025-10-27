@@ -163,17 +163,6 @@ npx @supabase/mcp-server-supabase --access-token=${SUPABASE_ACCESS_TOKEN} --proj
 
 ## 📋 検索対象外の技術スタック
 
-以下はContext7でカバーされるため、MCP検索対象外:
-
-- ❌ フロントエンドフレームワーク（Next.js, React, Vue等）
-- ❌ バックエンドフレームワーク（FastAPI, Express, Django等）
-- ❌ 汎用ライブラリ（axios, lodash等）
-
----
-
-## 🔍 検索方法の詳細
-
-### Phase 1: サービス抽出
 技術スタックから外部サービスを抽出:
 - Database: Supabase, MongoDB, PostgreSQL, MySQL, Firebase
 - Payment: Stripe, PayPal
@@ -231,7 +220,7 @@ mcp__serena__read_memory(memory_name: "system/system_state.md")
 
 **参照ファイル** (system_state.md から参照):
 - `system/tech_stack.md` - 技術スタック詳細(選択理由、制約含む)
-- `system/tech_best_practices.md` - Context7取得のベストプラクティス(90日キャッシュ)
+- `system/tech_best_practices.md` - 技術スタックのベストプラクティス(90日キャッシュ)
 - `system/mcp_servers.md` - 設定済みMCPサーバー一覧
 - `system/implementation_status.md` - 実装済み機能・進捗状況
 

@@ -49,7 +49,7 @@ mcp__serena__read_memory(memory_name: "system/system_state.md")
 
 **参照ファイル** (system_state.md から参照):
 - `system/tech_stack.md` - 技術スタック詳細(選択理由、制約含む)
-- `system/tech_best_practices.md` - Context7取得のベストプラクティス(90日キャッシュ)
+- `system/tech_best_practices.md` - 技術スタックのベストプラクティス(90日キャッシュ)
 - `system/mcp_servers.md` - 設定済みMCPサーバー一覧
 - `system/implementation_status.md` - 実装済み機能・進捗状況
 

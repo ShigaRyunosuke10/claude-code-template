@@ -153,7 +153,7 @@ mcp__serena__write_memory(
 
 1. **github** - GitHub操作（PR/Issue管理）
 2. **serena** - コードベース解析・シンボル操作
-3. **context7** - ライブラリドキュメント取得
+
 4. **supabase** - Supabase管理
 5. **playwright** - ブラウザ自動化（E2Eテスト）
 
@@ -180,7 +180,6 @@ mcp__serena__write_memory(
 ## 📚 参照ドキュメント
 
 - [tech_stack.md](./tech_stack.md) - 技術スタック詳細（選択理由・制約含む）
-- [tech_best_practices.md](./tech_best_practices.md) - Context7取得のベストプラクティス
 - [mcp_servers.md](./mcp_servers.md) - MCP設定詳細
 - [implementation_status.md](./implementation_status.md) - 実装進捗詳細
 - [project_requirements.md](../../project_requirements.md) - プロジェクト要件定義
@@ -208,7 +207,7 @@ mcp__serena__write_memory(
 #### 2.3 tech_best_practices.md（ベストプラクティス）
 
 **更新タイミング**:
-- 初回: tech-stack-validator エージェントがContext7から取得時
+- 初回: tech-stack-validator エージェントがWebSearchから取得時
 - 以降: 90日ごと、または技術スタック大幅変更時
 
 **実行方法**:
@@ -216,7 +215,6 @@ mcp__serena__write_memory(
 ```bash
 mcp__serena__write_memory(
   memory_name: "system/tech_best_practices.md",
-  content: "{Context7取得内容}"
 )
 ```
 
@@ -226,26 +224,22 @@ mcp__serena__write_memory(
 # 技術ベストプラクティス
 
 最終更新: {YYYY-MM-DD}
-Context7取得日: {YYYY-MM-DD}
 有効期限: {YYYY-MM-DD}（90日後）
 
 ---
 
 ## Next.js 14 App Router Best Practices
 
-{Context7取得内容}
 
 ---
 
 ## FastAPI Pydantic v2 Best Practices
 
-{Context7取得内容}
 
 ---
 
 ## Supabase Integration Best Practices
 
-{Context7取得内容}
 ```
 
 ---

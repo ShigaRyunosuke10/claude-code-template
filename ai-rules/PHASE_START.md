@@ -625,7 +625,7 @@ tech-stack-validator エージェントを呼び出して、環境変数設定�
 **タスク内容**:
 1. system/tech_stack.md を読み込み
 2. 必要な環境変数を特定
-3. 最新の設定方法を調査（WebSearch/Context7）
+3. 最新の設定方法を調査（WebSearch）
 4. ai-rules/ENV_SETUP_GUIDE.md を具体的な手順に書き換え
 5. 必要な環境変数リストを返却
 
@@ -645,11 +645,10 @@ Task tool を使用して tech-stack-validator を起動してください。
    - 認証（Auth0, Firebase Auth, AWS Cognito等）
    - 決済（Stripe, PayPal等）
    - インフラ（Vercel, AWS, GCP等）
-   - AI/MCP（OpenAI, Anthropic, Context7等）
+   - AI/MCP（OpenAI, Anthropic等）
 
 3. 各サービスの最新設定方法を調査
    - WebSearch で公式ドキュメント検索（例: "Supabase environment variables setup 2025"）
-   - Context7 MCP でライブラリドキュメント取得（例: mcp__context7__search_context(query: "supabase-js setup")）
    - MCP Registry を参照（https://github.com/modelcontextprotocol/registry）
 
 4. ai-rules/ENV_SETUP_GUIDE.md を上書き
@@ -661,7 +660,7 @@ Task tool を使用して tech-stack-validator を起動してください。
 5. 必要な環境変数リストを以下の形式で返却:
    {
      "required": ["GITHUB_TOKEN", "SUPABASE_ACCESS_TOKEN", ...],
-     "optional": ["OPENAI_API_KEY", "CONTEXT7_API_KEY", ...],
+     "optional": ["OPENAI_API_KEY", ...],
      "descriptions": {
        "SUPABASE_ACCESS_TOKEN": "Supabaseデータベース操作",
        ...
@@ -695,7 +694,6 @@ echo $SUPABASE_PROJECT_REF
 
 # optional リストをチェック
 echo $OPENAI_API_KEY | head -c 10
-echo $CONTEXT7_API_KEY | head -c 10
 # ...（動的に生成）
 ```
 
@@ -777,13 +775,10 @@ C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限�
 - 取得方法: https://platform.openai.com/api-keys
 - 設定コマンド: README.md「Step 0: 環境変数設定」参照
 
-#### ⚠️ CONTEXT7_API_KEY（任意・推奨）
 - 用途: ライブラリドキュメント自動取得（90日キャッシュ）
 - 取得方法: https://context7.upstash.com/
 - 設定コマンド:
   ```powershell
-  $env:CONTEXT7_API_KEY = "your-api-key"
-  [System.Environment]::SetEnvironmentVariable('CONTEXT7_API_KEY', 'your-api-key', 'User')
   ```
 
 ### 次のステップ
@@ -808,10 +803,9 @@ echo "GITHUB_TOKEN: $(echo $GITHUB_TOKEN | head -c 10)"
 echo "SUPABASE_ACCESS_TOKEN: $(echo $SUPABASE_ACCESS_TOKEN | head -c 10)"
 echo "SUPABASE_PROJECT_REF: $SUPABASE_PROJECT_REF"
 echo "OPENAI_API_KEY: $(echo $OPENAI_API_KEY | head -c 10)"
-echo "CONTEXT7_API_KEY: $(echo $CONTEXT7_API_KEY | head -c 10)"
 
 # .mcp.json検証
-cat .mcp.json | grep -E "SUPABASE|OPENAI|CONTEXT7|GITHUB"
+cat .mcp.json | grep -E "SUPABASE|OPENAI|GITHUB"
 ```
 
 ---
@@ -826,7 +820,6 @@ cat .mcp.json | grep -E "SUPABASE|OPENAI|CONTEXT7|GITHUB"
 - SUPABASE_ACCESS_TOKEN: sbp_XYZ***
 - SUPABASE_PROJECT_REF: your-project-ref
 - OPENAI_API_KEY: sk-123*** （任意）
-- CONTEXT7_API_KEY: ctx_789*** （任意）
 
 【次のステップ】
 Phase 0.3（技術スタック検証）を開始します。

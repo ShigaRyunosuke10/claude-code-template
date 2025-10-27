@@ -460,19 +460,6 @@ mcp__serena__replace_symbol_body(...)
 mcp__serena__insert_after_symbol(...)
 ```
 
-### Context7 MCP（ライブラリドキュメント取得）
-
-**使用タイミング**: 新しいライブラリ機能を使う時
-
-```bash
-# FastAPI の最新ドキュメント取得
-mcp__context7__resolve-library-id(libraryName: "fastapi")
-mcp__context7__get-library-docs(
-  context7CompatibleLibraryID: "/tiangolo/fastapi",
-  topic: "dependency injection",
-  tokens: 3000
-)
-```
 
 ### Playwright MCP（E2Eテスト・デバッグ）
 
