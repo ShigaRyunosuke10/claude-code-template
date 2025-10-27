@@ -23,11 +23,42 @@
 
 ## 🚀 使い方
 
+
+### Step 0.5: Codex CLI設定（オプション・推奨）
+
+**重要**: エラーループ時のAI自動相談機能を利用するには、Codex CLIのセットアップが必要です。
+
+#### 1. Codex CLIインストール
+
+\`\`\`bash
+npm install -g @openai/codex-cli
+\`\`\`
+
+#### 2. OpenAI APIキー設定
+
+\`\`\`bash
+# 方法1: Codex CLI経由で設定
+codex auth login
+
+# 方法2: 環境変数で設定
+export OPENAI_API_KEY="sk-..."
+\`\`\`
+
+#### 3. 動作確認
+
+\`\`\`bash
+codex --version
+\`\`\`
+
+#### 注意事項
+- Codex CLI未設定の場合、エラーループ時は従来通りユーザー相談になります
+- OpenAI APIキーが必要（有料）
+- 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
+
+---
+
 ### Step 1: テンプレートをコピー
 
-```bash
-cp -r claude-code-template my-new-project
-cd my-new-project
 ```
 
 ### Step 2: プレースホルダーを置換（自動化）

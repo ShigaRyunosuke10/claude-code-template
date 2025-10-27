@@ -411,3 +411,17 @@ console.log('✅ AI Autonomous Execution Complete');
 - `lint-fix`: テストコード整形
 - `doc-writer`: 検疫レポートのドキュメント化
 - **Human**: QUARANTINE時の根本原因修正依頼
+
+---
+
+## Codex AI相談フロー（HEALING失敗時）
+
+**トリガー**: HEALING仮説処方失敗時（QUARANTINE直前）
+
+**手順**: [ai-rules/CODEX_CONSULTATION.md](../../ai-rules/CODEX_CONSULTATION.md) を参照
+
+**概要**:
+1. Codex AIに自動相談（`mcp__codex__codex()`）
+2. 推奨修正を適用 → SMOKE Test実行
+3. Codex失敗時 → QUARANTINE
+

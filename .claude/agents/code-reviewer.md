@@ -333,3 +333,17 @@ invoices = db.query(Invoice).options(joinedload(Invoice.project)).all()
 - **Integrator統合**: 旧integratorエージェントの機能（FE/BE型定義整合性チェック）を統合
   - 理由: code-reviewerとintegratorは役割が重複、レビュー時に型定義も確認する方が効率的
   - 利点: エージェント数削減（17体 → 14体）、一貫したレビュー
+
+---
+
+## Codex AI相談フロー（Critical問題検出時）
+
+**トリガー**: Critical問題（ブロック）検出時
+
+**手順**: [ai-rules/CODEX_CONSULTATION.md](../../ai-rules/CODEX_CONSULTATION.md) を参照
+
+**概要**:
+1. Codex AIに自動相談（`mcp__codex__codex()`）
+2. Codex推奨修正をレビューレポートに追加
+3. 修正適用は impl-dev-* エージェントに委譲
+

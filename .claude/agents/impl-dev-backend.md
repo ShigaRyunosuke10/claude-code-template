@@ -206,3 +206,17 @@ Edit: .serena/memories/testing/e2e_patterns.json
 - ✅ **アプリケーションコードを修正** - impl-dev-backendの責任
 - ✅ **Backend logs を必ず確認** - 根本原因特定のため
 - ✅ **修正ごとに Learning Memory 更新** - 試行回数管理のため
+
+---
+
+## Codex AI相談フロー（エラーループ時）
+
+**トリガー**: 同一バグパターン3回失敗時
+
+**手順**: [ai-rules/CODEX_CONSULTATION.md](../../ai-rules/CODEX_CONSULTATION.md) を参照
+
+**概要**:
+1. Codex AIに自動相談（`mcp__codex__codex()`）
+2. 推奨修正を適用 → テスト再実行
+3. Codex失敗時 → ユーザー相談
+

@@ -199,6 +199,7 @@ docs/
 - **playwright** - E2Eテスト
 - **desktop-commander** - ファイルシステム操作
 - **context7** - ライブラリドキュメント取得
+- **codex** - AI コーディングアシスタント（エラーループ時の自動相談）
 
 詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
 
