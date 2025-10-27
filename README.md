@@ -12,9 +12,9 @@
 このテンプレートは、Claude Code（エージェントベース開発環境）を使った新規プロジェクト開発のスタートポイントです。
 
 **含まれる設定**:
-- ✅ **14体の汎用エージェント** - 計画、実装、テスト、品質保証、デプロイ、リリース
-- ✅ **Phase Rollout System** - AI自律E2Eテストシステム（3段階デプロイ）
-- ✅ **ワークフローテンプレート** - Case A（機能拡張）/ Case B（新規立ち上げ）/ Case C（デプロイ）
+- ✅ **16体の汎用エージェント** - 計画、実装、テスト、品質保証、デプロイ、リリース
+- ✅ **AI自律実行システム（Mode 1-3）** - AI自律E2Eテストシステム（段階的デプロイ）
+- ✅ **動的ワークフローシステム** - plannerが状況に応じてPhase階層を生成
 - ✅ **5つの横断的MCPサーバー** - GitHub, Serena, Playwright, Desktop Commander, Context7
 - ✅ **Permissions & Hooks** - 安全な開発環境
 - ✅ **AI開発ルール** - 命名規則、コミット規約、開発フロー
@@ -80,8 +80,8 @@ touch ai-rules-project/.gitkeep
 ```
 my-project/
 ├── .claude/
-│   ├── agents/          # テンプレート（14体）- 変更禁止
-│   ├── workflows/       # テンプレート（Case A/B/C）- 変更禁止
+│   ├── agents/          # テンプレート（16体）- 変更禁止
+│   ├── workflows/       # テンプレート（動的ワークフローガイド）- 変更禁止
 │   ├── commands/        # テンプレート - 変更禁止
 │   └── project/         # ★ プロジェクト固有
 │       ├── agents/      # プロジェクト固有エージェント
@@ -124,9 +124,9 @@ git push -u origin main
 
 ## 🎯 開発開始
 
-### Case A: 既存プロジェクトに機能を追加する場合
+### 既存プロジェクトに機能を追加する場合
 
-[.claude/workflows/case-a-existing-project.md](./.claude/workflows/case-a-existing-project.md) を参照
+[ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md) を参照
 
 ```bash
 # Claude Codeで以下のフローを実行
@@ -148,9 +148,9 @@ Task:qa-integration(prompt: "統合テスト作成")
 /docs-sync
 ```
 
-### Case B: ゼロから新規プロジェクトを立ち上げる場合
+### ゼロから新規プロジェクトを立ち上げる場合
 
-[.claude/workflows/case-b-new-project.md](./.claude/workflows/case-b-new-project.md) を参照
+[ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md) を参照
 
 ```bash
 # Claude Codeで以下のフローを実行
@@ -181,9 +181,9 @@ Task:qa-integration(prompt: "統合テスト基盤セットアップ")
 Task:deployment-agent(prompt: "デプロイ構成推奨 + 設定ファイル生成 + 初回デプロイ")
 ```
 
-### Case C: デプロイを実行する場合
+### デプロイを実行する場合
 
-[.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md) を参照
+[ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md) を参照
 
 ```bash
 # Claude Codeで以下のフローを実行
@@ -285,7 +285,7 @@ touch .claude/project/workflows/payment-flow.md
 ### 不要なテンプレート機能（このプロジェクトでは使用しない）
 
 - ❌ **deployment-agent** - デプロイは手動運用のため不使用
-- ❌ **Case C ワークフロー** - デプロイワークフロー不使用
+- ❌ **E2E自動修復システム** - E2Eテストは別ツール使用
 ```
 
 **重要**:
@@ -313,8 +313,10 @@ git commit -m "chore: payment-processor削除（決済機能廃止のため）"
 ```
 claude-code-template/
 ├── .claude/
-│   ├── agents/               # 14体のエージェント定義
-│   │   ├── planner.md               # 統合: project-planner + sub-planner
+│   ├── agents/               # 16体のエージェント定義
+│   │   ├── planner.md               # 動的Phase階層生成
+│   │   ├── mcp-finder.md            # MCP自動検索
+│   │   ├── tech-stack-validator.md  # 技術スタック検証
 │   │   ├── impl-dev-frontend.md
 │   │   ├── impl-dev-backend.md
 │   │   ├── qa-unit.md
@@ -333,17 +335,15 @@ claude-code-template/
 │   │   ├── e2e-full.md
 │   │   ├── pre-commit-check.md
 │   │   └── release-check.md
-│   ├── phases/               # Phase Rolloutシステム
-│   │   ├── phase1-observer.json
-│   │   ├── phase2-conservative.json
-│   │   ├── phase3-full-autonomous.json
+│   ├── phases/               # AI自律実行システム（Mode 1-3）
+│   │   ├── mode1-observer.json
+│   │   ├── mode2-conservative.json
+│   │   ├── mode3-full-autonomous.json
 │   │   └── ROLLOUT_GUIDE.md
 │   ├── scripts/              # ヘルパースクリプト
-│   │   └── switch-phase.sh
-│   ├── workflows/            # ワークフローテンプレート
-│   │   ├── case-a-existing-project.md
-│   │   ├── case-b-new-project.md
-│   │   └── case-c-deployment.md
+│   │   └── switch-mode.sh
+│   ├── workflows/            # 動的ワークフローガイド
+│   │   └── WORKFLOW.md
 │   └── settings.json         # Permissions & Hooks
 ├── ai-rules/
 │   ├── WORKFLOW.md           # 開発フロー詳細
@@ -373,8 +373,8 @@ claude-code-template/
 - [ワークフロー詳細](./ai-rules/WORKFLOW.md)
 - [命名規則・コミット規約](./ai-rules/CONVENTIONS.md)
 - [Phase Rollout Guide](./.claude/phases/ROLLOUT_GUIDE.md)
-- [Case A ワークフロー](./.claude/workflows/case-a-existing-project.md)
-- [Case B ワークフロー](./.claude/workflows/case-b-new-project.md)
+- [既存プロジェクトワークフロー](./.claude/workflows/WORKFLOW.md)
+- [新規プロジェクトワークフロー](./.claude/workflows/WORKFLOW.md)
 
 ---
 

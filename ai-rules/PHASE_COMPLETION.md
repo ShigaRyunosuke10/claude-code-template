@@ -1,4 +1,4 @@
-# セッション完了時の手順（まとめフェーズ）
+# Phase完了時の手順（まとめフェーズ）
 
 タスク完了後に**自動的に**実行する手順。ユーザー介入なしで完了まで進めます。
 
@@ -17,8 +17,8 @@
 
 ```bash
 mcp__serena__write_memory(
-  memory_name: "project/session{番号}_{内容}.md",
-  content: "セッション完了報告の内容"
+  memory_name: "project/phase{番号}_{内容}.md",
+  content: "Phase完了報告の内容"
 )
 ```
 
@@ -359,12 +359,12 @@ Write: project_requirements.md
 
 ---
 
-## ③ next_session_prompt.md更新（必須）
+## ③ next_phase_prompt.md更新（必須）
 
 ### 実行方法
 
 ```bash
-Write:next_session_prompt.md
+Write:next_phase_prompt.md
 ```
 
 ### 記載内容
@@ -405,7 +405,7 @@ Write:next_session_prompt.md
 
 ## 参考情報
 
-- [前回セッション記録](./.serena/memories/project/session{番号}_{内容}.md)
+- [前回セッション記録](./.serena/memories/project/phase{番号}_{内容}.md)
 - [Technical Debt](../reports/technical-debt.md)
 ```
 
@@ -688,11 +688,11 @@ mcp__github__merge_pull_request(
 
 ## チェックリスト
 
-### セッション完了前の確認
+### Phase完了前の確認
 
 - [ ] ① Serenaメモリ更新完了（Session KPI含む）
 - [ ] ② システム状態更新完了（system_state.md, tech_stack.md等）
-- [ ] ③ next_session_prompt.md更新完了
+- [ ] ③ next_phase_prompt.md更新完了
 - [ ] ④ MCP設定完了（新サービス追加時のみ）
 - [ ] ⑤ `/pre-commit-check` 実行完了（test:/docs: 以外）
 - [ ] ⑤ 全テスト合格確認

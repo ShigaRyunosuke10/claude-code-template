@@ -13,25 +13,26 @@
 
 ---
 
-## セッション自律実行フロー
+## Phase自律実行フロー
 
 **基本原則**: ユーザーは見守るだけ。「計画 → 実装 → まとめ」を自動実行。
 
-詳細: [ai-rules/SESSION_START.md](./ai-rules/SESSION_START.md)
+詳細: [ai-rules/PHASE_START.md](./ai-rules/PHASE_START.md)
 
 ### ① 計画フェーズ（自動実行）
 
-1. **next_session_prompt.md 読み込み** - 前回の推奨タスクを確認
+1. **next_phase_prompt.md 読み込み** - 前回の推奨タスクを確認
 2. **タスク自動選択** - 優先度: 高 → 中 → 低 の順で選択
 3. **詳細計画作成** - TodoWriteで実装ステップをリスト化
 4. **自動開始** - 承認不要、自動的に実装フェーズへ
 
 ### ② 実装フェーズ（自動実行）
 
-**ワークフロー選択**:
-- **Case A: 既存プロジェクト機能拡張** → [.claude/workflows/case-a-existing-project.md](./.claude/workflows/case-a-existing-project.md)
-- **Case B: 新規プロジェクト立ち上げ** → [.claude/workflows/case-b-new-project.md](./.claude/workflows/case-b-new-project.md)
-- **Case C: デプロイ** → [.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md)
+**Phase 階層の動的生成**:
+- planner がプロジェクトの状況に応じて Phase 階層を生成
+- Phase 開始時に見直し、実態と乖離していれば再計画
+
+詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
 
 **エージェント自動呼び出し**:
 - backend実装 → `impl-dev-backend`
@@ -83,7 +84,7 @@
 3. **QUARANTINE（隔離）発生**
    - E2Eテストを一時的に隔離（推奨: 3日）
 
-詳細: [ai-rules/SESSION_START.md](./ai-rules/SESSION_START.md#ユーザー介入が必要な場合)
+詳細: [ai-rules/PHASE_START.md](./ai-rules/PHASE_START.md#ユーザー介入が必要な場合)
 
 ---
 
@@ -222,14 +223,13 @@
 ### 開発プロセス
 - [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md) - 開発フロー詳細
 - [ai-rules/REQUIREMENTS_CHANGE.md](./ai-rules/REQUIREMENTS_CHANGE.md) - 要件変更フロー
-- [ai-rules/SESSION_COMPLETION.md](./ai-rules/SESSION_COMPLETION.md) - セッション完了手順
+- [ai-rules/PHASE_COMPLETION.md](./ai-rules/PHASE_COMPLETION.md) - Phase完了手順
 - [ai-rules/CONVENTIONS.md](./ai-rules/CONVENTIONS.md) - 命名規則・コミット規約
 
 ### ツール設定
 - [.claude/settings.json](./.claude/settings.json) - Permissions & Hooks
-- [.claude/workflows/](./.claude/workflows/) - ワークフローテンプレート（Case A/B/C)
 - [.claude/agents/](./.claude/agents/) - エージェント定義（16体）
-- [.claude/phases/ROLLOUT_GUIDE.md](./.claude/phases/ROLLOUT_GUIDE.md) - AI自律システム段階導入
+- [.claude/phases/ROLLOUT_GUIDE.md](./.claude/phases/ROLLOUT_GUIDE.md) - AI自律システム段階導入（Mode 1-3）
 
 ### AI向け技術詳細
 - [.serena/memories/specifications/](./.serena/memories/specifications/) - API/DB/アーキテクチャ仕様
@@ -270,6 +270,5 @@
 
 - **ワークフロー詳細**: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
 - **要件変更**: [ai-rules/REQUIREMENTS_CHANGE.md](./ai-rules/REQUIREMENTS_CHANGE.md)
-- **セッション完了**: [ai-rules/SESSION_COMPLETION.md](./ai-rules/SESSION_COMPLETION.md)
-- **Case A/B/C**: [.claude/workflows/](./.claude/workflows/)
-- **Phase Rollout**: [.claude/phases/ROLLOUT_GUIDE.md](./.claude/phases/ROLLOUT_GUIDE.md)
+- **Phase完了**: [ai-rules/PHASE_COMPLETION.md](./ai-rules/PHASE_COMPLETION.md)
+- **AI自律システム導入**: [.claude/phases/ROLLOUT_GUIDE.md](./.claude/phases/ROLLOUT_GUIDE.md)

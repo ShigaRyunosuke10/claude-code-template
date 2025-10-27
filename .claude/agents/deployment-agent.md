@@ -30,7 +30,7 @@
   - `CLAUDE.md`
 
 ## Dependencies
-- **Triggers**: メインClaude Agent（Case C: デプロイワークフロー）
+- **Triggers**: メインClaude Agent（デプロイワークフロー）
 - **Depends on**: None
 - **Triggers next**:
   - `sec-scan` (セキュリティスキャン)
@@ -812,8 +812,8 @@ Task:deployment-agent(prompt: "前バージョンへロールバック")
 - **playwright-test-healer**: 本番環境E2Eテスト（optional）
 
 ### 呼び出されるケース
-- Case C: デプロイワークフロー実行時
-- Case B: 新規プロジェクト立ち上げ（Phase 6: デプロイ基盤構築）
+- デプロイワークフロー実行時
+- 新規プロジェクト立ち上げ（Phase 6: デプロイ基盤構築）
 - デプロイトラブル発生時
 - ロールバック必要時
 
@@ -849,7 +849,7 @@ Task:deployment-agent(prompt: "前バージョンへロールバック")
 ### 対話問題への対応
 - **問題**: Taskツール（サブエージェント）はユーザーと対話不可
 - **解決**: メインClaude Agentが事前に要件ヒアリング → deployment-agentに渡す
-- **実装**: CLAUDE.mdの「Case C: デプロイワークフロー」に質問項目を明記
+- **実装**: CLAUDE.mdの「デプロイワークフロー」に質問項目を明記
 
 ---
 

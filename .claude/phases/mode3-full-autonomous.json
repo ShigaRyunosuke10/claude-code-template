@@ -1,8 +1,8 @@
 {
   "$schema": "https://claude.com/schemas/settings.json",
-  "description": "Phase 3: Full Autonomous（Week 5+）- 全機能有効化",
-  "phase": 3,
-  "phaseName": "Full Autonomous",
+  "description": "Mode 3: Full Autonomous（Week 5+）- 全機能有効化",
+  "mode": 3,
+  "modeName": "Full Autonomous",
   "duration": "Week 5+",
   "enabled": true,
 

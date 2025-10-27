@@ -11,7 +11,7 @@ ai-rules/
 ├── README.md                   # 本ファイル（概要・クイックスタート）
 ├── WORKFLOW.md                 # 開発フロー詳細
 ├── REQUIREMENTS_CHANGE.md      # 要件変更フロー
-├── SESSION_COMPLETION.md       # セッション完了手順
+├── PHASE_COMPLETION.md       # Phase完了手順
 ├── CONVENTIONS.md              # 命名規則・コミット規約
 └── PROJECT_CUSTOMIZATION.md    # プロジェクト固有設定管理ガイド
 ```
@@ -20,20 +20,20 @@ ai-rules/
 
 ## 🚀 クイックスタート
 
-### 1. セッション開始
+### 1. Phase開始
 
 ```bash
 # 引き継ぎ情報確認
-# 優先順位: next_session_prompt.md → Serenaメモリ
+# 優先順位: next_phase_prompt.md → Serenaメモリ
 mcp__serena__activate_project(project: "{{PROJECT_NAME}}")
 mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 ```
 
 ### 2. ワークフロー選択
 
-- **Case A: 既存プロジェクト機能拡張** → [../.claude/workflows/case-a-existing-project.md](../.claude/workflows/case-a-existing-project.md)
-- **Case B: 新規プロジェクト立ち上げ** → [../.claude/workflows/case-b-new-project.md](../.claude/workflows/case-b-new-project.md)
-- **Case C: デプロイ** → [../.claude/workflows/case-c-deployment.md](../.claude/workflows/case-c-deployment.md)
+- **既存プロジェクト機能拡張** → [../.claude/workflows/WORKFLOW.md](../.claude/workflows/WORKFLOW.md)
+- **新規プロジェクト立ち上げ** → [../.claude/workflows/WORKFLOW.md](../.claude/workflows/WORKFLOW.md)
+- **デプロイ** → [../.claude/workflows/WORKFLOW.md](../.claude/workflows/WORKFLOW.md)
 
 ### 3. 計画フェーズ（必須）
 
@@ -65,12 +65,12 @@ git checkout -b <type>-<機能名>
 
 [WORKFLOW.md](./WORKFLOW.md) の「PR作成」を参照
 
-### 8. セッション完了
+### 8. Phase完了
 
-詳細: [SESSION_COMPLETION.md](./SESSION_COMPLETION.md)
+詳細: [PHASE_COMPLETION.md](./PHASE_COMPLETION.md)
 
 1. Serenaメモリ更新
-2. next_session_prompt.md更新
+2. next_phase_prompt.md更新
 3. Git commit & PR作成
 
 ---
@@ -89,7 +89,7 @@ git checkout -b <type>-<機能名>
 ### 開発プロセス
 - [WORKFLOW.md](./WORKFLOW.md) - 開発フロー詳細（Phase 1-6）
 - [REQUIREMENTS_CHANGE.md](./REQUIREMENTS_CHANGE.md) - 要件変更フロー（開発途中の機能追加・仕様変更）
-- [SESSION_COMPLETION.md](./SESSION_COMPLETION.md) - セッション完了手順（Serenaメモリ・Git・PR）
+- [PHASE_COMPLETION.md](./PHASE_COMPLETION.md) - Phase完了手順（Serenaメモリ・Git・PR）
 - [CONVENTIONS.md](./CONVENTIONS.md) - 命名規則・コミット規約
 - [PROJECT_CUSTOMIZATION.md](./PROJECT_CUSTOMIZATION.md) - プロジェクト固有設定管理ガイド（テンプレートとの分離方法）
 
@@ -102,5 +102,5 @@ git checkout -b <type>-<機能名>
 
 ## 🔗 関連リンク
 
-- **CLAUDE.md**: [../CLAUDE.md](../CLAUDE.md) - 基本設定・セッション開始フロー
+- **CLAUDE.md**: [../CLAUDE.md](../CLAUDE.md) - 基本設定・Phase開始フロー
 - **README.md**: [../README.md](../README.md) - プロジェクト概要・セットアップ

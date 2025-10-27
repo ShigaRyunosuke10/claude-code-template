@@ -20,13 +20,13 @@ Task:mcp-finder(prompt: "{{技術スタックリストまたはproject_requireme
 
 **例**:
 ```bash
-# Case B: 新規プロジェクト（Phase 0.1の直後）
+# 新規プロジェクト（Phase 0.1の直後）
 Task:mcp-finder(prompt: "以下の技術スタックに対応するMCPサーバーを検索:
 - Database: Supabase, MongoDB
 - Payment: Stripe
 - Backend: Firebase")
 
-# Case A: 既存プロジェクトに新サービス追加
+# 既存プロジェクトに新サービス追加
 Task:mcp-finder(prompt: "Stripeに対応するMCPサーバーを検索して設定")
 ```
 
@@ -34,13 +34,13 @@ Task:mcp-finder(prompt: "Stripeに対応するMCPサーバーを検索して設�
 
 ## Input（メインClaude Agentが収集）
 
-### Case B: 新規プロジェクト
+### 新規プロジェクト
 **Phase 0.1（deployment-agent）の直後に実行**
 
 - 技術スタック決定済み（`project_requirements.md` に記載）
 - 外部サービス連携の技術スタックリスト
 
-### Case A: 既存プロジェクトに追加
+### 既存プロジェクトに追加
 - 追加したい外部サービス名（例: "Stripe", "SendGrid"）
 
 **重要**: メインClaude Agentが技術スタックを特定してから mcp-finder に渡す
@@ -766,6 +766,6 @@ A: （メインエージェントが実行）
 
 ## 関連ドキュメント
 
-- [Case B: 新規プロジェクトワークフロー](../workflows/case-b-new-project.md) - Phase 0.1.5
-- [SESSION_COMPLETION.md](../../ai-rules/SESSION_COMPLETION.md) - セッション完了時の手順
+- [WORKFLOW.md](../../ai-rules/WORKFLOW.md) - Phase 0.1.5（新規プロジェクトワークフロー）
+- [PHASE_COMPLETION.md](../../ai-rules/PHASE_COMPLETION.md) - セッション完了時の手順
 - [CLAUDE.md](../../CLAUDE.md) - エージェント一覧

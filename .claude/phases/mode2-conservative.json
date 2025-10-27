@@ -1,9 +1,9 @@
 {
-  "phase": "phase2_conservative_healing",
+  "mode": "mode2_conservative_healing",
   "startDate": "2025-10-23",
   "endDate": "2025-11-05",
   "duration": "2 weeks",
-  "description": "Phase 2: Conservative Healing - 既知処方のみ適用、SMOKE Test必須",
+  "description": "Mode 2: Conservative Healing - 既知処方のみ適用、SMOKE Test必須",
   "features": {
     "stopRuleDetection": true,
     "autoHealing": true,

@@ -2,11 +2,11 @@
 
 ## 概要
 
-Playwright AI完全自律実行システムを**3つのPhase**に分けて段階的に導入します。各Phaseで機能を少しずつ有効化し、リスクを最小化しながら本番運用へ移行します。
+Playwright AI完全自律実行システムを**3つのPhase**に分けて段階的に導入します。各Modeで機能を少しずつ有効化し、リスクを最小化しながら本番運用へ移行します。
 
 ---
 
-## Phase構成
+## Mode構成
 
 | Phase | 名称 | 期間 | 機能 | 目的 |
 |-------|------|------|------|------|
@@ -16,7 +16,7 @@ Playwright AI完全自律実行システムを**3つのPhase**に分けて段階
 
 ---
 
-## Phase 1: Observer Mode（Week 1-2）
+## Mode 1: Observer Mode（Week 1-2）
 
 ### 目的
 - 停止ルール5種の検知精度を測定
@@ -33,9 +33,9 @@ Playwright AI完全自律実行システムを**3つのPhase**に分けて段階
 
 ### 実行手順
 
-#### 1. Phase 1 に切り替え
+#### 1. Mode 1 に切り替え
 ```bash
-.claude/scripts/switch-phase.sh 1
+.claude/scripts/switch-mode.sh 1
 ```
 
 #### 2. E2Eテスト実行
@@ -55,7 +55,7 @@ grep "OBSERVER" frontend/e2e-test-result.log
 
 #### 4. Telemetry確認
 ```bash
-cat .serena/memories/testing/phase1_telemetry.json
+cat .serena/memories/testing/mode1_telemetry.json
 ```
 
 **期待される内容**:
@@ -84,17 +84,17 @@ cat .serena/memories/testing/phase1_telemetry.json
 - [ ] エラーパターン ≥10件収集
 - [ ] Telemetryデータ完全性 100%
 
-### 次Phaseへの判断基準
+### 次Modeへの判断基準
 **Week 2終了時**:
 - 停止ルールが安定して機能している
 - 10件以上のエラーパターンが蓄積
 - False Positive Rate <5%
 
-→ **Phase 2へ移行**
+→ **Mode 2へ移行**
 
 ---
 
-## Phase 2: Conservative Healing（Week 3-4）
+## Mode 2: Conservative Healing（Week 3-4）
 
 ### 目的
 - 既知処方の有効性検証（成功率80%以上）
@@ -113,7 +113,7 @@ cat .serena/memories/testing/phase1_telemetry.json
 
 ### 実行手順
 
-#### 1. Phase 1 の成果確認
+#### 1. Mode 1 の成果確認
 ```bash
 # Learning Memory に既知処方が蓄積されているか確認
 cat .serena/memories/testing/e2e_patterns.json
@@ -137,9 +137,9 @@ cat .serena/memories/testing/e2e_patterns.json
 }
 ```
 
-#### 2. Phase 2 に切り替え
+#### 2. Mode 2 に切り替え
 ```bash
-.claude/scripts/switch-phase.sh 2
+.claude/scripts/switch-mode.sh 2
 ```
 
 #### 3. E2Eテスト実行
@@ -167,7 +167,7 @@ ls -la .serena/memories/testing/quarantine/
 
 #### 6. Telemetry確認
 ```bash
-cat .serena/memories/testing/phase2_telemetry.json
+cat .serena/memories/testing/mode2_telemetry.json
 ```
 
 **期待される内容**:
@@ -193,17 +193,17 @@ cat .serena/memories/testing/phase2_telemetry.json
 - [ ] Smoke Test Pass率 ≥95%
 - [ ] False Positive Rate <2%
 
-### 次Phaseへの判断基準
+### 次Modeへの判断基準
 **Week 4終了時**:
 - 既知処方の成功率が80%以上
 - MTTR が安定して30分以内
 - Smoke Test が品質ゲートとして機能
 
-→ **Phase 3へ移行**
+→ **Mode 3へ移行**
 
 ---
 
-## Phase 3: Full Autonomous（Week 5+）
+## Mode 3: Full Autonomous（Week 5+）
 
 ### 目的
 - 完全自律修復の実現（人間介入なし）
@@ -224,9 +224,9 @@ cat .serena/memories/testing/phase2_telemetry.json
 
 ### 実行手順
 
-#### 1. Phase 3 に切り替え
+#### 1. Mode 3 に切り替え
 ```bash
-.claude/scripts/switch-phase.sh 3
+.claude/scripts/switch-mode.sh 3
 ```
 
 #### 2. E2Eテスト実行
@@ -254,7 +254,7 @@ cat .serena/memories/testing/e2e_patterns.json | grep -c "\"id\""
 
 #### 5. Telemetry確認
 ```bash
-cat .serena/memories/testing/phase3_telemetry.json
+cat .serena/memories/testing/mode3_telemetry.json
 ```
 
 **期待される内容**:
@@ -299,15 +299,15 @@ cat .serena/memories/testing/phase3_telemetry.json
 
 ### Phase 1で停止ルールが発動しない
 **原因**: テストが成功しすぎている（良いこと）
-**対応**: Phase 2へ早期移行を検討
+**対応**: Mode 2へ早期移行を検討
 
-### Phase 2でHealing成功率が低い（<70%）
+### Mode 2でHealing成功率が低い（<70%）
 **原因**: Learning Memoryのパターン不足
-**対応**: Phase 1に戻り、さらにエラーパターン収集
+**対応**: Mode 1に戻り、さらにエラーパターン収集
 
-### Phase 3でFalse Positive Rate が高い（>2%）
+### Mode 3でFalse Positive Rate が高い（>2%）
 **原因**: 仮説処方が過剰
-**対応**: Phase 2に戻り、既知処方の精度向上
+**対応**: Mode 2に戻り、既知処方の精度向上
 
 ### Quarantine が増え続ける
 **原因**: アプリケーションの根本的なバグ
@@ -323,20 +323,20 @@ cat .serena/memories/testing/phase3_telemetry.json
 いつでも前のPhaseに戻せます:
 
 ```bash
-# Phase 3 → Phase 2
-.claude/scripts/switch-phase.sh 2
+# Mode 3 → Phase 2
+.claude/scripts/switch-mode.sh 2
 
-# Phase 2 → Phase 1
-.claude/scripts/switch-phase.sh 1
+# Mode 2 → Phase 1
+.claude/scripts/switch-mode.sh 1
 ```
 
 ---
 
 ## KPI ダッシュボード
 
-各Phaseの進捗を追跡:
+各Modeの進捗を追跡:
 
-| KPI | Phase 1 | Phase 2 | Phase 3 | 目標 |
+| KPI | Mode 1 | Mode 2 | Mode 3 | 目標 |
 |-----|---------|---------|---------|------|
 | 停止ルール検知精度 | 97% | - | - | >95% |
 | Healing成功率 | - | 85% | 92% | ≥90% |
@@ -357,7 +357,7 @@ cat .claude/.current-phase
 
 ### Phase切り替え
 ```bash
-.claude/scripts/switch-phase.sh 2
+.claude/scripts/switch-mode.sh 2
 ```
 
 ### Telemetry確認
@@ -370,7 +370,7 @@ cat .serena/memories/testing/phase$(cat .claude/.current-phase)_telemetry.json
 ## 関連ファイル
 
 - **Phase設定**: `.claude/phases/phase{1,2,3}-*.json`
-- **切り替えスクリプト**: `.claude/scripts/switch-phase.sh`
+- **切り替えスクリプト**: `.claude/scripts/switch-mode.sh`
 - **Telemetry**: `.serena/memories/testing/phase{1,2,3}_telemetry.json`
 - **Learning Memory**: `.serena/memories/testing/e2e_patterns.json`
 - **Quarantine**: `.serena/memories/testing/quarantine/*.md`

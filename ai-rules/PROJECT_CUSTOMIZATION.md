@@ -53,10 +53,10 @@ my-project/
 │   │   ├── code-reviewer.md
 │   │   └── ...
 │   │
-│   ├── workflows/               # ★ テンプレート（Case A/B/C）- 変更禁止
-│   │   ├── case-a-existing-project.md
-│   │   ├── case-b-new-project.md
-│   │   └── case-c-deployment.md
+│   ├── workflows/               # ★ テンプレート（動的にplannerが生成）- 変更禁止
+│   │   ├── WORKFLOW.md
+│   │   ├── WORKFLOW.md
+│   │   └── WORKFLOW.md
 │   │
 │   ├── commands/                # ★ テンプレート - 変更禁止
 │   │   ├── docs-sync.md
@@ -71,7 +71,7 @@ my-project/
 ├── ai-rules/                    # ★ テンプレート - 変更禁止
 │   ├── WORKFLOW.md
 │   ├── REQUIREMENTS_CHANGE.md
-│   ├── SESSION_COMPLETION.md
+│   ├── PHASE_COMPLETION.md
 │   └── CONVENTIONS.md
 │
 └── ai-rules-project/            # ☆ プロジェクト固有ルール

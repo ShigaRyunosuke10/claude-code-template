@@ -20,10 +20,10 @@ Task:tech-stack-validator(prompt: "{{project_requirements.mdパスまたは技�
 
 **例**:
 ```bash
-# Case B: 新規プロジェクト（Phase 0.1の直後）
+# 新規プロジェクト（Phase 0.1の直後）
 Task:tech-stack-validator(prompt: "project_requirements.md の技術スタックを検証してください")
 
-# Case A: 既存プロジェクトの定期更新
+# 既存プロジェクトの定期更新
 Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラクティスを最新化してください")
 ```
 
@@ -31,7 +31,7 @@ Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラ
 
 ## Input（メインClaude Agentが収集）
 
-### Case B: 新規プロジェクト
+### 新規プロジェクト
 **Phase 0.1（deployment-agent）の直後に実行**
 
 - `project_requirements.md` が生成済み
@@ -41,7 +41,7 @@ Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラ
   - **制約・留意点**（重要）
   - **技術変更時の留意事項**
 
-### Case A: 既存プロジェクトの定期更新
+### 既存プロジェクトの定期更新
 - `system/tech_stack.md` が存在
 - `system/tech_best_practices.md` の鮮度確認が必要
 
@@ -355,7 +355,7 @@ mcp__context7__search(query: "FastAPI Supabase PostgreSQL setup")
 - Context7ソース記録
 ```
 
-#### Case B: tech_best_practices.md が存在し、90日以内
+#### 新規プロジェクト: tech_best_practices.md が存在し、90日以内
 
 ```markdown
 ## キャッシュを使用（Context7呼び出しスキップ）
@@ -657,8 +657,8 @@ A: Next.js 15へアップグレードします。
 
 ## 関連ドキュメント
 
-- [Case B: 新規プロジェクトワークフロー](../workflows/case-b-new-project.md) - Phase 0.1.3
+- [新規プロジェクトワークフロー](../workflows/WORKFLOW.md) - Phase 0.1.3
 - [deployment-agent](./deployment-agent.md) - project_requirements.md 生成
 - [mcp-finder](./mcp-finder.md) - MCP検索（Phase 0.1.5）
-- [SESSION_COMPLETION.md](../../ai-rules/SESSION_COMPLETION.md) - system_state.md 更新手順
+- [PHASE_COMPLETION.md](../../ai-rules/PHASE_COMPLETION.md) - system_state.md 更新手順
 - [CLAUDE.md](../../CLAUDE.md) - エージェント一覧

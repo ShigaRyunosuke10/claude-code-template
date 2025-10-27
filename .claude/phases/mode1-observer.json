@@ -1,8 +1,8 @@
 {
   "$schema": "https://claude.com/schemas/settings.json",
-  "description": "Phase 1: Observer Mode（Week 1-2）- 停止ルール検知のみ、修復なし",
-  "phase": 1,
-  "phaseName": "Observer Mode",
+  "description": "Mode 1: Observer Mode（Week 1-2）- 停止ルール検知のみ、修復なし",
+  "mode": 1,
+  "modeName": "Observer Mode",
   "duration": "Week 1-2",
   "enabled": true,
 
@@ -29,7 +29,7 @@
       "threshold": 3,
       "action": {
         "type": "log",
-        "message": "📊 [OBSERVER] 同一エラー3連続を検知（修復はPhase 2以降）"
+        "message": "📊 [OBSERVER] 同一エラー3連続を検知（修復はMode 2以降）"
       }
     },
     {
@@ -39,7 +39,7 @@
       "threshold": 0.3,
       "action": {
         "type": "log",
-        "message": "📊 [OBSERVER] 失敗率30%超を検知（修復はPhase 2以降）"
+        "message": "📊 [OBSERVER] 失敗率30%超を検知（修復はMode 2以降）"
       }
     },
     {
@@ -50,7 +50,7 @@
       "window": "3min",
       "action": {
         "type": "log",
-        "message": "📊 [OBSERVER] タイムアウト連鎖を検知（修復はPhase 2以降）"
+        "message": "📊 [OBSERVER] タイムアウト連鎖を検知（修復はMode 2以降）"
       }
     },
     {
@@ -60,7 +60,7 @@
       "minTests": 5,
       "action": {
         "type": "log",
-        "message": "📊 [OBSERVER] spec全滅を検知（検疫はPhase 2以降）"
+        "message": "📊 [OBSERVER] spec全滅を検知（検疫はMode 2以降）"
       }
     },
     {
@@ -69,7 +69,7 @@
       "threshold": 10,
       "action": {
         "type": "log",
-        "message": "📊 [OBSERVER] 全体失敗10件超を検知（修復はPhase 2以降）"
+        "message": "📊 [OBSERVER] 全体失敗10件超を検知（修復はMode 2以降）"
       }
     }
   ],
@@ -82,7 +82,7 @@
       "testDuration",
       "failurePatterns"
     ],
-    "outputPath": ".serena/memories/testing/phase1_telemetry.json"
+    "outputPath": ".serena/memories/testing/mode1_telemetry.json"
   },
 
   "objectives": [

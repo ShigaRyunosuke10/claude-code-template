@@ -7,7 +7,7 @@
 - **Smoke Test検証**（修復後の安全性確認）
 - **MTTR測定**（Phase 3 KPI）
 
-設定ファイル: [`.claude/phases/phase3-full-autonomous.json`](../.claude/phases/phase3-full-autonomous.json)
+設定ファイル: [`.claude/phases/mode3-full-autonomous.json`](../.claude/phases/mode3-full-autonomous.json)
 
 ---
 
@@ -182,7 +182,7 @@ function normalizeErrorSignature(error: Error, stack: string): string {
 
 ## Workflow（自律実行フロー）
 
-### Phase 1: RUNNING
+### Mode 1: RUNNING
 
 **⚠️ 重要**: E2Eテストは**バックグラウンド実行**し、**定期的に進捗監視**すること。
 
@@ -249,7 +249,7 @@ while (true) {
 }
 ```
 
-### Phase 2: ABORTING
+### Mode 2: ABORTING
 ```typescript
 // 実行中のテストを停止
 await killProcess(playwrightPID);
@@ -263,7 +263,7 @@ if (hasConsecutiveSignature(signatures, 3)) {
 }
 ```
 
-### Phase 3: HEALING
+### Mode 3: HEALING
 ```typescript
 // Step 1: 既知処方の強制適用
 const knownFix = loadLearningMemory().find(p => p.errorSignature === signature && p.enforced);
@@ -379,15 +379,15 @@ console.log('✅ AI Autonomous Execution Complete');
 ---
 
 ## Rollout Phases（段階的導入）
-### Phase 1 (Week 1-2): Observer Mode
+### Mode 1 (Week 1-2): Observer Mode
 - 停止ルール検知のみ（修復なし）
 - Telemetry収集
 
-### Phase 2 (Week 3-4): Conservative Healing
+### Mode 2 (Week 3-4): Conservative Healing
 - 既知処方のみ適用
 - 仮説処方は無効化
 
-### Phase 3 (Week 5+): Full Autonomous
+### Mode 3 (Week 5+): Full Autonomous
 - すべての自律機能を有効化
 
 ---

@@ -1,13 +1,13 @@
-# セッション開始時の手順（自律実行）
+# Phase開始時の手順（自律実行）
 
-セッション開始時に**自動的に**実行する手順。ユーザー介入なしで「計画 → 実装 → まとめ」の流れを開始します。
+Phase開始時に**自動的に**実行する手順。ユーザー介入なしで「計画 → 実装 → まとめ」の流れを開始します。
 
 ---
 
 ## セッション自律実行フロー
 
 ```
-セッション開始
+Phase開始
   ↓
 ① 計画フェーズ（自動）
   ↓
@@ -15,7 +15,7 @@
   ↓
 ③ まとめフェーズ（自動）
   ↓
-セッション完了（ピポパ音♪）
+Phase完了（ピポパ音♪）
 ```
 
 ---
@@ -25,12 +25,12 @@
 ### Step 1: 前回の引き継ぎ情報を読み込み
 
 **優先順位**:
-1. `next_session_prompt.md` があれば読む
+1. `next_phase_prompt.md` があれば読む
 2. なければSerenaメモリ `project/current_context.md` を確認
 
 ```bash
-# next_session_prompt.md を読む
-Read: next_session_prompt.md
+# next_phase_prompt.md を読む
+Read: next_phase_prompt.md
 
 # ない場合はSerenaメモリ確認
 mcp__serena__activate_project(project: "{{PROJECT_NAME}}")
@@ -39,7 +39,7 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 
 ### Step 2: 推奨タスクを自動選択
 
-**next_session_prompt.md の形式**:
+**next_phase_prompt.md の形式**:
 ```markdown
 ## 今セッションの推奨タスク
 
@@ -156,7 +156,7 @@ TodoWriteで作成した計画に沿って、順次実装を進めます。
 
 ## ③ まとめフェーズ（自動実行）
 
-詳細: [ai-rules/SESSION_COMPLETION.md](./SESSION_COMPLETION.md)
+詳細: [ai-rules/PHASE_COMPLETION.md](./PHASE_COMPLETION.md)
 
 ### 実行内容
 
@@ -174,7 +174,7 @@ TodoWriteで作成した計画に沿って、順次実装を進めます。
 
 **完了時のログ出力**:
 ```markdown
-✅ セッション完了
+✅ Phase完了
 
 今回の成果:
 - ユーザーロール管理API実装完了
@@ -186,13 +186,13 @@ TodoWriteで作成した計画に沿って、順次実装を進めます。
 2. 🟡 中: E2Eテスト追加
 
 Serenaメモリ更新完了
-next_session_prompt.md 更新完了
+next_phase_prompt.md 更新完了
 Git commit & PR作成完了
 
 次回のセッションで会いましょう！
 ```
 
-**音声通知**: セッション完了時に「ピポパ」音が鳴ります（600Hz → 800Hz → 1000Hz）
+**音声通知**: Phase完了時に「ピポパ」音が鳴ります（600Hz → 800Hz → 1000Hz）
 
 ---
 
@@ -262,7 +262,7 @@ Git commit & PR作成完了
 ## 関連ドキュメント
 
 - [ai-rules/WORKFLOW.md](./WORKFLOW.md) - 実装フェーズ詳細
-- [ai-rules/SESSION_COMPLETION.md](./SESSION_COMPLETION.md) - まとめフェーズ詳細
+- [ai-rules/PHASE_COMPLETION.md](./PHASE_COMPLETION.md) - まとめフェーズ詳細
 - [ai-rules/REQUIREMENTS_CHANGE.md](./REQUIREMENTS_CHANGE.md) - 途中で要件変更が発生した場合
 - [CLAUDE.md](../CLAUDE.md) - 全体設定
 
@@ -270,7 +270,7 @@ Git commit & PR作成完了
 
 ## トラブルシューティング
 
-### Q: next_session_prompt.md がない場合は？
+### Q: next_phase_prompt.md がない場合は？
 
 A: Serenaメモリ `project/current_context.md` を確認し、前回の作業内容から推測して自動的にタスクを選択します。
 
@@ -293,7 +293,7 @@ A: 自動修復ループ対策が働き、一定回数試行後にユーザー�
 ### 基本原則
 
 1. **ユーザーは見守るだけ**
-   - セッション開始から完了まで、基本的にユーザー介入不要
+   - Phase開始から完了まで、基本的にユーザー介入不要
    - エラー時のみ相談
 
 2. **計画 → 実装 → まとめ の3段階**
@@ -315,11 +315,11 @@ A: 自動修復ループ対策が働き、一定回数試行後にユーザー�
 ```
 ユーザー: 「開始」
 
-Claude: （next_session_prompt.md読み込み）
+Claude: （next_phase_prompt.md読み込み）
 Claude: （計画フェーズ自動実行）
 Claude: （実装フェーズ自動実行）
 Claude: （まとめフェーズ自動実行）
-Claude: 「✅ セッション完了！」
+Claude: 「✅ Phase完了！」
 （ピポパ♪）
 
 ユーザー: 「おつかれ！」

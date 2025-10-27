@@ -163,5 +163,5 @@ Task:impl-dev-backend(prompt: "新設計の Task 1: ...")
 ## 関連ドキュメント
 
 - [planner.md Step 0](../.claude/agents/planner.md) - 要件検証チェックリスト
-- [Case A Workflow](../.claude/workflows/case-a-existing-project.md) - 既存プロジェクト機能拡張
+- [既存プロジェクトワークフロー](../.claude/workflows/WORKFLOW.md) - 既存プロジェクト機能拡張
 - [WORKFLOW.md](./WORKFLOW.md) - 開発フロー詳細
