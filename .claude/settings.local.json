@@ -39,7 +39,9 @@
       "Bash(git remote:*)",
       "Bash(Remove-Item -Recurse -Force backend, frontend, .serena, docs, reports, reference, nginx, .git -ErrorAction SilentlyContinue)",
       "Bash(rm:*)",
-      "Bash(git clone:*)"
+      "Bash(git clone:*)",
+      "Bash(dir:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

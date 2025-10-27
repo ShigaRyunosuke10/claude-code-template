@@ -46,3 +46,11 @@ htmlcov/
 *.bak
 *.swp
 .~*
+
+backend/.env
+frontend/.env.local
+
+# テンプレートは含める（除外解除）
+!.env.example
+!backend/.env.example
+!frontend/.env.local.example

@@ -25,53 +25,94 @@
 
 ### Step 0: 環境変数設定
 
-**必須設定（テンプレートのMCPサーバー用）**:
+プロジェクトを開始する前に、以下の環境変数を設定してください。
+
+#### 1. ルート環境変数（`.env`）
 
 ```bash
-# 1. GitHub Personal Access Token（必須）
-export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-# 2. OpenAI API Key（必須 - Codex AI相談機能用）
-export OPENAI_API_KEY="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-# 確認
-echo $GITHUB_TOKEN | head -c 10
-echo $OPENAI_API_KEY | head -c 10
+cp .env.example .env
 ```
+
+以下を設定:
+
+**必須設定（テンプレートのMCPサーバー用）**:
+- `GITHUB_TOKEN`: GitHubパーソナルアクセストークン（repo権限）
+- `OPENAI_API_KEY`: OpenAI APIキー（Codex MCP用）
 
 **取得方法**:
 
-#### 1. GitHub Personal Access Token
+**GitHub Personal Access Token**:
 1. [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
 2. "Generate new token (classic)" をクリック
 3. Scopes: `repo`, `workflow`, `admin:org`（プライベートリポジトリの場合は `repo` 全権限）
-4. トークンをコピーして環境変数に設定
+4. トークンをコピーして `.env` に設定
 
-#### 2. OpenAI API Key
+**OpenAI API Key**:
 1. [OpenAI API Keys](https://platform.openai.com/api-keys) にアクセス
 2. "Create new secret key" をクリック
-3. APIキーをコピーして環境変数に設定
+3. APIキーをコピーして `.env` に設定
 4. **用途**: エラーループ時のCodex AI自動相談
    - Critical/High問題: 初回発生時に自動相談
    - Medium問題: 3回失敗後に自動相談
    - 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
 
-**技術スタック依存の設定（Phase 0.3で自動チェック）**:
+#### 2. Supabaseプロジェクト作成（Phase 1で実施）
 
-Phase 0.2 でテンプレートが技術スタックを決定後、`tech-stack-validator` が必要な環境変数を自動的にチェックします。
-設定が不足している場合は、テンプレートが設定方法を案内します。
+1. [Supabase](https://supabase.com/)にアクセス
+2. 新規プロジェクト作成（プロジェクト名: `nissei-worklog`）
+3. リージョン選択（推奨: `Northeast Asia (Tokyo)`）
+4. データベースパスワード設定（安全な場所に保存）
+5. プロジェクト作成完了後、以下を取得:
+   - `Project URL`: `https://xxxxx.supabase.co`
+   - `anon public key`: Supabase Settings > API > anon key
+   - `service_role key`: Supabase Settings > API > service_role key（⚠️機密情報）
 
-**自動生成される設定ガイド**:
-- `ai-rules/ENV_SETUP_GUIDE.md` - 技術スタック別の環境変数設定手順が自動生成されます
+#### 3. バックエンド環境変数（`backend/.env`）
 
-**設定が必要になる可能性のある環境変数**:
-- `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` (Supabase使用時)
-- `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` (Stripe使用時)
-- `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` (Auth0使用時)
-- その他（Vercel, AWS, GCP等、技術スタック次第）
+```bash
+cd backend
+cp .env.example .env
+```
 
-詳細: [ai-rules/PHASE_START.md - Phase 0.3](./ai-rules/PHASE_START.md)、[ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
+`.env`ファイルに以下を設定:
+```env
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+JWT_SECRET=your-generated-jwt-secret-minimum-32-chars
+ALLOWED_ORIGINS=http://localhost:3000
+```
 
+**JWT_SECRET生成方法**:
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+#### 4. フロントエンド環境変数（`frontend/.env.local`）
+
+```bash
+cd frontend
+cp .env.local.example .env.local
+```
+
+`.env.local`ファイルに以下を設定:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+#### セキュリティ注意事項
+
+⚠️ **絶対にコミットしてはいけないファイル**:
+- `.env`
+- `backend/.env`
+- `frontend/.env.local`
+
+✅ **コミット可能なファイル**:
+- `.env.example`
+- `backend/.env.example`
+- `frontend/.env.local.example`
 ---
 
 

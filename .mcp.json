@@ -38,6 +38,13 @@
         "@trishchuk/codex-mcp-tool"
       ],
       "env": {}
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
+      }
     }
   }
 }
