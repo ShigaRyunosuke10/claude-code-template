@@ -239,10 +239,59 @@ Phase 0 を継続します。
 
 **実行タイミング**: Phase 0.0（GitHubリポジトリ初期化）の直後
 
-**目的**: 
+**目的**:
 - プロジェクト開始時に要件定義書（docs/requirements/）またはチャット履歴から要件を抽出
 - plannerエージェントで分析し、プロジェクト計画とPhase階層を生成
 - Serenaメモリに保存してプロジェクト全体で共有
+
+---
+
+### ⚠️ 重要: Serenaのonboardingツールとの違い
+
+**Phase 0.1を実行すべき場合**:
+- ✅ 要件定義書が `docs/requirements/` または `docs/references/` に存在する
+- ✅ Serenaメモリが未初期化（`.serena/memories/` が空）
+- ✅ **新規プロジェクト**でこれからコードを書く
+
+**Serenaのonboardingツールを実行すべき場合**:
+- ✅ 要件定義書が**存在しない**
+- ✅ **既存のコードベース**を初めて見る
+- ✅ 技術スタック、コーディング規約、テストコマンド等を**手動で調査**する必要がある
+
+**判断フロー（疑似コード）**:
+```
+プロジェクト開始時
+  ↓
+要件定義書は存在するか？
+  ├─ YES → Phase 0.1（plannerで自動生成） ← このフロー
+  └─ NO → Serenaのonboarding（手動調査）
+```
+
+**❌ 絶対にやってはいけないこと**:
+- Phase 0.1で `mcp__serena__onboarding` を呼ぶ（競合するため）
+- 要件定義書があるのに手動でメモリを作成する（plannerを呼ぶべき）
+
+---
+
+### Step 0: 前提条件チェック（自動実行）
+
+**Phase 0.1実行前に確認すること**:
+
+1. **要件定義書の存在確認**:
+```bash
+Glob: "docs/requirements/**/*.{md,pdf,txt,xlsx,docx}"
+Glob: "docs/references/**/*.{md,pdf,txt,xlsx,docx}"
+```
+
+2. **Serenaメモリの初期化状態確認**:
+```bash
+Glob: ".serena/memories/**/*.md"
+```
+
+**判断ロジック**:
+- ✅ 要件定義書あり + Serenaメモリ空 → Phase 0.1実行
+- ❌ 要件定義書なし → Phase 0.1スキップ（Phase 0.2へ）
+- ❌ Serenaメモリ既存 → Phase 0.1スキップ（既に初期化済み）
 
 ---
 

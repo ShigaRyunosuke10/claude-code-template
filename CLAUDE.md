@@ -41,9 +41,18 @@ docs/
 ### 計画フェーズ（自動実行）
 
 **Phase 0（プロジェクト基盤構築）の場合**:
-1. GitHubリポジトリ初期化チェック（自動・GitHub MCP使用）
-2. next_phase_prompt.md 読み込み、タスク自動選択
-3. 詳細計画作成、自動開始
+
+**Phase 0.0**: GitHubリポジトリ初期化（自動・GitHub MCP使用）
+
+**Phase 0.1**: 要件定義書分析・Serenaメモリ初期化
+- **前提条件**: `docs/requirements/` または `docs/references/` に要件定義書が存在
+- **重要**: Serenaの`onboarding`ツールは**使わない**（要件定義書がある場合）
+- **実行内容**: `planner`エージェントが要件定義書を自動解析
+- **成果物**: `project_overview.md`, `requirements_summary.md`, `phase_hierarchy.md`, `api_contracts.md`, `database_schema.md`
+
+**Phase 0.2**: 技術スタック決定
+
+**Phase 0.3**: 環境変数・MCP設定チェック
 
 **Phase 階層**: planner がプロジェクトの状況に応じて動的生成
 
