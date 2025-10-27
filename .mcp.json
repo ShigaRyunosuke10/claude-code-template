@@ -17,19 +17,6 @@
         "Authorization": "Bearer ${GITHUB_TOKEN}"
       }
     },
-    "desktop-commander": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@wonderwhy-er/desktop-commander@latest",
-        "--debug",
-        "--no-onboarding"
-      ],
-      "env": {}
-    },
     "serena": {
       "type": "stdio",
       "command": "uvx",

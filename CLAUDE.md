@@ -198,7 +198,6 @@ docs/
 - **github** - PR/Issue管理（環境変数: `GITHUB_TOKEN`）
 - **serena** - コードベース解析
 - **playwright** - E2Eテスト
-- **desktop-commander** - ファイルシステム操作
 - **codex** - AI コーディングアシスタント（環境変数: `OPENAI_API_KEY`）
 
 ### 技術スタック依存（Phase 0.2で追加）

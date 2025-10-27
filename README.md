@@ -15,7 +15,7 @@
 - ✅ **16体の汎用エージェント** - 計画、実装、テスト、品質保証、デプロイ、リリース
 - ✅ **AI自律実行システム（Mode 1-3）** - AI自律E2Eテストシステム（段階的デプロイ）
 - ✅ **動的ワークフローシステム** - plannerが状況に応じてPhase階層を生成
-- ✅ **5つの横断的MCPサーバー** - GitHub, Serena, Playwright, Desktop Commander, Context7
+- ✅ **4つの横断的MCPサーバー** - GitHub, Serena, Playwright, Codex
 - ✅ **Permissions & Hooks** - 安全な開発環境
 - ✅ **AI開発ルール** - 命名規則、コミット規約、開発フロー
 
