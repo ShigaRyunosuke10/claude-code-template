@@ -437,7 +437,7 @@ Task:planner(prompt: "
 ## Phase 0: プロジェクト基盤構築
 - Phase 0.0: GitHubリポジトリ初期化
 - Phase 0.1: 要件定義書分析
-- Phase 0.3: 技術スタック決定
+- Phase 0.2: 技術スタック決定
 - Phase 0.3: 環境変数・MCP設定
 
 ## Phase 1: {機能グループ1}
@@ -485,7 +485,7 @@ Response: ...
 - DB設計（初期版）: .serena/memories/specifications/database_schema.md
 
 【次のステップ】
-Phase 0.3: 技術スタック決定を開始します。
+Phase 0.2: 技術スタック決定を開始します。
 ```
 
 ---
@@ -526,7 +526,7 @@ Phase 0.2へ
 ```
 Phase 0.1 をスキップ
   ↓
-Phase 0.3, 0.4, 0.5 を完了
+Phase 0.2, 0.3 を完了
   ↓
 Phase 1 開始前にユーザーが要件定義書を追加
   ↓
@@ -906,9 +906,165 @@ Claude: 「✅ Phase完了！」
 
 ---
 
-## Phase 0.3: 環境変数・MCP設定チェック（NEW）
+## Phase 0.2: 技術スタック決定（自動・Phase 0 のみ）
 
-**実行タイミング**: Phase 0.1（技術スタック決定）の直後
+**実行タイミング**: Phase 0.1（要件定義書分析）の直後
+
+**目的**:
+- プロジェクトの技術スタックを決定
+- 必要なライブラリ・フレームワーク・サービスを選定
+- 技術スタックをSerenaメモリに保存
+
+**実行エージェント**: planner
+
+---
+
+### Step 1: 要件からの技術スタック抽出
+
+**planner が実行**:
+```bash
+# Phase 0.1で生成された要件サマリーを読み込み
+mcp__serena__read_memory(memory_name: "project/requirements_summary.md")
+```
+
+**抽出内容**:
+- フロントエンド要件（UI/UX、レスポンシブ対応等）
+- バックエンド要件（API、認証、ファイルアップロード等）
+- データベース要件（RDB、NoSQL、リアルタイム更新等）
+- インフラ要件（ホスティング、CI/CD等）
+
+---
+
+### Step 2: 技術スタック候補の提案
+
+**planner が生成**:
+```markdown
+## 技術スタック候補
+
+### フロントエンド
+- **推奨**: Next.js 14 (App Router)
+  - 理由: React + SSR + ルーティング統合
+- **代替案**: Vite + React
+
+### バックエンド
+- **推奨**: FastAPI (Python)
+  - 理由: 高速、型安全、自動ドキュメント生成
+- **代替案**: Express.js (Node.js)
+
+### データベース
+- **推奨**: Supabase (PostgreSQL + Auth + Storage)
+  - 理由: バックエンド機能統合、リアルタイム対応
+- **代替案**: Firebase
+
+### インフラ
+- **推奨**: Vercel (Frontend) + Railway (Backend)
+  - 理由: 簡単デプロイ、自動SSL、環境変数管理
+```
+
+---
+
+### Step 3: 技術スタックの決定
+
+**決定方法**:
+1. ユーザーに提案を提示
+2. ユーザーが承認または修正
+3. 確定した技術スタックをSerenaメモリに保存
+
+**Serenaメモリ保存**:
+```bash
+mcp__serena__write_memory(
+  memory_name: "system/tech_stack.md",
+  content: "
+# 技術スタック
+
+## フロントエンド
+- **フレームワーク**: Next.js 14.2.5 (App Router)
+- **言語**: TypeScript 5.5
+- **スタイリング**: Tailwind CSS 3.4
+- **UI コンポーネント**: shadcn/ui
+- **状態管理**: Zustand 4.5
+- **HTTP クライアント**: Axios 1.7
+
+## バックエンド
+- **フレームワーク**: FastAPI 0.111
+- **言語**: Python 3.12
+- **バリデーション**: Pydantic v2
+- **非同期**: asyncio + httpx
+
+## データベース
+- **メインDB**: Supabase (PostgreSQL 15)
+- **認証**: Supabase Auth
+- **ストレージ**: Supabase Storage
+
+## インフラ
+- **Frontend Hosting**: Vercel
+- **Backend Hosting**: Railway
+- **CI/CD**: GitHub Actions
+"
+)
+```
+
+---
+
+### Step 4: system_state.md 初期化
+
+**実行内容**:
+```bash
+mcp__serena__write_memory(
+  memory_name: "system/system_state.md",
+  content: "
+# システム状態
+
+最終更新: {YYYY-MM-DD}
+
+---
+
+## 技術スタック概要
+
+- **Frontend**: Next.js 14.2.5 (TypeScript)
+- **Backend**: FastAPI 0.111 (Python 3.12)
+- **Database**: Supabase (PostgreSQL 15)
+- **Hosting**: Vercel + Railway
+
+詳細: `.serena/memories/system/tech_stack.md`
+
+---
+
+## プロジェクト進捗
+
+- **Phase 0**: プロジェクト基盤構築（進行中）
+- **Phase 1**: 未着手
+"
+)
+```
+
+---
+
+### Step 5: 次のPhaseへ
+
+**planner が報告**:
+```markdown
+✅ Phase 0.2: 技術スタック決定 完了
+
+【決定内容】
+- Frontend: Next.js 14 + TypeScript
+- Backend: FastAPI + Python 3.12
+- Database: Supabase (PostgreSQL)
+- Hosting: Vercel + Railway
+
+【成果物】
+- .serena/memories/system/tech_stack.md
+- .serena/memories/system/system_state.md
+
+【次のステップ】
+Phase 0.3: 環境変数・MCP設定チェックを開始します。
+```
+
+---
+
+## Phase 0.3: 環境変数・MCP設定チェック（自動・Phase 0 のみ）
+
+**実行タイミング**: Phase 0.2（技術スタック決定）の直後
 
 **目的**: 技術スタックに基づいて必要な環境変数・MCP設定を一斉チェック・設定
 
@@ -1125,6 +1281,6 @@ cat .mcp.json | grep -E "SUPABASE|OPENAI|GITHUB"
 - OPENAI_API_KEY: sk-123*** （任意）
 
 【次のステップ】
-Phase 0.3（技術スタック検証）を開始します。
+Phase 0.2（技術スタック決定）を開始します。
 ```
 

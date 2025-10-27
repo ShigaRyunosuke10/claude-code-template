@@ -179,10 +179,12 @@ mcp__serena__write_memory(
 
 ## 📚 参照ドキュメント
 
-- [tech_stack.md](./tech_stack.md) - 技術スタック詳細（選択理由・制約含む）
-- [mcp_servers.md](./mcp_servers.md) - MCP設定詳細
-- [implementation_status.md](./implementation_status.md) - 実装進捗詳細
-- [project_requirements.md](../../project_requirements.md) - プロジェクト要件定義
+**注**: 以下はプロジェクト実行時にSerenaメモリまたはdocs/配下に自動生成されるファイルです
+
+- `.serena/memories/system/tech_stack.md` - 技術スタック詳細（選択理由・制約含む）
+- `.serena/memories/system/mcp_servers.md` - MCP設定詳細
+- `.serena/memories/system/implementation_status.md` - 実装進捗詳細
+- `docs/requirements/project-requirements.md` - プロジェクト要件定義
 ```
 
 ---

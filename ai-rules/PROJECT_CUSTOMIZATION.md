@@ -153,7 +153,7 @@ my-project/
 
    ## プロジェクト固有ルール参照
 
-   - [決済セキュリティルール](./../project/rules/PAYMENT_RULES.md)
+   - [決済セキュリティルール](../.claude/project/rules/PAYMENT_RULES.md)
    ```
 
 4. **CLAUDE.md更新**
@@ -162,7 +162,7 @@ my-project/
    ### プロジェクト固有エージェント
 
    - **payment-processor** - 決済処理専用エージェント
-     - 詳細: [.claude/project/agents/payment-processor.md](./.claude/project/agents/payment-processor.md)
+     - 詳細: [.claude/project/agents/payment-processor.md](../.claude/project/agents/payment-processor.md)
      - 責任: Stripe API連携、決済ログ記録、PCI DSS準拠確認
      - 連携: planner, impl-dev-backend, code-reviewer
    ```
@@ -236,7 +236,7 @@ my-project/
    ### プロジェクト固有ワークフロー
 
    - **決済フロー** - Stripe連携の標準ワークフロー
-     - 詳細: [.claude/project/workflows/payment-flow.md](./.claude/project/workflows/payment-flow.md)
+     - 詳細: [.claude/project/workflows/payment-flow.md](../.claude/project/workflows/payment-flow.md)
      - 使用タイミング: 決済機能の追加・変更時
    ```
 
@@ -285,7 +285,7 @@ my-project/
    ### プロジェクト固有ルール
 
    - **決済セキュリティルール** - PCI DSS準拠
-     - 詳細: [.claude/project/rules/PAYMENT_RULES.md](./.claude/project/rules/PAYMENT_RULES.md)
+     - 詳細: [.claude/project/rules/PAYMENT_RULES.md](../.claude/project/rules/PAYMENT_RULES.md)
    ```
 
 ---
