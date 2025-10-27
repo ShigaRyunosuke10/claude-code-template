@@ -52,7 +52,14 @@ docs/
 
 **Phase 0.2**: 技術スタック決定
 
-**Phase 0.3**: 環境変数・MCP設定チェック
+**Phase 0.3**: 環境変数テンプレート作成（自動）
+- `.env.example`, `backend/.env.example`, `frontend/.env.local.example` 作成
+
+**Phase 0.4**: 環境変数設定・MCP接続確認（手動+検証）
+- **前提条件**: Codex CLI認証済み（`codex login`実行済み）
+- **実行内容**: `.env`等に実キー設定、全MCP接続確認
+- **完了条件**: GitHub/Codex/Supabase/Serena MCP接続成功
+- **Phase 0完了**: Phase 0.4完了時点
 
 **Phase 階層**: planner がプロジェクトの状況に応じて動的生成
 

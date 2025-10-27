@@ -30,12 +30,9 @@
     },
     "codex": {
       "type": "stdio",
-      "command": "cmd",
+      "command": "codex",
       "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@trishchuk/codex-mcp-tool"
+        "mcp-server"
       ],
       "env": {}
     },
