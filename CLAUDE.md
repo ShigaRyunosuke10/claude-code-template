@@ -76,9 +76,12 @@ docs/
 ### ① 計画フェーズ（自動実行）
 
 **Phase 0（プロジェクト基盤構築）の場合**:
-1. **GitHubリポジトリ初期化チェック**（自動）← NEW
+1. **GitHubリポジトリ初期化チェック**（自動・GitHub MCP使用）← NEW
+   - **環境変数 `GITHUB_TOKEN` をチェック**（必須）
+   - 未設定の場合は設定手順を表示し、一時中断
    - リモートURLがなければリポジトリ作成を提案
    - プロジェクト名、リポジトリ名をヒアリング
+   - **GitHub MCP (`mcp__github__create_repository`) でリポジトリ作成**
    - CLAUDE.md のプレースホルダー自動置換
    - git init, commit, push を自動実行
    - 詳細: [ai-rules/PHASE_START.md - Step -1](./ai-rules/PHASE_START.md)

@@ -38,6 +38,7 @@ Claude Code がPhase 0（プロジェクト基盤構築）の最初に以下を�
 
 1. **GitHubリポジトリ作成の確認**
    - リモートURLがなければリポジトリ作成を提案
+   - **環境変数 `GITHUB_TOKEN` を使用してGitHub MCP経由で作成**
    - プロジェクト名、リポジトリ名、可視性をヒアリング
 
 2. **CLAUDE.md プレースホルダー自動置換**
@@ -141,7 +142,8 @@ Claude Code が Phase 0 を開始
   ↓
 ① GitHubリポジトリ作成の確認
   - プロジェクト名、リポジトリ名をヒアリング
-  - リポジトリ作成 + git init, commit, push
+  - 環境変数 GITHUB_TOKEN をチェック
+  - GitHub MCP経由でリポジトリ作成 + git init, commit, push
   ↓
 ② CLAUDE.md プレースホルダー自動置換
   ↓
@@ -438,8 +440,9 @@ claude-code-template/
 ## ⚠️ 注意事項
 
 1. **プレースホルダー置換を忘れずに**: `CLAUDE.md` の `{{...}}` は必ず実際の値に置換してください
-2. **MCPサーバー認証情報**: `.mcp.json` の環境変数（`${GITHUB_TOKEN}` 等）は、実行環境で設定してください
-3. **Phase Rollout System**: E2Eテスト自律システムは、Phase 1（Observer Mode）から順に実行してください
+2. **環境変数 GITHUB_TOKEN の設定**: Phase 0でのリポジトリ自動作成には環境変数の設定が必須です（Step 0参照）
+3. **MCPサーバー認証情報**: `.mcp.json` の環境変数（`${GITHUB_TOKEN}` 等）は、実行環境で設定してください
+4. **Phase Rollout System**: E2Eテスト自律システムは、Phase 1（Observer Mode）から順に実行してください
 
 ---
 
