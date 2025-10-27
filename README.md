@@ -90,8 +90,31 @@ my-project/
 │       └── rules/       # プロジェクト固有ルール
 │
 ├── ai-rules/            # テンプレート - 変更禁止
-└── ai-rules-project/    # ★ プロジェクト固有ルール
+├── ai-rules-project/    # ★ プロジェクト固有ルール
+│
+└── docs/                # ★ プロジェクト資料
+    ├── requirements/    # 要件定義書
+    ├── specs/           # 技術仕様書
+    ├── designs/         # 設計資料
+    └── references/      # 参考資料
 ```
+
+### Step 3.5: プロジェクト資料フォルダ（推奨）
+
+ユーザー提供の資料（要件定義書、仕様書等）を格納するフォルダです。
+
+```bash
+# docs フォルダはテンプレートに含まれています
+# 必要に応じて資料を配置してください
+```
+
+**使い方**:
+- `docs/requirements/` - 要件定義書、ユーザーストーリー
+- `docs/specs/` - API仕様、DB設計
+- `docs/designs/` - アーキテクチャ図、UIモックアップ
+- `docs/references/` - 競合分析、技術調査
+
+詳細: 各フォルダ内の `README.md` を参照
 
 ### Step 4: Git初期化
 
