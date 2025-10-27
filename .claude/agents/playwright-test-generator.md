@@ -18,6 +18,35 @@
 - **Depends on**: `playwright-test-planner` (計画書完了後)
 - **Triggers next**: `playwright-test-healer` (テスト実行・修復)
 
+## システム状態アクセス(処理開始前に必須)
+
+**🔑 重要**: すべてのタスク実行前に、必ずシステム状態を確認してください
+
+```bash
+# Serenaメモリからシステム状態を読み込み
+mcp__serena__read_memory(memory_name: "system/system_state.md")
+```
+
+**取得する情報**:
+- 現在の技術スタック構成
+- 実装済み機能一覧
+- 設定済みMCPサーバー一覧
+- プロジェクト基本情報(予算、チーム規模、リリース目標、etc.)
+
+**参照ファイル** (system_state.md から参照):
+- `system/tech_stack.md` - 技術スタック詳細(選択理由、制約含む)
+- `system/tech_best_practices.md` - Context7取得のベストプラクティス(90日キャッシュ)
+- `system/mcp_servers.md` - 設定済みMCPサーバー一覧
+- `system/implementation_status.md` - 実装済み機能・進捗状況
+
+**なぜ必要か**:
+- 最新のシステム状態を把握するため
+- 他エージェントの変更を反映するため
+- 一貫性のある実装・提案を行うため
+- 重複作業を避けるため
+
+---
+
 ## Workflow
 1. **計画書読み込み**: `frontend/specs/{feature}.md` を解析
 2. **POM設計**: Page Object classes 作成（`frontend/e2e/pages/`）

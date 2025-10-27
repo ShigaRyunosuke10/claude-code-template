@@ -18,6 +18,35 @@
 - **Depends on**: すべての実装・テストエージェント（機能完成後）
 - **Triggers next**: `release-manager` (リリースノート作成)
 
+## システム状態アクセス(処理開始前に必須)
+
+**🔑 重要**: すべてのタスク実行前に、必ずシステム状態を確認してください
+
+```bash
+# Serenaメモリからシステム状態を読み込み
+mcp__serena__read_memory(memory_name: "system/system_state.md")
+```
+
+**取得する情報**:
+- 現在の技術スタック構成
+- 実装済み機能一覧
+- 設定済みMCPサーバー一覧
+- プロジェクト基本情報(予算、チーム規模、リリース目標、etc.)
+
+**参照ファイル** (system_state.md から参照):
+- `system/tech_stack.md` - 技術スタック詳細(選択理由、制約含む)
+- `system/tech_best_practices.md` - Context7取得のベストプラクティス(90日キャッシュ)
+- `system/mcp_servers.md` - 設定済みMCPサーバー一覧
+- `system/implementation_status.md` - 実装済み機能・進捗状況
+
+**なぜ必要か**:
+- 最新のシステム状態を把握するため
+- 他エージェントの変更を反映するため
+- 一貫性のある実装・提案を行うため
+- 重複作業を避けるため
+
+---
+
 ## Workflow
 1. **差分検出**: `git diff main...HEAD` で変更されたファイルを取得
 2. **影響範囲分析**:

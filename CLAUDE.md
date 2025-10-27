@@ -63,8 +63,10 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 詳細: [ai-rules/SESSION_COMPLETION.md](./ai-rules/SESSION_COMPLETION.md)
 
 1. **Serenaメモリ更新**（Session KPI含む）
-2. **next_session_prompt.md更新**
-3. **Git commit & PR作成**（`/pre-commit-check` 実行）
+2. **システム状態更新**（system_state.md, tech_stack.md等 - 技術スタック変更時）
+3. **next_session_prompt.md更新**
+4. **MCP設定**（新サービス追加時のみ）
+5. **Git commit & PR作成**（`/pre-commit-check` 実行）
 
 **⚠️ 重要**:
 - mainブランチへの直接pushは禁止
@@ -72,13 +74,14 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 
 ---
 
-## エージェント一覧（15体）
+## エージェント一覧（16体）
 
 詳細: [.claude/agents/](./.claude/agents/)
 
 ### 計画・要件定義
 - **planner** - Epic+タスク+API契約生成
 - **mcp-finder** - 技術スタックに対応するMCP自動検索・セットアップガイド生成
+- **tech-stack-validator** - 技術スタック検証・最新情報確認（Context7連携、ユーザー意図尊重）
 
 ### 実装
 - **impl-dev-frontend** / **impl-dev-backend** - 実装
@@ -203,7 +206,7 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 ### ツール設定
 - [.claude/settings.json](./.claude/settings.json) - Permissions & Hooks
 - [.claude/workflows/](./.claude/workflows/) - ワークフローテンプレート（Case A/B/C)
-- [.claude/agents/](./.claude/agents/) - エージェント定義（14体）
+- [.claude/agents/](./.claude/agents/) - エージェント定義（16体）
 - [.claude/phases/ROLLOUT_GUIDE.md](./.claude/phases/ROLLOUT_GUIDE.md) - AI自律システム段階導入
 
 ### AI向け技術詳細

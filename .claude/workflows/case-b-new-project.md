@@ -26,7 +26,55 @@ Task:deployment-agent(prompt: "新規プロジェクトの技術スタック要�
 - 推奨技術スタック構成図
 - プラットフォーム推奨（Vercel / Railway / Render / etc.）
 - コスト見積もり
-- `project_requirements.md` 生成
+- `project_requirements.md` 生成（選択理由・制約・変更制限ガイドライン含む）
+
+### 0.1.3 技術スタック検証（NEW）
+
+**エージェント**: `tech-stack-validator`
+
+```bash
+Task:tech-stack-validator(prompt: "Phase 0.1で決定した技術スタックを最新情報で検証")
+```
+
+**処理内容**:
+1. `project_requirements.md` から技術スタックと選択理由を読み込み
+2. Context7で最新ベストプラクティスを取得（90日キャッシュ）
+3. 各技術の最新バージョン・セキュリティ情報を確認
+4. ユーザーの選択理由を尊重した検証を実施
+
+**検証例**:
+
+```markdown
+## 技術スタック検証結果
+
+### Next.js 14.2.x
+✅ **現在のバージョン**: 14.2.5
+📌 **最新版**: 15.0.2（2025-01-15リリース）
+
+**ユーザー選択理由**（project_requirements.md より）:
+> 「安定性重視。Next.js 15は破壊的変更が多いため避ける。個人開発で学習コストを最小化したい。」
+
+**検証結果**: ✅ ユーザー意図を尊重し、Next.js 14のまま維持
+**推奨アクション**: セキュリティパッチのみ適用（14.2.5 → 14.2.7）
+
+---
+
+### FastAPI 0.115.0
+⚠️ **セキュリティパッチあり**: 0.115.2にアップデート推奨（CVE-2025-XXXX対応）
+
+**検証結果**: ✅ Auto-apply可能（破壊的変更なし）
+**推奨アクション**: 自動適用済み（0.115.0 → 0.115.2）
+```
+
+**Output**:
+- `tech_stack_validation_report.md` - 検証結果レポート
+- `system/tech_stack.md` - 技術スタック詳細（Serenaメモリ）
+- `system/tech_best_practices.md` - Context7取得のベストプラクティス（90日キャッシュ）
+- `system/system_state.md` 更新 - システム状態概要
+
+**重要**: ユーザーの選択理由を尊重し、安易なアップデートは提案しない
+
+---
 
 ### 0.1.5 MCP自動検索・提案（NEW）
 
