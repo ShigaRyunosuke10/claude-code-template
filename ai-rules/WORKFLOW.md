@@ -135,6 +135,7 @@ planner が参考にする「よくあるパターン」。固定ではなく、
 
 ```
 Phase 0: プロジェクト基盤構築
+  ├─ Phase 0.0: GitHubリポジトリ作成（自動）← NEW
   ├─ Phase 0.1: 技術スタック決定
   ├─ Phase 0.2: 技術スタック検証
   ├─ Phase 0.3: MCP設定
@@ -149,6 +150,14 @@ Phase 1: 認証システム実装
 Phase 2: コア機能実装
   └─ ...
 ```
+
+**Phase 0.0（GitHubリポジトリ作成）**:
+- Phase 0 の最初に自動実行
+- リモートURLがなければリポジトリ作成を提案
+- CLAUDE.md のプレースホルダーを置換
+- git init, commit, push を自動実行
+
+詳細: [PHASE_START.md Step -1](./PHASE_START.md)
 
 ### パターン2: 既存プロジェクト機能拡張
 

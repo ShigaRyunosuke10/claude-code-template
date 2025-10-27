@@ -22,6 +22,162 @@ Phase完了（ピポパ音♪）
 
 ## ① 計画フェーズ（自動実行）
 
+### Step -1: GitHubリポジトリ初期化チェック（自動・Phase 0 のみ）
+
+**実行タイミング**: Phase 0（プロジェクト基盤構築）の最初のみ実行
+
+**実行内容**:
+```bash
+# リモートURLの存在チェック
+git config --get remote.origin.url
+```
+
+**リモートURLが存在しない場合**:
+→ GitHubリポジトリを作成します
+
+---
+
+#### 1. プロジェクト情報ヒアリング
+
+**メインClaude Agentが質問**:
+```markdown
+GitHubリポジトリが未設定です。新規作成しますか？
+
+【質問】
+1. プロジェクト名は？（例: my-awesome-app）
+2. リポジトリ名は？（デフォルト: プロジェクト名と同じ）
+3. リポジトリの可視性は？（public / private）
+4. リポジトリの説明は？（省略可）
+5. GitHubオーナー名は？（例: YourUsername）
+
+【選択肢】
+A. 新規作成する（推奨）
+B. 後で手動で作成する
+C. 既存リポジトリを使う
+```
+
+**選択肢Aを選んだ場合**:
+→ 以下のステップを自動実行
+
+**選択肢Bを選んだ場合**:
+→ スキップ（Phase 0 を継続）
+
+**選択肢Cを選んだ場合**:
+→ リモートURLの入力を求める
+```bash
+git remote add origin {{ユーザー提供のURL}}
+git branch -M main
+git push -u origin main
+```
+
+---
+
+#### 2. CLAUDE.md プレースホルダー置換
+
+**実行内容**:
+```bash
+# プレースホルダーを実際の値に置換
+sed -i 's/{{PROJECT_NAME}}/my-awesome-app/g' CLAUDE.md
+sed -i 's/{{GITHUB_OWNER}}/YourUsername/g' CLAUDE.md
+sed -i 's/{{REPO_NAME}}/my-awesome-app/g' CLAUDE.md
+sed -i 's/{{FRONTEND_PORT}}/3000/g' CLAUDE.md  # デフォルト値
+sed -i 's/{{BACKEND_PORT}}/8000/g' CLAUDE.md   # デフォルト値
+
+# Windows の場合
+# powershell -c "(Get-Content CLAUDE.md) -replace '{{PROJECT_NAME}}', 'my-awesome-app' | Set-Content CLAUDE.md"
+```
+
+**ポート番号の確認**:
+```markdown
+フロントエンドポート: 3000（デフォルト）でよろしいですか？
+バックエンドポート: 8000（デフォルト）でよろしいですか？
+
+変更する場合は番号を入力してください。
+```
+
+---
+
+#### 3. GitHubリポジトリ作成
+
+**実行内容**:
+```bash
+# GitHub CLI でリポジトリ作成
+gh repo create {{REPO_NAME}} \
+  --{{public|private}} \
+  --source=. \
+  --description="{{説明文}}" \
+  --remote=origin
+
+# または
+gh repo create {{GITHUB_OWNER}}/{{REPO_NAME}} \
+  --{{public|private}} \
+  --description="{{説明文}}"
+
+git remote add origin https://github.com/{{GITHUB_OWNER}}/{{REPO_NAME}}.git
+```
+
+**エラー時**:
+- GitHub CLI が未インストール → インストール手順を表示
+- 認証エラー → `gh auth login` を実行
+- リポジトリ名重複 → 別の名前を提案
+
+---
+
+#### 4. git init & commit & push
+
+**実行内容**:
+```bash
+# git 初期化（既に .git があればスキップ）
+git init
+
+# 全ファイルをステージング
+git add .
+
+# 初回コミット
+git commit -m "chore: プロジェクト初期化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# メインブランチにリネーム
+git branch -M main
+
+# リモートにプッシュ
+git push -u origin main
+```
+
+---
+
+#### 5. 完了メッセージ
+
+```markdown
+✅ GitHubリポジトリ作成完了
+
+【作成されたリポジトリ】
+- URL: https://github.com/{{GITHUB_OWNER}}/{{REPO_NAME}}
+- 可視性: {{public|private}}
+
+【次のステップ】
+Phase 0（プロジェクト基盤構築）を開始します。
+```
+
+---
+
+**リモートURLが既に存在する場合**:
+→ スキップ（このステップは実行しない）
+
+```markdown
+✅ GitHubリポジトリは既に設定されています。
+
+【リモートURL】
+- origin: {{既存のURL}}
+
+Phase 0 を継続します。
+```
+
+---
+
 ### Step 0: 要件定義変更検知（自動）
 
 **実行内容**:

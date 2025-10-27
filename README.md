@@ -30,19 +30,33 @@ cp -r claude-code-template my-new-project
 cd my-new-project
 ```
 
-### Step 2: プレースホルダーを置換
+### Step 2: プレースホルダーを置換（自動化）
 
-[CLAUDE.md](./CLAUDE.md) を編集して、以下のプレースホルダーを実際の値に置換してください:
+**Phase 0 開始時に自動実行されます**。手動での置換は不要です。
 
-| プレースホルダー | 説明 | 例 |
-|----------------|------|-----|
-| `{{PROJECT_NAME}}` | プロジェクト名 | `my-awesome-app` |
-| `{{GITHUB_OWNER}}` | GitHubオーナー名 | `YourUsername` |
-| `{{REPO_NAME}}` | リポジトリ名 | `my-awesome-app` |
-| `{{FRONTEND_PORT}}` | フロントエンドポート | `3000` |
-| `{{BACKEND_PORT}}` | バックエンドポート | `8000` |
+Claude Code がPhase 0（プロジェクト基盤構築）の最初に以下を自動実行します：
 
-**置換例**:
+1. **GitHubリポジトリ作成の確認**
+   - リモートURLがなければリポジトリ作成を提案
+   - プロジェクト名、リポジトリ名、可視性をヒアリング
+
+2. **CLAUDE.md プレースホルダー自動置換**
+   - `{{PROJECT_NAME}}` → 実際のプロジェクト名
+   - `{{GITHUB_OWNER}}` → GitHubオーナー名
+   - `{{REPO_NAME}}` → リポジトリ名
+   - `{{FRONTEND_PORT}}` → フロントエンドポート（デフォルト: 3000）
+   - `{{BACKEND_PORT}}` → バックエンドポート（デフォルト: 8000）
+
+3. **git init & commit & push**
+   - 初回コミット作成
+   - GitHubリポジトリにプッシュ
+
+詳細: [ai-rules/PHASE_START.md - Step -1](./ai-rules/PHASE_START.md)
+
+---
+
+**手動で置換したい場合**:
+
 ```bash
 # macOS/Linux
 sed -i 's/{{PROJECT_NAME}}/my-awesome-app/g' CLAUDE.md
@@ -116,30 +130,50 @@ my-project/
 
 詳細: 各フォルダ内の `README.md` を参照
 
-### Step 4: Git初期化
+### Step 4: Claude Code でプロジェクト開始（自動化）
 
-```bash
-git init
-git add .
-git commit -m "chore: プロジェクト初期化
+**Phase 0（プロジェクト基盤構築）を開始してください**。
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+ユーザー「Next.js + FastAPIで勤怠管理システムを作りたい」
+  ↓
+Claude Code が Phase 0 を開始
+  ↓
+① GitHubリポジトリ作成の確認
+  - プロジェクト名、リポジトリ名をヒアリング
+  - リポジトリ作成 + git init, commit, push
+  ↓
+② CLAUDE.md プレースホルダー自動置換
+  ↓
+③ 技術スタック決定（deployment-agent）
+④ 技術スタック検証（tech-stack-validator）
+⑤ MCP設定（mcp-finder）
+⑥ プロジェクト初期化
 ```
 
-### Step 5: GitHubリポジトリ作成・プッシュ
+詳細: [ai-rules/PHASE_START.md - Step -1](./ai-rules/PHASE_START.md)
+
+---
+
+**手動で Git 初期化・GitHub リポジトリ作成したい場合**:
 
 ```bash
-# 1. GitHubで新規リポジトリ作成（Webから）
+# 1. Git 初期化
+git init
+git add .
+git commit -m "chore: プロジェクト初期化"
 
-# 2. リモートリポジトリを追加
+# 2. GitHubリポジトリ作成（GitHub CLI）
+gh repo create my-awesome-app --private --source=. --description="プロジェクトの説明" --push
+
+# または Web から作成
+# 3. リモートリポジトリを追加
 git remote add origin https://github.com/{{GITHUB_OWNER}}/{{REPO_NAME}}.git
 
-# 3. メインブランチにリネーム
+# 4. メインブランチにリネーム
 git branch -M main
 
-# 4. プッシュ
+# 5. プッシュ
 git push -u origin main
 ```
 

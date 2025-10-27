@@ -75,6 +75,15 @@ docs/
 
 ### ① 計画フェーズ（自動実行）
 
+**Phase 0（プロジェクト基盤構築）の場合**:
+1. **GitHubリポジトリ初期化チェック**（自動）← NEW
+   - リモートURLがなければリポジトリ作成を提案
+   - プロジェクト名、リポジトリ名をヒアリング
+   - CLAUDE.md のプレースホルダー自動置換
+   - git init, commit, push を自動実行
+   - 詳細: [ai-rules/PHASE_START.md - Step -1](./ai-rules/PHASE_START.md)
+
+**通常のPhaseの場合**:
 1. **next_phase_prompt.md 読み込み** - 前回の推奨タスクを確認
 2. **タスク自動選択** - 優先度: 高 → 中 → 低 の順で選択
 3. **詳細計画作成** - TodoWriteで実装ステップをリスト化
