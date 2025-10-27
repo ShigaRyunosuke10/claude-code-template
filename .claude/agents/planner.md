@@ -247,6 +247,167 @@ mcp__serena__read_memory(memory_name: "system/system_state.md")
 
 ---
 
+### Step 0.5: 影響範囲分析（要件定義変更時のみ）
+
+**トリガー**: 要件定義変更フロー（REQUIREMENTS_CHANGE.md）から呼び出される
+
+**呼び出し方**:
+```bash
+Task:planner(prompt: "要件変更の影響範囲を分析してください
+
+【変更内容】
+- 変更内容: {変更内容}
+- 想定ユーザー: {ユーザー}
+- 既存機能との関連: {関連}
+- 優先度: {優先度}
+- 期限: {期限}
+
+【現在の状況】
+- 現在のPhase: Phase {番号}（{Phase名}）
+- Phase階層: [以下に現在のPhase階層を貼り付け]
+
+Phase X.Y: {Phase名} ✅ 完了 / 🔄 作業中 / ⏳ 未着手
+Phase X.Z: {Phase名} ✅ 完了 / 🔄 作業中 / ⏳ 未着手
+...
+")
+```
+
+**実行内容**:
+
+1. **変更内容の解析**
+   - 技術的影響範囲の特定
+   - アーキテクチャへの影響度判定
+   - 依存関係の洗い出し
+
+2. **Phase階層の読み込み**
+   ```bash
+   # Serenaメモリから現在のPhase階層を読み込み
+   mcp__serena__read_memory(memory_name: "project/current_context.md")
+   ```
+
+3. **影響のあるPhaseの特定**
+   - ✅ 完了済みPhase → 新しいPhaseとして修正版を作成
+   - 🔄 作業中Phase → 中断・保存 → 新しいPhaseとして最初から実装
+   - ⏳ 未着手Phase → 影響ありなら再計画、影響なしなら継続
+
+4. **再計画後のPhase階層生成**
+   - 完了済みPhaseは維持
+   - 新しいPhaseを追加（影響のある修正版）
+   - 影響のないPhaseは番号繰り上げ
+
+**出力形式**:
+
+`.serena/memories/project/requirements_change_{日付}.md`
+
+```markdown
+# 影響範囲分析レポート
+
+## 📊 要件変更サマリー
+
+- **変更内容**: {変更内容の簡潔な説明}
+- **影響度**: 大/中/小
+- **優先度**: 高/中/低
+- **期限**: {期限}
+
+---
+
+## ✅ 影響のあるPhase（完了済み）
+
+### Phase X.Y: {Phase名} ✅
+- **状態**: 完了済み
+- **影響**: あり（{影響内容}）
+- **対応方針**: **新しいPhaseとして修正版を作成**
+  - 元のPhase X.Yは維持
+  - Phase Z.A として修正版を新規作成
+
+---
+
+## 🔄 影響のあるPhase（作業中）
+
+### Phase X.Y: {Phase名} 🔄
+- **状態**: 作業中（{進捗}%完了）
+- **影響**: あり（{影響内容}）
+- **対応方針**: **中断・保存 → 新しいPhaseとして最初から実装**
+  - 現在の作業を中断（wip commit）
+  - Phase Z.B として修正版を新規作成
+
+---
+
+## ⏳ 影響のあるPhase（未着手）
+
+### Phase X.Y: {Phase名} ⏳
+- **状態**: 未着手
+- **影響**: あり（{影響内容}）
+- **対応方針**: **再計画**
+  - Phase Z.C として再設計版を作成
+
+---
+
+## ⭕ 影響のないPhase
+
+### Phase X.Y: {Phase名} ⏳
+- **状態**: 未着手
+- **影響**: なし（{理由}）
+- **対応方針**: **継続**（Phase番号を繰り上げて Phase Z+1 として継続）
+
+---
+
+## 🔄 再計画後のPhase階層
+
+### 既存Phase（維持）
+```
+Phase X.Y: {Phase名} ✅ → そのまま維持
+Phase X.Z: {Phase名} ✅ → そのまま維持
+Phase X.W: {Phase名} 🔄 → 中断・保存（wip commit）
+```
+
+### 新規Phase（修正版）
+```
+Phase Z: {大きな変更名} ← 新しいPhaseとして追加
+  ├─ Phase Z.1: {Phase名}（Phase X.Yの修正版）
+  │    ├─ Phase Z.1.1: {詳細タスク}
+  │    └─ Phase Z.1.2: {詳細タスク}
+  │
+  ├─ Phase Z.2: {Phase名}（Phase X.Zの修正版）
+  │    └─ Phase Z.2.1: {詳細タスク}
+  │
+  └─ Phase Z.3: {Phase名}（Phase X.Wの修正版）
+       ├─ Phase Z.3.1: {詳細タスク}
+       └─ Phase Z.3.2: {詳細タスク}
+```
+
+### 既存Phase（継続・番号繰り上げ）
+```
+Phase Z+1: {Phase名}（元 Phase X.V）← 継続
+Phase Z+2: {Phase名}（元 Phase X.U）← 継続
+```
+
+---
+
+## 📌 推奨アクション
+
+1. **Phase Z.1 から開始** - {開始するPhase}
+2. **完了済みPhaseは削除せず維持** - 変更履歴として残す
+3. **作業中Phaseは中断・保存** - wip commit
+4. **Phase Z完了後、Phase Z+1以降を継続**
+
+---
+
+## 📅 想定スケジュール
+
+- Phase Z.1: {時間}
+- Phase Z.2: {時間}
+- Phase Z.3: {時間}
+- 合計: {時間}（期限{期限}に収まる/収まらない）
+```
+
+**出力後の動作**:
+- メインClaude Agentに影響範囲分析レポートを返す
+- メインAgentがユーザーに承認を求める
+- 承認後、REQUIREMENTS_CHANGE.md のフローに戻る
+
+---
+
 **判定ロジック**:
 ```
 if (Critical項目が1つでも不足):

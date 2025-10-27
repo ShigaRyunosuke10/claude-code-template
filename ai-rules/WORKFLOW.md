@@ -520,6 +520,97 @@ mcp__github__create_pull_request(...)
 
 ---
 
+## Phase実行中の要件定義変更
+
+### トリガー
+
+以下のいずれかで要件定義変更を検知:
+- **ユーザーが要件変更を宣言**
+  - 例: 「認証方式をJWTからAuth0に変更したい」
+- **Phase開始時に自動検知**（詳細: [PHASE_START.md](./PHASE_START.md)）
+  - `project_requirements.md` の変更を検出
+
+### 基本方針
+
+- **独立した横断フロー** - Phase番号体系とは別の「要件定義変更モード」
+- **完了済みPhaseは維持** - 新しいPhaseとして修正版を追加
+- **影響範囲はplannerが自動判定** - 影響のあるPhaseのみ再計画
+- **作業中Phaseは中断・保存** - 新しいPhaseとして最初から実装
+
+### フロー概要
+
+```
+Phase X.Y（作業中）
+  ↓
+要件変更検知
+  ↓
+【要件定義変更モード発動】
+  ↓
+① 作業の一時保存（wip commit）
+② 要件ヒアリング
+③ planner 影響範囲分析（自動）
+④ ユーザー承認
+⑤ Phase階層再構築 + 復帰
+  ↓
+新しいPhaseに移行
+```
+
+### 具体例
+
+**シナリオ**: Phase 2.3（JWT認証実装）完了後、Phase 3.1（ログイン画面）作業中に「Auth0に変更したい」
+
+**変更前のPhase階層**:
+```
+Phase 2.3: 認証API実装（JWT方式）✅ 完了
+Phase 2.4: トークン検証ミドルウェア（JWT）✅ 完了
+Phase 3.1: ログイン画面実装 🔄 作業中（50%）
+Phase 3.2: ダッシュボード実装 ⏳ 未着手
+```
+
+**planner が影響範囲分析**:
+- Phase 2.3 ✅ → 影響あり（完了済み → 新しいPhaseとして修正版作成）
+- Phase 2.4 ✅ → 影響あり（完了済み → 新しいPhaseとして修正版作成）
+- Phase 3.1 🔄 → 影響あり（作業中 → 中断・保存 → 新しいPhaseとして最初から）
+- Phase 3.2 ⏳ → 影響なし（継続）
+
+**変更後のPhase階層**:
+```
+【維持】
+Phase 2.3: 認証API実装（JWT方式）✅ 完了（維持）
+Phase 2.4: トークン検証ミドルウェア（JWT）✅ 完了（維持）
+Phase 3.1: ログイン画面実装（JWT）🔄 中断・保存（wip commit）
+
+【新規追加】
+Phase 4: Auth0移行 ← NEW
+  ├─ Phase 4.1: 認証API Auth0化（Phase 2.3の修正版）← 現在ここ
+  ├─ Phase 4.2: トークン検証 Auth0化（Phase 2.4の修正版）
+  └─ Phase 4.3: ログイン画面 Auth0化（Phase 3.1の修正版）
+
+【継続（番号繰り上げ）】
+Phase 5: ダッシュボード実装（元 Phase 3.2）⏳ 未着手
+```
+
+**復帰後の動作**:
+```markdown
+✅ 要件定義変更モード終了
+
+Phase 4.1（認証API Auth0化）を開始します。
+
+【Phase階層】
+Phase 4: Auth0移行
+  ├─ Phase 4.1: 認証API Auth0化 ← 現在ここ
+  ├─ Phase 4.2: トークン検証 Auth0化
+  └─ Phase 4.3: ログイン画面 Auth0化
+
+実装フェーズを開始します。
+```
+
+### 詳細フロー
+
+詳細: [REQUIREMENTS_CHANGE.md](./REQUIREMENTS_CHANGE.md)
+
+---
+
 ## 絶対禁止事項
 
 - **mainブランチへの直接commit & push**（実装コード・ドキュメント含め**一切禁止**）

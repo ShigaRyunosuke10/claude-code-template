@@ -22,6 +22,67 @@ Phase完了（ピポパ音♪）
 
 ## ① 計画フェーズ（自動実行）
 
+### Step 0: 要件定義変更検知（自動）
+
+**実行内容**:
+```bash
+# project_requirements.md と system_state.md を読み込み
+Read: project_requirements.md
+Read: .serena/memories/system/system_state.md
+
+# 前回Phase完了時の要件と比較
+Read: .serena/memories/project/phase{前回番号}_*.md
+```
+
+**要件変更検知条件**:
+- `project_requirements.md` に新しい要件が追加されている
+- 技術スタックが変更されている（例: JWT → Auth0）
+- アーキテクチャ変更が記載されている
+- 既存機能の大幅な仕様変更
+
+**検知時の動作**:
+```markdown
+⚠️ 要件定義変更を検知しました。
+
+【変更内容】
+- 認証方式: JWT → Auth0
+
+【影響の可能性】
+- Phase 2.3: 認証API実装（影響あり）
+- Phase 2.4: トークン検証（影響あり）
+- Phase 3.1: ログイン画面（影響あり）
+
+要件定義変更フローを発動しますか？
+1. はい - REQUIREMENTS_CHANGE.md のフローに移行
+2. いいえ - 現在のPhaseを継続（非推奨）
+3. 後で - Technical Debt登録 + 現在のPhaseを継続
+```
+
+**選択肢の処理**:
+
+**1. 「はい」選択時**:
+→ [REQUIREMENTS_CHANGE.md](./REQUIREMENTS_CHANGE.md) のフローに移行
+
+**2. 「いいえ」選択時**:
+→ 現在のPhaseを継続（要件変更を無視）
+
+**3. 「後で」選択時**:
+→ Technical Debt登録
+```bash
+Write: reports/technical-debt.md
+
+追加内容:
+## 要件定義変更（未対応）
+
+- **登録日**: 2025-01-27
+- **変更内容**: 認証方式 JWT → Auth0
+- **影響Phase**: Phase 2.3, 2.4, 3.1
+- **優先度**: 高
+- **対応予定**: Phase 5完了後
+```
+
+---
+
 ### Step 1: 前回の引き継ぎ情報を読み込み
 
 **優先順位**:
