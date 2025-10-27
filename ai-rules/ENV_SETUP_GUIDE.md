@@ -2,6 +2,8 @@
 
 技術スタック確定後に必要な環境変数・MCP設定を一斉に設定するためのガイド。
 
+**このファイルはテンプレートです。** プロジェクト開始時に `tech-stack-validator` エージェントが技術スタックに基づいて具体的な設定手順を自動生成します。
+
 ---
 
 ## 📋 設定タイミング
@@ -10,7 +12,7 @@
 
 - **実行タイミング**: 技術スタック決定後（Phase 0.1 → 0.2）
 - **目的**: プロジェクトに必要な環境変数・MCP設定を漏れなく設定
-- **自動化**: 技術スタックに基づいて必要な設定を自動検知
+- **自動化**: `tech-stack-validator` が技術スタックに基づいて設定ガイドを生成
 
 ---
 
@@ -21,7 +23,7 @@
 #### 1. GITHUB_TOKEN
 - **用途**: GitHubリポジトリ作成、PR/Issue管理
 - **MCPサーバー**: `github`
-- **設定方法**: README.md「Step 0: 環境変数設定」参照
+- **設定方法**: [README.md「Step 0: 環境変数設定」](../README.md)参照
 - **検証方法**:
   ```bash
   echo $GITHUB_TOKEN | head -c 10
@@ -30,41 +32,47 @@
 
 ---
 
-### 技術スタック別設定
+## 🤖 tech-stack-validator の責任
 
-#### データベース: Supabase
+**Phase 0.2 実行時**に以下を自動実行：
 
-**必要な設定**:
-1. **SUPABASE_ACCESS_TOKEN**
-   - Supabaseアクセストークン
-   - 取得方法: [Supabase Dashboard](https://app.supabase.com/) > Settings > API > Service Role Key
-
-2. **SUPABASE_PROJECT_REF**
-   - プロジェクトID
-   - 取得方法: Supabase Dashboard > Settings > General > Reference ID
-
-**`.mcp.json` 設定**:
-```json
-{
-  "mcpServers": {
-    "supabase": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--access-token",
-        "${SUPABASE_ACCESS_TOKEN}",
-        "--project-ref",
-        "${SUPABASE_PROJECT_REF}"
-      ]
-    }
-  }
-}
+### 1. 技術スタック読み込み
+```
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
 ```
 
+### 2. 必要な環境変数・MCP設定を特定
+技術スタックから必要な設定を抽出：
+- データベース（Supabase, PostgreSQL, MySQL等）
+- 認証（Auth0, Firebase Auth, AWS Cognito等）
+- 決済（Stripe, PayPal等）
+- インフラ（Vercel, AWS, GCP等）
+- AI/MCP（OpenAI, Anthropic, Context7等）
+
+### 3. 最新情報を調査
+各サービスの最新設定方法を調査：
+- **WebSearch**: 公式ドキュメント、最新のセットアップ手順
+- **Context7 MCP**: ライブラリ・SDKのドキュメント取得
+- **例**: "Supabase MCP setup 2025", "Stripe environment variables Node.js"
+
+### 4. 環境変数設定ガイドを生成
+このファイルを上書きし、以下を含む具体的なガイドを作成：
+
+```markdown
+## 技術スタック別設定
+
+### データベース: Supabase
+**必要な環境変数**:
+- `SUPABASE_ACCESS_TOKEN`
+- `SUPABASE_PROJECT_REF`
+
+**取得方法**:
+1. [Supabase Dashboard](https://app.supabase.com/) にアクセス
+2. Settings > API > Service Role Key をコピー
+3. Settings > General > Reference ID をコピー
+
 **環境変数設定**:
-```bash
+\```bash
 # Windows PowerShell
 $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
 $env:SUPABASE_PROJECT_REF = "your-project-ref"
@@ -77,270 +85,94 @@ $env:SUPABASE_PROJECT_REF = "your-project-ref"
 export SUPABASE_ACCESS_TOKEN="sbp_..."
 export SUPABASE_PROJECT_REF="your-project-ref"
 
-# 永続化
+# 永続化（~/.bashrc または ~/.zshrc に追記）
 echo 'export SUPABASE_ACCESS_TOKEN="sbp_..."' >> ~/.bashrc
 echo 'export SUPABASE_PROJECT_REF="your-project-ref"' >> ~/.bashrc
-```
+\```
 
----
-
-#### データベース: PostgreSQL (非Supabase)
-
-**必要な設定**:
-- DATABASE_URL
-- PostgreSQL接続情報（ホスト、ポート、ユーザー、パスワード）
-
-**MCPサーバー**: 不要（直接接続）
-
----
-
-#### データベース: MongoDB
-
-**必要な設定**:
-- MONGODB_URI
-
-**MCPサーバー**: 必要に応じて追加
-
----
-
-#### AI機能: OpenAI (Codex)
-
-**必要な設定**:
-1. **OPENAI_API_KEY**
-   - OpenAI APIキー
-   - 取得方法: [OpenAI Platform](https://platform.openai.com/api-keys)
-
-**MCPサーバー**: `codex` (既に`.mcp.json`に設定済み)
-
-**Codex CLI設定**:
-```bash
-# Codex CLIインストール
-npm install -g @openai/codex-cli
-
-# 認証
-codex auth login
-# または
-export OPENAI_API_KEY="sk-..."
-```
-
----
-
-#### ドキュメント: Context7
-
-**必要な設定**:
-1. **CONTEXT7_API_KEY**
-   - Context7 APIキー
-   - 取得方法: [Context7 Dashboard](https://context7.upstash.com/)
-
-**MCPサーバー**: `context7` (既に`.mcp.json`に設定済み)
-
-**環境変数設定**:
-```bash
-# Windows PowerShell
-$env:CONTEXT7_API_KEY = "your-api-key"
-[System.Environment]::SetEnvironmentVariable('CONTEXT7_API_KEY', 'your-api-key', 'User')
-
-# macOS/Linux
-export CONTEXT7_API_KEY="your-api-key"
-echo 'export CONTEXT7_API_KEY="your-api-key"' >> ~/.bashrc
-```
-
----
-
-#### 認証: Auth0
-
-**必要な設定**:
-- AUTH0_DOMAIN
-- AUTH0_CLIENT_ID
-- AUTH0_CLIENT_SECRET
-
-**MCPサーバー**: 不要（SDKで直接連携）
-
----
-
-#### 決済: Stripe
-
-**必要な設定**:
-- STRIPE_SECRET_KEY
-- STRIPE_PUBLISHABLE_KEY
-
-**MCPサーバー**: 不要（SDKで直接連携）
-
----
-
-#### デプロイ: Vercel
-
-**必要な設定**:
-- VERCEL_TOKEN
-
-**取得方法**: [Vercel Dashboard](https://vercel.com/account/tokens)
-
----
-
-#### デプロイ: AWS
-
-**必要な設定**:
-- AWS_ACCESS_KEY_ID
-- AWS_SECRET_ACCESS_KEY
-- AWS_REGION
-
----
-
-## 🔄 Phase 0.2: 環境変数・MCP設定チェックフロー
-
-### Step 1: 技術スタック読み込み
-
-```bash
-# Serenaメモリから技術スタックを読み込み
-mcp__serena__read_memory(memory_name: "system/tech_stack.md")
-```
-
-**取得情報**:
-- データベース種類（Supabase / PostgreSQL / MongoDB）
-- 認証方式（Auth0 / Supabase Auth / JWT）
-- 決済サービス（Stripe / PayPal）
-- デプロイ先（Vercel / AWS / Netlify）
-- AI機能有無（OpenAI / Anthropic）
-
----
-
-### Step 2: 必要な環境変数を特定
-
-**技術スタック別マッピング**:
-
-| 技術スタック | 必要な環境変数 | MCPサーバー |
-|-------------|--------------|-----------|
-| Supabase | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` | `supabase` |
-| Auth0 | `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` | - |
-| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` | - |
-| OpenAI (Codex) | `OPENAI_API_KEY` | `codex` |
-| Context7 | `CONTEXT7_API_KEY` | `context7` |
-| Vercel | `VERCEL_TOKEN` | - |
-
----
-
-### Step 3: 環境変数チェック
-
-```bash
-# 必須: GITHUB_TOKEN
-echo $GITHUB_TOKEN | head -c 10
-
-# 技術スタック依存
+**検証**:
+\```bash
 echo $SUPABASE_ACCESS_TOKEN | head -c 10
-echo $CONTEXT7_API_KEY | head -c 10
-echo $OPENAI_API_KEY | head -c 10
+echo $SUPABASE_PROJECT_REF
+\```
+
+### 認証: Auth0
+（同様の形式で生成）
+
+### 決済: Stripe
+（同様の形式で生成）
+
+...（技術スタック依存で動的生成）
 ```
 
----
-
-### Step 4: 未設定の環境変数を一括案内
-
-**メインClaude Agentが表示**:
+### 5. ユーザーに設定を案内
+未設定の環境変数があれば、生成したガイドを表示し設定を促す：
 
 ```markdown
-## 🔧 環境変数・MCP設定が必要です
+⚠️ **以下の環境変数が未設定です**:
 
-技術スタック確定に基づき、以下の設定が必要です。
+1. **SUPABASE_ACCESS_TOKEN** - Supabaseアクセストークン
+2. **SUPABASE_PROJECT_REF** - SupabaseプロジェクトID
 
-### 必須設定
+設定方法は上記「技術スタック別設定」セクションをご確認ください。
 
-#### ✅ GITHUB_TOKEN
-- 状態: 設定済み
-
-### 技術スタック別設定
-
-#### ❌ SUPABASE_ACCESS_TOKEN（未設定）
-- 用途: Supabase データベース操作
-- 取得方法: https://app.supabase.com/ > Settings > API > Service Role Key
-- 設定コマンド:
-  ```powershell
-  $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
-  [System.Environment]::SetEnvironmentVariable('SUPABASE_ACCESS_TOKEN', 'sbp_...', 'User')
-  ```
-
-#### ❌ SUPABASE_PROJECT_REF（未設定）
-- 用途: Supabaseプロジェクト識別
-- 取得方法: https://app.supabase.com/ > Settings > General > Reference ID
-- 設定コマンド:
-  ```powershell
-  $env:SUPABASE_PROJECT_REF = "your-project-ref"
-  [System.Environment]::SetEnvironmentVariable('SUPABASE_PROJECT_REF', 'your-project-ref', 'User')
-  ```
-
-#### ⚠️ OPENAI_API_KEY（任意・推奨）
-- 用途: エラーループ時のAI自動相談（Codex）
-- 取得方法: https://platform.openai.com/api-keys
-- 設定コマンド: README.md「Step 0.5」参照
-
-#### ⚠️ CONTEXT7_API_KEY（任意・推奨）
-- 用途: ライブラリドキュメント自動取得
-- 取得方法: https://context7.upstash.com/
-- 設定コマンド:
-  ```powershell
-  $env:CONTEXT7_API_KEY = "your-api-key"
-  [System.Environment]::SetEnvironmentVariable('CONTEXT7_API_KEY', 'your-api-key', 'User')
-  ```
-
-### 次のステップ
-
-1. 上記の環境変数を設定してください
-2. Claude Code を再起動してください
-3. Phase 0.2 を再実行します
-
-**選択肢**:
-A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
-B. 後で設定する → Phase 0 を一時中断
-C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
+設定完了後、以下で検証してください：
+\```bash
+echo $SUPABASE_ACCESS_TOKEN | head -c 10
+echo $SUPABASE_PROJECT_REF
+\```
 ```
 
----
-
-### Step 5: .mcp.json プレースホルダー置換
-
-**設定完了後、自動実行**:
-
+### 6. 設定完了を検証
+すべての環境変数が設定されていることを確認：
 ```bash
-# Supabase設定をプレースホルダーから環境変数参照に変更
-sed -i 's/"--access-token", "sbp_.*"/"--access-token", "${SUPABASE_ACCESS_TOKEN}"/' .mcp.json
-sed -i 's/"--project-ref", ".*"/"--project-ref", "${SUPABASE_PROJECT_REF}"/' .mcp.json
-
-# Windows PowerShell版
-(Get-Content .mcp.json) -replace '"--access-token", "sbp_.*"', '"--access-token", "${SUPABASE_ACCESS_TOKEN}"' | Set-Content .mcp.json
-(Get-Content .mcp.json) -replace '"--project-ref", ".*"', '"--project-ref", "${SUPABASE_PROJECT_REF}"' | Set-Content .mcp.json
+# 各環境変数をチェック
+echo $GITHUB_TOKEN | head -c 10
+echo $SUPABASE_ACCESS_TOKEN | head -c 10
+echo $SUPABASE_PROJECT_REF
+# ...（技術スタック依存）
 ```
 
 ---
 
-### Step 6: 設定検証
+## 📝 フロー概要
 
-```bash
-# 環境変数確認
-echo "GITHUB_TOKEN: $(echo $GITHUB_TOKEN | head -c 10)"
-echo "SUPABASE_ACCESS_TOKEN: $(echo $SUPABASE_ACCESS_TOKEN | head -c 10)"
-echo "SUPABASE_PROJECT_REF: $SUPABASE_PROJECT_REF"
-echo "OPENAI_API_KEY: $(echo $OPENAI_API_KEY | head -c 10)"
-echo "CONTEXT7_API_KEY: $(echo $CONTEXT7_API_KEY | head -c 10)"
-
-# .mcp.json検証
-cat .mcp.json | grep -E "SUPABASE|OPENAI|CONTEXT7|GITHUB"
+```
+Phase 0.1: 技術スタック決定
+    ↓
+Phase 0.2: 環境変数・MCP設定チェック（tech-stack-validator）
+    ↓
+tech-stack-validator が以下を実行:
+    1. tech_stack.md 読み込み
+    2. 必要な環境変数を特定
+    3. 最新設定方法を調査（WebSearch/Context7）
+    4. 本ファイルを具体的なガイドに上書き
+    5. 未設定変数をユーザーに案内
+    6. 設定完了を検証
+    ↓
+すべて設定完了 → Phase 0.3 へ
 ```
 
 ---
 
-## ✅ 成功基準
+## 🎯 期待される成果物（Phase 0.2完了後）
 
-- [ ] 技術スタックに基づいて必要な環境変数が特定された
-- [ ] 未設定の環境変数がユーザーに一括案内された
-- [ ] 環境変数設定後、`.mcp.json` のプレースホルダーが置換された
-- [ ] 全ての必須環境変数が設定済み
-- [ ] Claude Code 再起動後、MCPサーバーが正常に動作
+このファイルが以下の構造に変わっていること：
+
+- ✅ **必須設定（GITHUB_TOKEN）** - 常に含まれる
+- ✅ **技術スタック別設定** - プロジェクト固有（Supabase, Stripe等）
+- ✅ **取得方法** - 最新の公式ドキュメント参照
+- ✅ **環境変数設定手順** - Windows/macOS/Linux対応
+- ✅ **検証コマンド** - 設定確認方法
 
 ---
 
-## 📚 参考リンク
+## 🔍 tech-stack-validator が参照すべきリソース
 
-- [Supabase API Keys](https://app.supabase.com/)
-- [OpenAI API Keys](https://platform.openai.com/api-keys)
-- [Context7 Dashboard](https://context7.upstash.com/)
-- [GitHub Personal Access Tokens](https://github.com/settings/tokens?type=beta)
-- [Vercel Tokens](https://vercel.com/account/tokens)
+- **WebSearch**: 公式ドキュメント最新情報
+  - 例: "Supabase environment variables setup 2025"
+  - 例: "Stripe API keys configuration Node.js"
+- **Context7 MCP**: ライブラリ・SDK公式ドキュメント
+  - 例: `mcp__context7__search_context(query: "supabase-js setup")`
+- **MCP Registry**: 利用可能なMCPサーバー一覧
+  - [MCP Registry](https://github.com/modelcontextprotocol/registry)

@@ -662,3 +662,342 @@ A: Next.js 15へアップグレードします。
 - [mcp-finder](./mcp-finder.md) - MCP検索（Phase 0.1.5）
 - [PHASE_COMPLETION.md](../../ai-rules/PHASE_COMPLETION.md) - system_state.md 更新手順
 - [CLAUDE.md](../../CLAUDE.md) - エージェント一覧
+
+---
+
+## Phase 0.2専用タスク: 環境変数設定ガイド生成
+
+**呼び出しタイミング**: Phase 0.2（環境変数・MCP設定チェック）
+
+**目的**: 技術スタックに基づいて必要な環境変数設定ガイドを動的生成
+
+詳細: [ai-rules/PHASE_START.md - Phase 0.2](../../ai-rules/PHASE_START.md)
+
+---
+
+### Input（plannerから受け取る）
+
+```
+タスク: Phase 0.2 環境変数設定ガイド生成
+
+1. system/tech_stack.md を読み込み
+2. 必要な環境変数を特定
+3. 最新の設定方法を調査（WebSearch/Context7）
+4. ai-rules/ENV_SETUP_GUIDE.md を具体的な手順に書き換え
+5. 必要な環境変数リストを返却
+```
+
+---
+
+### 実行手順
+
+#### Step 1: 技術スタック読み込み
+
+```bash
+mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+```
+
+**確認項目**:
+- データベース（Supabase, PostgreSQL, MySQL, MongoDB等）
+- 認証（Auth0, Firebase Auth, AWS Cognito, Clerk等）
+- 決済（Stripe, PayPal, Square等）
+- インフラ（Vercel, AWS, GCP, Netlify等）
+- AI/MCP（OpenAI, Anthropic, Context7等）
+
+---
+
+#### Step 2: 必要な環境変数を特定
+
+技術スタックごとに必要な環境変数をマッピング：
+
+**例**:
+- **Supabase** → `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF`
+- **Auth0** → `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`
+- **Stripe** → `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
+- **Vercel** → `VERCEL_TOKEN`
+- **OpenAI** → `OPENAI_API_KEY`（任意・推奨）
+- **Context7** → `CONTEXT7_API_KEY`（任意・推奨）
+
+**必須 vs 任意の判断基準**:
+- **必須**: プロジェクトの基本機能に必要（DB接続、認証、決済等）
+- **任意・推奨**: 開発体験向上（Codex相談、ドキュメント自動取得等）
+
+---
+
+#### Step 3: 最新設定方法を調査
+
+各サービスの公式ドキュメント・最新手順を調査：
+
+**WebSearch**:
+```bash
+# 例: Supabase
+WebSearch: "Supabase environment variables setup 2025"
+WebSearch: "Supabase MCP server configuration"
+
+# 例: Stripe
+WebSearch: "Stripe API keys setup Node.js 2025"
+WebSearch: "Stripe environment variables best practices"
+```
+
+**Context7 MCP**:
+```bash
+# 例: Supabase
+mcp__context7__search_context(query: "supabase-js environment setup")
+
+# 例: Stripe
+mcp__context7__search_context(query: "stripe-js api keys configuration")
+```
+
+**MCP Registry**:
+- [MCP Registry](https://github.com/modelcontextprotocol/registry) を参照
+- 利用可能なMCPサーバーを確認
+
+---
+
+#### Step 4: ENV_SETUP_GUIDE.md を生成
+
+`ai-rules/ENV_SETUP_GUIDE.md` を以下の構造で上書き：
+
+```markdown
+# 環境変数・MCP設定ガイド
+
+技術スタック確定後に必要な環境変数・MCP設定を一斉に設定するためのガイド。
+
+**このファイルはプロジェクト開始時に tech-stack-validator が自動生成しました。**
+
+生成日時: {YYYY-MM-DD HH:MM:SS}
+技術スタック: {tech_stack.md から抽出}
+
+---
+
+## 必須設定（全プロジェクト共通）
+
+### GITHUB_TOKEN
+- **用途**: GitHubリポジトリ作成、PR/Issue管理
+- **MCPサーバー**: `github`
+- **設定方法**: [README.md「Step 0: 環境変数設定」](../README.md)参照
+
+---
+
+## 技術スタック別設定
+
+### データベース: Supabase
+
+**必要な環境変数**:
+- `SUPABASE_ACCESS_TOKEN`
+- `SUPABASE_PROJECT_REF`
+
+**取得方法**:
+1. [Supabase Dashboard](https://app.supabase.com/) にアクセス
+2. Settings > API > Service Role Key をコピー
+3. Settings > General > Reference ID をコピー
+
+**環境変数設定**:
+\```bash
+# Windows PowerShell
+$env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+$env:SUPABASE_PROJECT_REF = "your-project-ref"
+
+# 永続化
+[System.Environment]::SetEnvironmentVariable('SUPABASE_ACCESS_TOKEN', 'sbp_...', 'User')
+[System.Environment]::SetEnvironmentVariable('SUPABASE_PROJECT_REF', 'your-project-ref', 'User')
+
+# macOS/Linux
+export SUPABASE_ACCESS_TOKEN="sbp_..."
+export SUPABASE_PROJECT_REF="your-project-ref"
+
+# 永続化（~/.bashrc または ~/.zshrc に追記）
+echo 'export SUPABASE_ACCESS_TOKEN="sbp_..."' >> ~/.bashrc
+echo 'export SUPABASE_PROJECT_REF="your-project-ref"' >> ~/.bashrc
+\```
+
+**検証**:
+\```bash
+echo $SUPABASE_ACCESS_TOKEN | head -c 10
+echo $SUPABASE_PROJECT_REF
+\```
+
+### 認証: Auth0
+（同様の形式で生成）
+
+### 決済: Stripe
+（同様の形式で生成）
+
+### インフラ: Vercel
+（同様の形式で生成）
+
+---
+
+## 任意設定（推奨）
+
+### OPENAI_API_KEY
+- **用途**: エラーループ時のAI自動相談（Codex）
+  - Critical/High問題: 初回発生時に自動相談
+  - Medium問題: 3回失敗後に自動相談
+- **取得方法**: https://platform.openai.com/api-keys
+- **設定手順**: （同上）
+
+### CONTEXT7_API_KEY
+- **用途**: ライブラリドキュメント自動取得（90日キャッシュ）
+- **取得方法**: https://context7.upstash.com/
+- **設定手順**: （同上）
+
+---
+
+## 検証コマンド一覧
+
+\```bash
+# 必須設定
+echo $GITHUB_TOKEN | head -c 10
+
+# 技術スタック別設定
+echo $SUPABASE_ACCESS_TOKEN | head -c 10
+echo $SUPABASE_PROJECT_REF
+# ...（動的に生成）
+
+# 任意設定
+echo $OPENAI_API_KEY | head -c 10
+echo $CONTEXT7_API_KEY | head -c 10
+\```
+```
+
+---
+
+#### Step 5: 環境変数リストを返却
+
+plannerに返すJSON形式レポート：
+
+```json
+{
+  "required": [
+    "GITHUB_TOKEN",
+    "SUPABASE_ACCESS_TOKEN",
+    "SUPABASE_PROJECT_REF",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_PUBLISHABLE_KEY"
+  ],
+  "optional": [
+    "OPENAI_API_KEY",
+    "CONTEXT7_API_KEY"
+  ],
+  "descriptions": {
+    "GITHUB_TOKEN": "GitHubリポジトリ作成、PR/Issue管理",
+    "SUPABASE_ACCESS_TOKEN": "Supabaseデータベース操作",
+    "SUPABASE_PROJECT_REF": "Supabaseプロジェクト識別",
+    "STRIPE_SECRET_KEY": "Stripe決済処理（サーバーサイド）",
+    "STRIPE_PUBLISHABLE_KEY": "Stripe決済UI（クライアントサイド）",
+    "OPENAI_API_KEY": "Codex AI相談（エラーループ時）",
+    "CONTEXT7_API_KEY": "ライブラリドキュメント自動取得"
+  },
+  "guide_path": "ai-rules/ENV_SETUP_GUIDE.md",
+  "updated_at": "2025-01-15 10:30:00"
+}
+```
+
+---
+
+### Output（plannerに返すメッセージ）
+
+```markdown
+✅ 環境変数設定ガイドを生成しました。
+
+【生成ファイル】
+- ai-rules/ENV_SETUP_GUIDE.md（{行数}行）
+
+【必要な環境変数】
+- 必須: {N}個
+- 任意・推奨: {N}個
+
+【環境変数リスト】
+（上記JSONを返却）
+
+plannerは以下を実行してください:
+1. ENV_SETUP_GUIDE.md の内容を確認
+2. 各環境変数をチェック（echo $VARIABLE | head -c 10）
+3. 未設定の変数をユーザーに案内
+```
+
+---
+
+### メインエージェント（planner）への引き継ぎ
+
+tech-stack-validator 完了後、plannerは以下を実施：
+
+#### 1. 環境変数リスト取得
+
+```bash
+# tech-stack-validator が返したJSON
+env_vars_list = {
+  "required": [...],
+  "optional": [...],
+  "descriptions": {...}
+}
+```
+
+#### 2. 環境変数チェック
+
+```bash
+# 必須設定
+echo $GITHUB_TOKEN | head -c 10
+
+# required リストをチェック
+for var in env_vars_list["required"]:
+    echo $var | head -c 10
+
+# optional リストをチェック
+for var in env_vars_list["optional"]:
+    echo $var | head -c 10
+```
+
+#### 3. 未設定変数をユーザーに案内
+
+```markdown
+## 🔧 環境変数・MCP設定が必要です
+
+技術スタック確定に基づき、以下の設定が必要です。
+
+詳細な設定手順は [ai-rules/ENV_SETUP_GUIDE.md](ai-rules/ENV_SETUP_GUIDE.md) をご覧ください。
+
+### 未設定の環境変数
+
+#### ❌ SUPABASE_ACCESS_TOKEN（必須）
+- 用途: Supabaseデータベース操作
+- 設定方法: ENV_SETUP_GUIDE.md の「データベース: Supabase」セクション参照
+
+#### ❌ SUPABASE_PROJECT_REF（必須）
+- 用途: Supabaseプロジェクト識別
+- 設定方法: ENV_SETUP_GUIDE.md の「データベース: Supabase」セクション参照
+
+#### ⚠️ OPENAI_API_KEY（任意・推奨）
+- 用途: エラーループ時のAI自動相談（Codex）
+- 設定方法: ENV_SETUP_GUIDE.md の「任意設定: OPENAI_API_KEY」セクション参照
+
+### 次のステップ
+
+1. ENV_SETUP_GUIDE.md を参照して環境変数を設定
+2. Claude Code を再起動
+3. Phase 0.2 を再実行
+
+**選択肢**:
+A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
+B. 後で設定する → Phase 0 を一時中断
+C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
+```
+
+---
+
+### ベストプラクティス
+
+1. **最新情報を取得** - WebSearch/Context7で公式ドキュメント参照
+2. **プラットフォーム対応** - Windows/macOS/Linux の設定手順を提供
+3. **検証方法を含める** - 設定後の確認コマンドを明示
+4. **必須 vs 任意を明確に** - ユーザーが優先順位を判断できるように
+5. **セキュリティ配慮** - トークン・APIキーの取り扱い注意事項を記載
+
+---
+
+### 関連ドキュメント
+
+- [ai-rules/ENV_SETUP_GUIDE.md](../../ai-rules/ENV_SETUP_GUIDE.md) - テンプレート
+- [ai-rules/PHASE_START.md - Phase 0.2](../../ai-rules/PHASE_START.md) - 実行フロー
+- [README.md - Step 0](../../README.md) - 環境変数設定手順

@@ -609,62 +609,136 @@ Claude: 「✅ Phase完了！」
 
 **目的**: 技術スタックに基づいて必要な環境変数・MCP設定を一斉チェック・設定
 
+**実行エージェント**: planner（メイン） + tech-stack-validator（サブエージェント）
+
 詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ENV_SETUP_GUIDE.md)
 
 ---
 
-### Step 1: 技術スタック読み込み
+### Step 1: tech-stack-validator を呼び出し
 
-```bash
-# Serenaメモリから技術スタックを読み込み
-mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+**planner が実行**:
+
+```markdown
+tech-stack-validator エージェントを呼び出して、環境変数設定ガイドを生成させます。
+
+**タスク内容**:
+1. system/tech_stack.md を読み込み
+2. 必要な環境変数を特定
+3. 最新の設定方法を調査（WebSearch/Context7）
+4. ai-rules/ENV_SETUP_GUIDE.md を具体的な手順に書き換え
+5. 必要な環境変数リストを返却
+
+Task tool を使用して tech-stack-validator を起動してください。
 ```
 
-**取得情報**:
-- データベース種類（Supabase / PostgreSQL / MongoDB）
-- 認証方式（Auth0 / Supabase Auth / JWT）
-- 決済サービス（Stripe / PayPal）
-- デプロイ先（Vercel / AWS / Netlify）
-- AI機能有無（OpenAI / Anthropic）
+**tech-stack-validator への指示**:
+
+```
+以下のタスクを実行し、結果を報告してください：
+
+1. Serenaメモリから技術スタックを読み込む
+   mcp__serena__read_memory(memory_name: "system/tech_stack.md")
+
+2. 技術スタックから必要な環境変数を特定
+   - データベース（Supabase, PostgreSQL, MySQL等）
+   - 認証（Auth0, Firebase Auth, AWS Cognito等）
+   - 決済（Stripe, PayPal等）
+   - インフラ（Vercel, AWS, GCP等）
+   - AI/MCP（OpenAI, Anthropic, Context7等）
+
+3. 各サービスの最新設定方法を調査
+   - WebSearch で公式ドキュメント検索（例: "Supabase environment variables setup 2025"）
+   - Context7 MCP でライブラリドキュメント取得（例: mcp__context7__search_context(query: "supabase-js setup")）
+   - MCP Registry を参照（https://github.com/modelcontextprotocol/registry）
+
+4. ai-rules/ENV_SETUP_GUIDE.md を上書き
+   - 必須設定（GITHUB_TOKEN）は常に含める
+   - 技術スタック別設定セクションを追加
+   - 各サービスの取得方法、設定コマンド、検証方法を記載
+   - Windows/macOS/Linux 対応の設定手順
+
+5. 必要な環境変数リストを以下の形式で返却:
+   {
+     "required": ["GITHUB_TOKEN", "SUPABASE_ACCESS_TOKEN", ...],
+     "optional": ["OPENAI_API_KEY", "CONTEXT7_API_KEY", ...],
+     "descriptions": {
+       "SUPABASE_ACCESS_TOKEN": "Supabaseデータベース操作",
+       ...
+     }
+   }
+```
 
 ---
 
-### Step 2: 必要な環境変数を特定
+### Step 2: tech-stack-validator の実行結果を受け取り
 
-**技術スタック別マッピング**:
+**planner が確認**:
 
-| 技術スタック | 必要な環境変数 | 必須/任意 |
-|-------------|--------------|----------|
-| **全プロジェクト** | `GITHUB_TOKEN` | **必須** |
-| Supabase | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` | 必須 |
-| OpenAI (Codex) | `OPENAI_API_KEY` | 任意（推奨） |
-| Context7 | `CONTEXT7_API_KEY` | 任意（推奨） |
-| Auth0 | `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` | 必須 |
-| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` | 必須 |
-| Vercel | `VERCEL_TOKEN` | 必須 |
+- tech-stack-validator が返した環境変数リストを取得
+- ENV_SETUP_GUIDE.md が更新されたことを確認
 
 ---
 
 ### Step 3: 環境変数チェック
 
+**planner が実行**:
+
 ```bash
 # 必須: GITHUB_TOKEN
 echo $GITHUB_TOKEN | head -c 10
 
-# 技術スタック依存
+# tech-stack-validator が返した required リストをチェック
 echo $SUPABASE_ACCESS_TOKEN | head -c 10
 echo $SUPABASE_PROJECT_REF
+# ...（動的に生成）
+
+# optional リストをチェック
 echo $OPENAI_API_KEY | head -c 10
 echo $CONTEXT7_API_KEY | head -c 10
+# ...（動的に生成）
 ```
 
 ---
 
-### Step 4: 未設定の環境変数を一括案内
+### Step 4: 未設定の環境変数をユーザーに案内
 
-**メインClaude Agentが表示**:
+**planner が実行**:
+
+未設定の環境変数がある場合、ENV_SETUP_GUIDE.md の内容を表示してユーザーに案内：
 
 ```markdown
+## 🔧 環境変数・MCP設定が必要です
+
+技術スタック確定に基づき、以下の設定が必要です。
+
+詳細な設定手順は [ai-rules/ENV_SETUP_GUIDE.md](ai-rules/ENV_SETUP_GUIDE.md) をご覧ください。
+
+### 未設定の環境変数
+
+#### ❌ SUPABASE_ACCESS_TOKEN（必須）
+- 用途: Supabaseデータベース操作
+- 設定方法: ENV_SETUP_GUIDE.md の「データベース: Supabase」セクション参照
+
+#### ❌ SUPABASE_PROJECT_REF（必須）
+- 用途: Supabaseプロジェクト識別
+- 設定方法: ENV_SETUP_GUIDE.md の「データベース: Supabase」セクション参照
+
+#### ⚠️ OPENAI_API_KEY（任意・推奨）
+- 用途: エラーループ時のAI自動相談（Codex）
+- 設定方法: ENV_SETUP_GUIDE.md の「AI/MCP: OpenAI」セクション参照
+
+### 次のステップ
+
+1. ENV_SETUP_GUIDE.md を参照して環境変数を設定
+2. Claude Code を再起動
+3. Phase 0.2 を再実行
+
+**選択肢**:
+A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
+B. 後で設定する → Phase 0 を一時中断
+C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
+```
 ## 🔧 環境変数・MCP設定が必要です
 
 技術スタック確定に基づき、以下の設定が必要です。
