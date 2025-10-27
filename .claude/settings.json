@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -c \"[console]::beep(800,200); [console]::beep(1000,200); [console]::beep(1200,200)\""
+            "command": "powershell -c \"try { [System.Media.SystemSounds]::Asterisk.Play(); Start-Sleep -Milliseconds 300; [System.Media.SystemSounds]::Beep.Play(); Start-Sleep -Milliseconds 300; [System.Media.SystemSounds]::Exclamation.Play() } catch { [console]::beep(800,200); [console]::beep(1000,200); [console]::beep(1200,200) }\""
           }
         ]
       }
