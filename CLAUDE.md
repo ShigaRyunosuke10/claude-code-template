@@ -51,15 +51,30 @@ docs/
 - **成果物**: `project_overview.md`, `requirements_summary.md`, `phase_hierarchy.md`, `api_contracts.md`, `database_schema.md`
 
 **Phase 0.2**: 技術スタック決定
+- **deployment-agent実行**: デプロイ要件ヒアリング、プラットフォーム推奨
+- **成果物**: `tech_stack.md`, `deployment_plan.md`
 
-**Phase 0.3**: 環境変数テンプレート作成（自動）
-- `.env.example`, `backend/.env.example`, `frontend/.env.local.example` 作成
+**Phase 0.3**: 技術スタック検証・MCP設定
+- **tech-stack-validator実行**: 最新情報確認、ベストプラクティス取得
+- **mcp-finder実行**: MCP自動検索
+- **環境変数テンプレート作成**: `backend/.env.example`, `frontend/.env.local.example`
 
-**Phase 0.4**: 環境変数設定・MCP接続確認（手動+検証）
+**Phase 0.4**: プロジェクト構造生成（自動）
+- **backend/ 初期化**: FastAPI + Poetry
+- **frontend/ 初期化**: Next.js 14 + TypeScript
+- **Docker Compose設定**（技術スタック依存）
+
+**Phase 0.5**: MCP接続確認（自動+手動）
 - **前提条件**: Codex CLI認証済み（`codex login`実行済み）
-- **実行内容**: `.env`等に実キー設定、全MCP接続確認
-- **完了条件**: GitHub/Codex/Supabase/Serena MCP接続成功
-- **Phase 0完了**: Phase 0.4完了時点
+- **Supabase OAuth認証**: ブラウザベース自動実行
+- **全MCP接続確認**: GitHub/Codex/Supabase/Serena
+- **完了条件**: 全MCP接続成功
+- **Phase 0完了**: Phase 0.5完了時点
+
+**Phase 1開始前の手動作業**:
+- 外部サービス作成（Supabase/Vercel/Railway）
+- 環境変数設定（実キー）
+- 詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
 
 **Phase 階層**: planner がプロジェクトの状況に応じて動的生成
 
