@@ -115,14 +115,14 @@ docs/
 - **codex** - AI コーディングアシスタント（環境変数: `OPENAI_API_KEY`）
   - 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
 
-### 技術スタック依存（Phase 0.2で追加）
+### 技術スタック依存（Phase 0.3で追加）
 
 - **supabase** - Supabase DB操作（Supabase使用時）
 - **stripe, auth0, vercel等** - プロジェクト次第で追加
 
 **設定方法**:
 - 必須環境変数: [README.md - Step 0](./README.md)
-- 技術スタック依存: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)（Phase 0.2で自動生成）
+- 技術スタック依存: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)（Phase 0.3で自動生成）
 
 ---
 

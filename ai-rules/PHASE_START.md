@@ -235,6 +235,260 @@ Phase 0 を継続します。
 
 ---
 
+## Phase 0.1: 要件定義書分析・Serenaメモリ初期化（自動・Phase 0 のみ）
+
+**実行タイミング**: Phase 0.0（GitHubリポジトリ初期化）の直後
+
+**目的**: 
+- プロジェクト開始時に要件定義書（docs/requirements/）またはチャット履歴から要件を抽出
+- plannerエージェントで分析し、プロジェクト計画とPhase階層を生成
+- Serenaメモリに保存してプロジェクト全体で共有
+
+---
+
+### Step 1: 要件定義書の検出
+
+**検出対象**:
+1. `docs/requirements/` 配下のファイル
+2. `docs/references/` 配下のファイル（要件定義書.md等）
+3. チャット履歴（ユーザーが直接記述した要件）
+
+**検出方法**:
+```bash
+# Markdown/PDF/テキストファイルを検出
+Glob: "docs/requirements/**/*.{md,pdf,txt,xlsx,docx}"
+Glob: "docs/references/**/*.{md,pdf,txt,xlsx,docx}"
+```
+
+**検出結果例**:
+```
+docs/requirements/project-requirements.md
+docs/requirements/user-stories.md
+docs/references/要件定義書.md
+docs/specs/api-spec.yaml
+```
+
+---
+
+### Step 2: 要件の読み込み
+
+**ファイルがある場合**:
+```bash
+# 要件定義書を読み込み
+Read: docs/requirements/project-requirements.md
+Read: docs/references/要件定義書.md
+
+# 仕様書も読み込み（ある場合）
+Read: docs/specs/api-spec.yaml
+Read: docs/specs/database-schema.sql
+```
+
+**ファイルがない場合**:
+```markdown
+要件定義書が見つかりませんでした。
+
+【質問】
+1. 要件定義書はありますか？
+   A. ある → ファイルパスを教えてください
+   B. ない → 口頭で要件を教えてください
+   C. 後で追加する → Phase 0.1 をスキップ
+```
+
+**選択肢Bの場合（口頭要件）**:
+```markdown
+プロジェクトの要件を教えてください：
+
+【質問項目】
+1. プロジェクトの目的は？（何を実現したいか）
+2. 主要機能は？（3-5個）
+3. 想定ユーザーは？（管理者/一般ユーザー/外部ユーザー等）
+4. 技術スタックの希望は？（フロントエンド/バックエンド/DB）
+5. 非機能要件は？（パフォーマンス/セキュリティ/スケーラビリティ等）
+```
+
+---
+
+### Step 3: plannerエージェント呼び出し
+
+**planner実行**:
+```bash
+Task:planner(prompt: "
+以下の要件定義書を分析し、プロジェクト計画を作成してください。
+
+【要件定義書】
+{ファイル内容 または ユーザー回答内容}
+
+【分析タスク】
+1. プロジェクト概要・目的を抽出
+2. 主要機能一覧を整理
+3. 技術的要件・非機能要件を特定
+4. Phase階層を生成（Phase 0 → Phase 1 → ...）
+5. 各Phaseの推定工数を算出
+6. API契約の初期版を作成（可能な範囲で）
+7. データベーススキーマの初期版を作成（可能な範囲で）
+
+【成果物】
+- .serena/memories/project/project_overview.md
+- .serena/memories/project/requirements_summary.md
+- .serena/memories/specifications/api_contracts.md
+- .serena/memories/specifications/database_schema.md
+- .serena/memories/project/phase_hierarchy.md
+")
+```
+
+---
+
+### Step 4: Serenaメモリへの保存
+
+**plannerが以下のファイルを生成**:
+
+#### 1. `.serena/memories/project/project_overview.md`
+```markdown
+# プロジェクト概要
+
+## プロジェクトの目的
+{目的}
+
+## 主要機能
+1. {機能1}
+2. {機能2}
+...
+
+## 想定ユーザー
+- 管理者: {役割}
+- 一般ユーザー: {役割}
+
+## 技術スタック（推奨）
+- Frontend: {技術}
+- Backend: {技術}
+- Database: {技術}
+```
+
+#### 2. `.serena/memories/project/requirements_summary.md`
+```markdown
+# 要件サマリー
+
+## 機能要件
+...
+
+## 非機能要件
+...
+
+## 画面一覧
+...
+
+## データベーステーブル
+...
+```
+
+#### 3. `.serena/memories/project/phase_hierarchy.md`
+```markdown
+# Phase階層（プロジェクト固有）
+
+## Phase 0: プロジェクト基盤構築
+- Phase 0.0: GitHubリポジトリ初期化
+- Phase 0.1: 要件定義書分析
+- Phase 0.3: 技術スタック決定
+- Phase 0.3: 環境変数・MCP設定
+
+## Phase 1: {機能グループ1}
+- Phase 1.1: {サブ機能}
+- Phase 1.2: {サブ機能}
+
+## Phase 2: {機能グループ2}
+...
+```
+
+#### 4. `.serena/memories/specifications/api_contracts.md`（初期版）
+```markdown
+# API契約（初期版）
+
+## 認証API
+### POST /api/auth/login
+Request: ...
+Response: ...
+
+...
+```
+
+#### 5. `.serena/memories/specifications/database_schema.md`（初期版）
+```markdown
+# データベーススキーマ（初期版）
+
+## users テーブル
+...
+
+...
+```
+
+---
+
+### Step 5: 完了メッセージ
+
+```markdown
+✅ Phase 0.1 完了: 要件定義書分析・Serenaメモリ初期化
+
+【成果物】
+- プロジェクト概要: .serena/memories/project/project_overview.md
+- 要件サマリー: .serena/memories/project/requirements_summary.md
+- Phase階層: .serena/memories/project/phase_hierarchy.md
+- API契約（初期版）: .serena/memories/specifications/api_contracts.md
+- DB設計（初期版）: .serena/memories/specifications/database_schema.md
+
+【次のステップ】
+Phase 0.3: 技術スタック決定を開始します。
+```
+
+---
+
+### ユースケース
+
+#### ケース1: 要件定義書ファイルがある場合
+```
+docs/requirements/project-requirements.md が存在
+  ↓
+ファイルを読み込み
+  ↓
+plannerで分析
+  ↓
+Serenaメモリに保存
+  ↓
+Phase 0.2へ
+```
+
+#### ケース2: チャットで要件を記述した場合
+```
+ユーザー: 「工数管理システムを作りたい...」
+  ↓
+要件定義書ファイルなし検出
+  ↓
+チャット履歴から要件を抽出
+  ↓
+plannerで分析
+  ↓
+Serenaメモリに保存
+  ↓
+（オプション）docs/requirements/project-requirements.md を生成
+  ↓
+Phase 0.2へ
+```
+
+#### ケース3: 要件定義書を後で追加する場合
+```
+Phase 0.1 をスキップ
+  ↓
+Phase 0.3, 0.4, 0.5 を完了
+  ↓
+Phase 1 開始前にユーザーが要件定義書を追加
+  ↓
+Phase 1 開始時に「要件定義変更検知」が発動
+  ↓
+planner再実行
+```
+
+---
+
+
 ### Step 0: 要件定義変更検知（自動）
 
 **実行内容**:
@@ -603,7 +857,7 @@ Claude: 「✅ Phase完了！」
 
 ---
 
-## Phase 0.2: 環境変数・MCP設定チェック（NEW）
+## Phase 0.3: 環境変数・MCP設定チェック（NEW）
 
 **実行タイミング**: Phase 0.1（技術スタック決定）の直後
 
@@ -730,10 +984,10 @@ echo $OPENAI_API_KEY | head -c 10
 
 1. ENV_SETUP_GUIDE.md を参照して環境変数を設定
 2. Claude Code を再起動
-3. Phase 0.2 を再実行
+3. Phase 0.3 を再実行
 
 **選択肢**:
-A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
+A. 今すぐ設定する（推奨） → 設定後に Phase 0.3 再実行
 B. 後で設定する → Phase 0 を一時中断
 C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
 ```
@@ -785,10 +1039,10 @@ C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限�
 
 1. 上記の環境変数を設定してください
 2. Claude Code を再起動してください
-3. Phase 0.2 を再実行します
+3. Phase 0.3 を再実行します
 
 **選択肢**:
-A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
+A. 今すぐ設定する（推奨） → 設定後に Phase 0.3 再実行
 B. 後で設定する → Phase 0 を一時中断
 C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
 ```

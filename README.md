@@ -56,7 +56,7 @@ echo $OPENAI_API_KEY | head -c 10
    - Medium問題: 3回失敗後に自動相談
    - 詳細: [ai-rules/CODEX_CONSULTATION.md](./ai-rules/CODEX_CONSULTATION.md)
 
-**技術スタック依存の設定（Phase 0.2で自動チェック）**:
+**技術スタック依存の設定（Phase 0.3で自動チェック）**:
 
 Phase 0.2 でテンプレートが技術スタックを決定後、`tech-stack-validator` が必要な環境変数を自動的にチェックします。
 設定が不足している場合は、テンプレートが設定方法を案内します。
@@ -70,7 +70,7 @@ Phase 0.2 でテンプレートが技術スタックを決定後、`tech-stack-v
 - `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` (Auth0使用時)
 - その他（Vercel, AWS, GCP等、技術スタック次第）
 
-詳細: [ai-rules/PHASE_START.md - Phase 0.2](./ai-rules/PHASE_START.md)、[ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
+詳細: [ai-rules/PHASE_START.md - Phase 0.3](./ai-rules/PHASE_START.md)、[ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
 
 ---
 

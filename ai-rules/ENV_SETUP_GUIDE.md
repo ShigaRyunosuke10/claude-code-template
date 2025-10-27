@@ -8,7 +8,7 @@
 
 ## 📋 設定タイミング
 
-**Phase 0.2: 環境変数・MCP設定チェック**
+**Phase 0.3: 環境変数・MCP設定チェック**
 
 - **実行タイミング**: 技術スタック決定後（Phase 0.1 → 0.2）
 - **目的**: プロジェクトに必要な環境変数・MCP設定を漏れなく設定
@@ -34,7 +34,7 @@
 
 ## 🤖 tech-stack-validator の責任
 
-**Phase 0.2 実行時**に以下を自動実行：
+**Phase 0.3 実行時**に以下を自動実行：
 
 ### 1. 技術スタック読み込み
 ```
@@ -139,7 +139,7 @@ echo $SUPABASE_PROJECT_REF
 ```
 Phase 0.1: 技術スタック決定
     ↓
-Phase 0.2: 環境変数・MCP設定チェック（tech-stack-validator）
+Phase 0.3: 環境変数・MCP設定チェック（tech-stack-validator）
     ↓
 tech-stack-validator が以下を実行:
     1. tech_stack.md 読み込み
@@ -154,7 +154,7 @@ tech-stack-validator が以下を実行:
 
 ---
 
-## 🎯 期待される成果物（Phase 0.2完了後）
+## 🎯 期待される成果物（Phase 0.3完了後）
 
 このファイルが以下の構造に変わっていること：
 

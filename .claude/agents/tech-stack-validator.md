@@ -653,20 +653,20 @@ A: Next.js 15へアップグレードします。
 
 ---
 
-## Phase 0.2専用タスク: 環境変数設定ガイド生成
+## Phase 0.3専用タスク: 環境変数設定ガイド生成
 
-**呼び出しタイミング**: Phase 0.2（環境変数・MCP設定チェック）
+**呼び出しタイミング**: Phase 0.3（環境変数・MCP設定チェック）
 
 **目的**: 技術スタックに基づいて必要な環境変数設定ガイドを動的生成
 
-詳細: [ai-rules/PHASE_START.md - Phase 0.2](../../ai-rules/PHASE_START.md)
+詳細: [ai-rules/PHASE_START.md - Phase 0.3](../../ai-rules/PHASE_START.md)
 
 ---
 
 ### Input（plannerから受け取る）
 
 ```
-タスク: Phase 0.2 環境変数設定ガイド生成
+タスク: Phase 0.3 環境変数設定ガイド生成
 
 1. system/tech_stack.md を読み込み
 2. 必要な環境変数を特定
@@ -902,10 +902,10 @@ for var in env_vars_list["optional"]:
 
 1. ENV_SETUP_GUIDE.md を参照して環境変数を設定
 2. Claude Code を再起動
-3. Phase 0.2 を再実行
+3. Phase 0.3 を再実行
 
 **選択肢**:
-A. 今すぐ設定する（推奨） → 設定後に Phase 0.2 再実行
+A. 今すぐ設定する（推奨） → 設定後に Phase 0.3 再実行
 B. 後で設定する → Phase 0 を一時中断
 C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限あり）
 ```
@@ -925,5 +925,5 @@ C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限�
 ### 関連ドキュメント
 
 - [ai-rules/ENV_SETUP_GUIDE.md](../../ai-rules/ENV_SETUP_GUIDE.md) - テンプレート
-- [ai-rules/PHASE_START.md - Phase 0.2](../../ai-rules/PHASE_START.md) - 実行フロー
+- [ai-rules/PHASE_START.md - Phase 0.3](../../ai-rules/PHASE_START.md) - 実行フロー
 - [README.md - Step 0](../../README.md) - 環境変数設定手順
