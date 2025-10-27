@@ -72,16 +72,24 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 
 ---
 
-## エージェント一覧（14体）
+## エージェント一覧（15体）
 
 詳細: [.claude/agents/](./.claude/agents/)
 
+### 計画・要件定義
 - **planner** - Epic+タスク+API契約生成
+- **mcp-finder** - 技術スタックに対応するMCP自動検索・セットアップガイド生成
+
+### 実装
 - **impl-dev-frontend** / **impl-dev-backend** - 実装
+
+### 品質保証
 - **code-reviewer** - レビュー+FE/BE整合性チェック
 - **qa-unit** / **qa-integration** - テスト作成
 - **playwright-test-planner** / **playwright-test-generator** / **playwright-test-healer** - E2E
 - **lint-fix** / **sec-scan** - 品質保証
+
+### ドキュメント・デプロイ
 - **doc-writer** / **release-manager** - ドキュメント・リリース
 - **deployment-agent** - デプロイ全般
 

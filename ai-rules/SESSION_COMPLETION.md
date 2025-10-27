@@ -137,7 +137,157 @@ Write:next_session_prompt.md
 
 ---
 
-## ③ Git commit & PR作成（必須）
+## ③ MCP設定（新サービス追加時のみ）
+
+### 実行タイミング
+
+以下の場合にMCP設定を実施:
+- Phase 0.1.5（新規プロジェクト立ち上げ時）
+- 開発途中で新しい外部サービスを追加した場合（例: Stripe決済追加）
+
+### 実行方法
+
+```bash
+Task:mcp-finder(prompt: "{追加サービス名}に対応するMCPサーバーを検索して設定")
+
+# 例: Stripe追加時
+Task:mcp-finder(prompt: "Stripeに対応するMCPサーバーを検索して設定")
+```
+
+### mcp-finder 完了後の対応
+
+mcp-finder がファイル生成を完了したら、**メインエージェントが以下を実施**:
+
+#### 1. ユーザーへの提示
+
+```markdown
+MCP検索が完了しました！
+
+以下のサービスに対応するMCPサーバーが見つかりました:
+- Stripe（決済処理）⭐⭐⭐ 公式
+
+詳細: mcp_search_report.md
+
+Stripe MCPを設定しますか？（Y/n/後で設定）
+```
+
+#### 2. APIキー発行確認
+
+```markdown
+user: Y
+
+A: Stripe MCP設定を開始します。
+
+【必要な認証情報】
+- STRIPE_SECRET_KEY（必須）
+
+Stripe APIキーを発行済みですか？
+
+未発行の場合は、以下の手順で発行してください:
+1. https://dashboard.stripe.com/test/apikeys にアクセス
+2. 「Create secret key」をクリック
+3. キー名を入力（例: "claude-code-dev"）
+4. シークレットキー（sk_test_...）をコピー
+
+詳細: docs/mcp_setup_guide.md#stripe-mcp
+
+（はい / いいえ / 後で設定）
+```
+
+#### 3. APIキー受け取り・設定
+
+```markdown
+user: はい
+
+A: Stripeのシークレットキー（sk_test_...）を教えてください。
+※ このキーは .env ファイルにのみ保存され、Gitには含まれません。
+
+user: sk_test_abc123xyz...
+
+A: （メインエージェントが実行）
+
+1. .env ファイル更新
+   ```bash
+   # .env に追記
+   STRIPE_SECRET_KEY=sk_test_abc123xyz...
+   ```
+
+2. .mcp.json 生成
+   ```bash
+   # .mcp.json.template から .mcp.json を生成
+   # 環境変数参照形式で設定
+   ```
+
+3. .gitignore 確認
+   ```bash
+   # .env が .gitignore に含まれているか確認
+   # 未登録の場合は自動追加
+   ```
+
+✅ Stripe MCP設定完了
+```
+
+#### 4. 接続テスト
+
+```markdown
+A: 接続テストを実行します...
+
+（実行コマンド）
+npx -y @stripe/mcp --api-key=%STRIPE_SECRET_KEY%
+
+✅ Stripe MCP接続成功！
+
+利用可能なツール:
+- create_payment_link
+- list_payment_links
+- retrieve_payment_link
+...
+```
+
+#### 5. セキュリティチェック
+
+**メインエージェントが自動で実施**:
+
+```markdown
+1. ✅ .env が .gitignore に含まれているか確認
+2. ✅ .env.example にプレースホルダーのみ記載されているか確認
+   例: STRIPE_SECRET_KEY=sk_test_YOUR_KEY_HERE
+3. ✅ APIキーがソースコードにハードコードされていないか警告
+   - grep で "sk_test_", "sk_live_" 等を検索
+   - 検出された場合は警告
+4. ✅ README.md に「⚠️ .env ファイルを絶対にコミットしないこと」を明記
+```
+
+### 「後で設定」を選択した場合
+
+```markdown
+user: 後で設定
+
+A: 了解しました。Stripe MCPは後で設定します。
+
+✅ .env.example に STRIPE_SECRET_KEY プレースホルダー追加
+✅ docs/mcp_setup_guide.md にセットアップ手順を記載
+✅ README.md にセットアップ手順へのリンク追加
+
+後で設定する際は、以下のコマンドを実行してください:
+```bash
+# .env ファイルに追記
+STRIPE_SECRET_KEY=sk_test_YOUR_ACTUAL_KEY
+```
+
+詳細: docs/mcp_setup_guide.md#stripe-mcp
+```
+
+### 重要事項
+
+- ⚠️ **mcp-finder はファイル生成のみ** - 実際のAPIキー設定はメインエージェントが担当
+- ⚠️ **.env ファイルを絶対にGitにコミットしない** - .gitignore に必ず追加
+- ⚠️ **テスト環境キーを使用** - 開発中は `sk_test_...` を使用
+- ⚠️ **APIキーをソースコードにハードコードしない** - 必ず環境変数から読み込む
+
+---
+
+## ④ Git commit & PR作成（必須）
 
 ### 🚨 重要: 両リポジトリへのコミット&プッシュ
 

@@ -28,6 +28,143 @@ Task:deployment-agent(prompt: "新規プロジェクトの技術スタック要�
 - コスト見積もり
 - `project_requirements.md` 生成
 
+### 0.1.5 MCP自動検索・提案（NEW）
+
+**エージェント**: `mcp-finder`
+
+```bash
+Task:mcp-finder(prompt: "Phase 0.1で決定した技術スタックに対応するMCPサーバーを検索・提案")
+```
+
+**処理内容**:
+1. `project_requirements.md` から外部サービスを抽出
+   - Database: Supabase, MongoDB, PostgreSQL等
+   - Payment: Stripe, PayPal等
+   - Auth: Auth0, Clerk等
+   - Email: SendGrid, Mailgun等
+
+2. 各サービスのMCPを自動検索
+   - Smithery.ai検索
+   - npm公式パッケージ検索
+   - GitHub検索
+
+3. 信頼性評価・ソート
+   - ⭐⭐⭐ 公式パッケージ
+   - ⭐⭐ Smithery登録
+   - ⭐ コミュニティ人気
+
+**Output**:
+- `mcp_search_report.md` - 検索結果レポート
+- `docs/mcp_setup_guide.md` - 各MCPの詳細セットアップ手順（APIキー発行方法含む）
+- `.mcp.json.template` - MCP設定テンプレート
+- `.env.example` - 環境変数プレースホルダー（更新）
+- `README.md` - MCPセットアップセクション追加
+
+**メインエージェントの対応**:
+
+mcp-finder 完了後、メインエージェントがユーザーと対話:
+
+```markdown
+MCP検索が完了しました！
+
+以下の4つのサービスに対応するMCPサーバーが見つかりました:
+- Stripe（決済処理）⭐⭐⭐ 公式
+- Supabase（データベース・認証）⭐⭐⭐ 公式
+- MongoDB（データベース）⭐⭐⭐ 公式
+- Firebase（バックエンドサービス）⭐⭐⭐ 公式
+
+詳細: mcp_search_report.md
+
+これらのMCPサーバーを設定しますか？
+1. すべて設定する
+2. 個別に選択する
+3. 後で設定する（ガイドのみ生成済み）
+
+user: 2（個別選択の場合）
+
+A: 設定したいMCPサーバーを選んでください:
+□ Stripe
+□ Supabase
+□ MongoDB
+□ Firebase
+
+user: StripeとSupabase
+
+A: StripeとSupabaseのMCPを設定します。
+
+---
+
+## 1. Stripe MCP設定
+
+【必要な認証情報】
+- STRIPE_SECRET_KEY（必須）
+
+Stripe APIキーを発行済みですか？
+
+未発行の場合は、以下の手順で発行してください:
+1. https://dashboard.stripe.com/test/apikeys にアクセス
+2. 「Create secret key」をクリック
+3. キー名を入力（例: "claude-code-dev"）
+4. シークレットキー（sk_test_...）をコピー
+
+詳細: docs/mcp_setup_guide.md#stripe-mcp
+
+（はい / いいえ / 後で設定）
+
+user: はい
+
+A: Stripeのシークレットキー（sk_test_...）を教えてください。
+※ このキーは .env ファイルにのみ保存され、Gitには含まれません。
+
+user: sk_test_abc123xyz...
+
+A: （メインエージェントが実行）
+✅ .env に STRIPE_SECRET_KEY を追加
+✅ .mcp.json に Stripe MCP設定を追加
+✅ .gitignore に .env を追加（未登録の場合）
+
+接続テストを実行します...
+
+✅ Stripe MCP接続成功！
+
+利用可能なツール:
+- create_payment_link
+- list_payment_links
+- retrieve_payment_link
+...
+
+---
+
+## 2. Supabase MCP設定
+
+（同様の対話フロー）
+
+user: 後で設定
+
+A: 了解しました。Supabase MCPは後で設定します。
+
+✅ .env.example に SUPABASE_ACCESS_TOKEN プレースホルダー追加
+✅ docs/mcp_setup_guide.md にセットアップ手順を記載
+
+---
+
+## MCP設定完了サマリー
+
+✅ **設定済み**:
+- Stripe MCP（接続確認済み）
+
+⏳ **未設定（後で設定）**:
+- Supabase MCP
+
+❌ **スキップ**:
+- MongoDB MCP
+- Firebase MCP
+
+未設定のMCPは、必要になったタイミングで `docs/mcp_setup_guide.md` を参照して設定してください。
+```
+
+**重要**: mcp-finder はファイル生成のみ。実際のAPIキー設定はメインエージェントが対話的に実施。
+
 ### 0.2 インフラ構成決定
 
 **エージェント**: `deployment-agent`
