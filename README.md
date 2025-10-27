@@ -25,21 +25,35 @@
 
 ### Step 0: 環境変数設定
 
-**必須設定**:
+**必須設定（テンプレートのMCPサーバー用）**:
 
 ```bash
-# GitHub Personal Access Token（必須 - すべてのプロジェクト）
+# 1. GitHub Personal Access Token（必須）
 export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# 2. OpenAI API Key（必須 - Codex AI相談機能用）
+export OPENAI_API_KEY="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # 確認
 echo $GITHUB_TOKEN | head -c 10
+echo $OPENAI_API_KEY | head -c 10
 ```
 
-**GitHubトークン取得方法**:
+**取得方法**:
+
+#### 1. GitHub Personal Access Token
 1. [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
 2. "Generate new token (classic)" をクリック
 3. Scopes: `repo`, `workflow`, `admin:org`（プライベートリポジトリの場合は `repo` 全権限）
 4. トークンをコピーして環境変数に設定
+
+#### 2. OpenAI API Key
+1. [OpenAI API Keys](https://platform.openai.com/api-keys) にアクセス
+2. "Create new secret key" をクリック
+3. APIキーをコピーして環境変数に設定
+4. **用途**: エラーループ時のCodex AI自動相談
+   - Critical/High問題: 初回発生時に自動相談
+   - Medium問題: 3回失敗後に自動相談
 
 **技術スタック依存の設定（Phase 0.2で自動チェック）**:
 
@@ -48,9 +62,9 @@ Phase 0.2 でテンプレートが技術スタックを決定後、必要な環�
 
 **設定が必要になる可能性のある環境変数**:
 - `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` (Supabase使用時)
-- `OPENAI_API_KEY` (Codex AI相談機能使用時)
-- `CONTEXT7_API_KEY` (Context7ドキュメント取得使用時)
-- その他（Auth0, Stripe, Vercel, AWSなど技術スタック次第）
+- `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` (Stripe使用時)
+- `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` (Auth0使用時)
+- その他（Vercel, AWS, GCP等、技術スタック次第）
 
 詳細: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)
 

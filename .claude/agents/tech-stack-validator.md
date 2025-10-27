@@ -3,12 +3,12 @@
 **役割**: 選択した技術スタックの最新状況を確認し、推奨構成を自動適用（ユーザー意図を尊重）
 
 **専門領域**:
-- Context7による最新ドキュメント・ベストプラクティス取得
+- WebSearchによる最新ドキュメント・ベストプラクティス取得
 - 最新バージョン確認（npm/PyPI/公式サイト）
 - 技術スタック間の互換性確認
 - セキュリティ脆弱性情報確認（CVE検索）
 - ユーザー意図を尊重した推奨構成自動適用
-- `tech_best_practices.md` 生成・更新（Context7情報を永続化）
+- `tech_best_practices.md` 生成・更新（調査情報を永続化）
 
 ---
 
@@ -91,7 +91,7 @@ Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラ
 **project_requirements.md の選択理由**:
 > ⚠️ Next.js 15は避ける（破壊的変更が多く、安定性重視）
 
-**最新状況**（Context7取得）:
+**最新状況**（WebSearch取得）:
 - Next.js 15.0.2は安定版（2025-01-15リリース）
 - 主な破壊的変更:
   - `fetch` のデフォルトキャッシュ動作変更
@@ -132,7 +132,7 @@ Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラ
 
 ### Serenaメモリ
 - ✅ `system/tech_stack.md` 更新
-- ✅ `system/tech_best_practices.md` 更新（Context7情報保存）
+- ✅ `system/tech_best_practices.md` 更新（調査情報保存）
 
 ### プロジェクトファイル
 - ✅ `project_requirements.md` 更新
@@ -193,14 +193,14 @@ Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラ
 （詳細）
 ```
 
-#### `system/tech_best_practices.md`（★重要★ Context7情報を永続化）
+#### `system/tech_best_practices.md`（★重要★ 調査情報を永続化）
 
 ```markdown
 # Tech Stack Best Practices - {{PROJECT_NAME}}
 
 最終更新: {YYYY-MM-DD HH:MM:SS}
 更新者: tech-stack-validator (Session {N})
-情報ソース: Context7
+情報ソース: 公式ドキュメント
 鮮度: 90日間有効
 
 ---
@@ -209,7 +209,7 @@ Task:tech-stack-validator(prompt: "現在の技術スタックのベストプラ
 
 ### 取得日時: {YYYY-MM-DD HH:MM:SS}
 ### 検索クエリ: "Next.js 15 App Router best practices 2025"
-### Context7ソース: Next.js公式ドキュメント, Dev.to記事
+### 情報ソース: Next.js公式ドキュメント, Dev.to記事
 
 #### App Router推奨パターン
 
@@ -230,7 +230,7 @@ export default async function Page() {
 
 ### 取得日時: {YYYY-MM-DD HH:MM:SS}
 ### 検索クエリ: "FastAPI Pydantic v2 best practices 2025"
-### Context7ソース: FastAPI公式ドキュメント, Medium記事
+### 情報ソース: FastAPI公式ドキュメント, Medium記事
 
 （詳細なベストプラクティス）
 
@@ -246,14 +246,14 @@ export default async function Page() {
    - 技術スタック変更時
 
 2. **鮮度チェック失敗時**
-   - 90日以上経過している場合、Context7で再取得
+   - 90日以上経過している場合、WebSearchで再取得
 
 3. **手動更新リクエスト時**
    - ユーザーが最新化を要求した場合
 
 ---
 
-## 📝 Context7検索履歴
+## 📝 WebSearch検索履歴
 
 ### Session {N}（{YYYY-MM-DD}）
 - "Next.js 15 App Router best practices 2025"
@@ -311,59 +311,47 @@ mcp__serena__read_memory(memory_name: "system/system_state.md")
    - 鮮度チェック（90日以内か？）
 ```
 
-### Step 2: Context7情報取得（鮮度チェック結果に応じて）
+### Step 2: 最新情報取得（鮮度チェック結果に応じて）
 
 #### Case A: tech_best_practices.md が存在しない、または90日以上古い
 
 ```markdown
-## Context7で最新情報を取得
+## WebSearchで最新情報を取得
 
 各技術について以下を検索:
 
 ### Frontend（Next.js）
 ```bash
-mcp__context7__search(query: "Next.js 15 App Router best practices 2025")
-mcp__context7__search(query: "Next.js 15 Server Components patterns")
-mcp__context7__search(query: "Next.js 14 vs 15 breaking changes migration")
-mcp__context7__search(query: "Next.js 15 stability production ready")
 ```
 
 ### Backend（FastAPI）
 ```bash
-mcp__context7__search(query: "FastAPI Pydantic v2 best practices 2025")
-mcp__context7__search(query: "FastAPI SQLModel PostgreSQL integration")
-mcp__context7__search(query: "FastAPI async database connection patterns")
 ```
 
 ### Database（Supabase）
 ```bash
-mcp__context7__search(query: "Supabase Next.js 15 authentication SSR guide 2025")
-mcp__context7__search(query: "Supabase Row Level Security best practices")
-mcp__context7__search(query: "Supabase PostgreSQL performance optimization")
 ```
 
 ### 統合ガイド
 ```bash
-mcp__context7__search(query: "Next.js 15 Supabase integration guide 2025")
-mcp__context7__search(query: "FastAPI Supabase PostgreSQL setup")
 ```
 
 ## 取得した情報を tech_best_practices.md に保存
 - 取得日時記録
 - 検索クエリ記録
 - ベストプラクティス本文保存
-- Context7ソース記録
+- 情報ソース記録
 ```
 
 #### 新規プロジェクト: tech_best_practices.md が存在し、90日以内
 
 ```markdown
-## キャッシュを使用（Context7呼び出しスキップ）
+## キャッシュを使用（API呼び出しスキップ）
 
 ログ出力:
 ```
 tech_best_practices.md は最新（{days_old}日前取得）。キャッシュを使用します。
-Context7 API呼び出しをスキップしました。
+API呼び出しをスキップしました。
 ```
 
 ## tech_best_practices.md からベストプラクティスを読み込み
@@ -415,7 +403,7 @@ user_intent = {
     "constraint": "個人開発のため学習コストを最小化"
 }
 
-# Context7 + Web検索結果
+# WebSearch検索結果
 latest_info = {
     "latest_version": "Next.js 15.0.2",
     "breaking_changes": ["fetch cache behavior", "next/image defaults"],
@@ -443,7 +431,7 @@ user_intent = {
     "constraint": "予算: 無料枠のみ（$0/月）"
 }
 
-# Context7 + Web検索結果
+# WebSearch検索結果
 latest_info = {
     "supabase_auth": "無料枠継続、機能拡張中",
     "auth0": "無料枠7,000 MAU、それ以上は有料",
@@ -505,11 +493,11 @@ mcp__serena__write_memory(
 )
 ```
 
-### 2. system/tech_best_practices.md 更新（Context7情報保存）
+### 2. system/tech_best_practices.md 更新（調査情報保存）
 ```bash
 mcp__serena__write_memory(
   memory_name: "system/tech_best_practices.md",
-  content: "Context7で取得したベストプラクティス"
+  content: "WebSearchで取得したベストプラクティス"
 )
 ```
 
@@ -581,8 +569,8 @@ A: 了解しました。Next.js 14のまま維持します。
 
 ### ✅ tech-stack-validator が実施すること
 
-1. Context7による最新ドキュメント・ベストプラクティス取得（初回または90日経過時のみ）
-2. tech_best_practices.md 生成・更新（Context7情報を永続化）
+1. WebSearchによる最新ドキュメント・ベストプラクティス取得（初回または90日経過時のみ）
+2. tech_best_practices.md 生成・更新（調査情報を永続化）
 3. 最新バージョン確認（Web検索）
 4. CVE脆弱性確認（Web検索）
 5. ユーザー意図を尊重した検証
@@ -647,10 +635,10 @@ A: Next.js 15へアップグレードします。
 
 ## ベストプラクティス
 
-1. **Context7 API呼び出しを最小化** - 初回 + 90日ごとのみ
+1. **API呼び出しを最小化** - 初回 + 90日ごとのみ
 2. **ユーザー意図を最優先** - 選択理由・制約を尊重
 3. **セキュリティを重視** - CVE脆弱性は無条件で修正
-4. **情報の永続化** - tech_best_practices.md でContext7情報を共有
+4. **情報の永続化** - tech_best_practices.md で調査情報を共有
 5. **トレーサビリティ** - 検証履歴・検索クエリを記録
 
 ---
@@ -682,7 +670,7 @@ A: Next.js 15へアップグレードします。
 
 1. system/tech_stack.md を読み込み
 2. 必要な環境変数を特定
-3. 最新の設定方法を調査（WebSearch/Context7）
+3. 最新の設定方法を調査（WebSearch）
 4. ai-rules/ENV_SETUP_GUIDE.md を具体的な手順に書き換え
 5. 必要な環境変数リストを返却
 ```
@@ -702,7 +690,6 @@ mcp__serena__read_memory(memory_name: "system/tech_stack.md")
 - 認証（Auth0, Firebase Auth, AWS Cognito, Clerk等）
 - 決済（Stripe, PayPal, Square等）
 - インフラ（Vercel, AWS, GCP, Netlify等）
-- AI/MCP（OpenAI, Anthropic, Context7等）
 
 ---
 
@@ -716,7 +703,6 @@ mcp__serena__read_memory(memory_name: "system/tech_stack.md")
 - **Stripe** → `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
 - **Vercel** → `VERCEL_TOKEN`
 - **OpenAI** → `OPENAI_API_KEY`（任意・推奨）
-- **Context7** → `CONTEXT7_API_KEY`（任意・推奨）
 
 **必須 vs 任意の判断基準**:
 - **必須**: プロジェクトの基本機能に必要（DB接続、認証、決済等）
@@ -742,10 +728,8 @@ WebSearch: "Stripe environment variables best practices"
 **Context7 MCP**:
 ```bash
 # 例: Supabase
-mcp__context7__search_context(query: "supabase-js environment setup")
 
 # 例: Stripe
-mcp__context7__search_context(query: "stripe-js api keys configuration")
 ```
 
 **MCP Registry**:
@@ -839,7 +823,6 @@ echo $SUPABASE_PROJECT_REF
 
 ### CONTEXT7_API_KEY
 - **用途**: ライブラリドキュメント自動取得（90日キャッシュ）
-- **取得方法**: https://context7.upstash.com/
 - **設定手順**: （同上）
 
 ---
@@ -988,7 +971,7 @@ C. スキップ（任意設定のみ） → Phase 0.3 へ進む（機能制限�
 
 ### ベストプラクティス
 
-1. **最新情報を取得** - WebSearch/Context7で公式ドキュメント参照
+1. **最新情報を取得** - WebSearchで公式ドキュメント参照
 2. **プラットフォーム対応** - Windows/macOS/Linux の設定手順を提供
 3. **検証方法を含める** - 設定後の確認コマンドを明示
 4. **必須 vs 任意を明確に** - ユーザーが優先順位を判断できるように

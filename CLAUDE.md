@@ -194,16 +194,20 @@ docs/
 
 ## MCPサーバー
 
-- **github** - PR/Issue管理
+### テンプレート標準搭載
+- **github** - PR/Issue管理（環境変数: `GITHUB_TOKEN`）
 - **serena** - コードベース解析
 - **playwright** - E2Eテスト
 - **desktop-commander** - ファイルシステム操作
-- **context7** - ライブラリドキュメント取得
-- **codex** - AI コーディングアシスタント（エラーループ時の自動相談）
+- **codex** - AI コーディングアシスタント（環境変数: `OPENAI_API_KEY`）
 
-**設定方法**: [ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)（技術スタック依存の環境変数設定ガイド）
+### 技術スタック依存（Phase 0.2で追加）
+- **supabase** - Supabase DB操作（Supabase使用時）
+- **stripe, auth0, vercel等** - プロジェクト次第で追加
+
+**設定方法**: [README.md - Step 0](./README.md)（必須環境変数）、[ai-rules/ENV_SETUP_GUIDE.md](./ai-rules/ENV_SETUP_GUIDE.md)（技術スタック依存）
+
 詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
-
 ---
 
 ## ★ プロジェクト固有設定

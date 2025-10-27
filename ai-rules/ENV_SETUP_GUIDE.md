@@ -47,12 +47,11 @@ mcp__serena__read_memory(memory_name: "system/tech_stack.md")
 - 認証（Auth0, Firebase Auth, AWS Cognito等）
 - 決済（Stripe, PayPal等）
 - インフラ（Vercel, AWS, GCP等）
-- AI/MCP（OpenAI, Anthropic, Context7等）
+- 
 
 ### 3. 最新情報を調査
 各サービスの最新設定方法を調査：
 - **WebSearch**: 公式ドキュメント、最新のセットアップ手順
-- **Context7 MCP**: ライブラリ・SDKのドキュメント取得
 - **例**: "Supabase MCP setup 2025", "Stripe environment variables Node.js"
 
 ### 4. 環境変数設定ガイドを生成
@@ -173,6 +172,5 @@ tech-stack-validator が以下を実行:
   - 例: "Supabase environment variables setup 2025"
   - 例: "Stripe API keys configuration Node.js"
 - **Context7 MCP**: ライブラリ・SDK公式ドキュメント
-  - 例: `mcp__context7__search_context(query: "supabase-js setup")`
 - **MCP Registry**: 利用可能なMCPサーバー一覧
   - [MCP Registry](https://github.com/modelcontextprotocol/registry)

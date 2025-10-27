@@ -1,17 +1,5 @@
 {
   "mcpServers": {
-    "context7": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "@upstash/context7-mcp",
-        "--api-key",
-        "${CONTEXT7_API_KEY}"
-      ],
-      "env": {}
-    },
     "playwright": {
       "type": "stdio",
       "command": "cmd",
@@ -52,18 +40,6 @@
         "start-mcp-server"
       ],
       "env": {}
-    },
-    "supabase": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--access-token",
-        "${SUPABASE_ACCESS_TOKEN}",
-        "--project-ref",
-        "${SUPABASE_PROJECT_REF}"
-      ]
     },
     "codex": {
       "type": "stdio",
