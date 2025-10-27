@@ -111,3 +111,43 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - 詳細な変更内容
 - 変更理由
 - 影響範囲
+
+---
+
+## ドキュメント管理規約
+
+### CLAUDE.md の記載ルール
+
+**CLAUDE.mdは最低限のルールと参照先のみ記載する**
+
+#### ✅ 記載すべき内容
+- **基本設定**: プロジェクト名、リポジトリ、ポート、回答言語
+- **最低限のルール**: タスク管理（TodoWrite必須）、要件変更フロー、ユーザー介入条件
+- **参照先リンク**: 詳細はai-rules/、.claude/配下のファイルへのリンク
+- **MCPサーバー一覧**: テンプレート標準搭載、技術スタック依存（詳細は別ファイル）
+- **エージェント一覧**: カテゴリ別概要（詳細は.claude/agents/README.md）
+
+#### ❌ 記載すべきでない内容
+- **詳細な手順**: Phase実行フロー詳細、エージェント実装詳細等
+- **フォルダ構成の詳細**: docs/の使い方、ディレクトリツリー等
+- **プロジェクト固有設定の例**: 具体例は別ファイルに切り出す
+- **長いコードブロック**: 10行以上のコードブロックは別ファイル
+
+#### 目安
+- **全体**: 150行以内（現状346行 → 150行に削減）
+- **1セクション**: 10-20行程度
+- **参照リンク**: 詳細は必ず別ファイルへのリンクを記載
+
+#### 切り出し先ファイル
+- **プロジェクト資料フォルダ**: [DOCS_FOLDER_GUIDE.md](./DOCS_FOLDER_GUIDE.md)
+- **Phase実行フロー**: [PHASE_START.md](./PHASE_START.md)、[WORKFLOW.md](./WORKFLOW.md)
+- **エージェント一覧**: [.claude/agents/README.md](../.claude/agents/README.md)
+- **プロジェクト固有設定**: [PROJECT_CUSTOMIZATION.md](./PROJECT_CUSTOMIZATION.md)
+- **環境変数設定**: [ENV_SETUP_GUIDE.md](./ENV_SETUP_GUIDE.md)
+- **Codex相談**: [CODEX_CONSULTATION.md](./CODEX_CONSULTATION.md)
+
+#### 理由
+- **可読性向上**: 短く簡潔なCLAUDE.mdはプロジェクト全体を素早く把握できる
+- **保守性向上**: 詳細は専門ファイルに集約、修正が容易
+- **重複排除**: 同じ内容を複数ファイルに記載しない
+
