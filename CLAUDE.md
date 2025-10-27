@@ -13,32 +13,44 @@
 
 ---
 
-## セッション開始フロー
+## セッション自律実行フロー
 
-### 1. 引き継ぎ情報確認
+**基本原則**: ユーザーは見守るだけ。「計画 → 実装 → まとめ」を自動実行。
 
-```bash
-# 優先順位: next_session_prompt.md → Serenaメモリ
-mcp__serena__activate_project(project: "{{PROJECT_NAME}}")
-mcp__serena__read_memory(memory_file_name: "project/current_context.md")
-```
+詳細: [ai-rules/SESSION_START.md](./ai-rules/SESSION_START.md)
 
-### 2. ワークフロー選択
+### ① 計画フェーズ（自動実行）
 
+1. **next_session_prompt.md 読み込み** - 前回の推奨タスクを確認
+2. **タスク自動選択** - 優先度: 高 → 中 → 低 の順で選択
+3. **詳細計画作成** - TodoWriteで実装ステップをリスト化
+4. **自動開始** - 承認不要、自動的に実装フェーズへ
+
+### ② 実装フェーズ（自動実行）
+
+**ワークフロー選択**:
 - **Case A: 既存プロジェクト機能拡張** → [.claude/workflows/case-a-existing-project.md](./.claude/workflows/case-a-existing-project.md)
 - **Case B: 新規プロジェクト立ち上げ** → [.claude/workflows/case-b-new-project.md](./.claude/workflows/case-b-new-project.md)
 - **Case C: デプロイ** → [.claude/workflows/case-c-deployment.md](./.claude/workflows/case-c-deployment.md)
 
-**重要**: 各Caseでワークフローファイルに記載の要件ヒアリングを実施してください。
+**エージェント自動呼び出し**:
+- backend実装 → `impl-dev-backend`
+- frontend実装 → `impl-dev-frontend`
+- テスト → `qa-unit` / `qa-integration` / E2E
+- 品質保証 → `code-reviewer` / `sec-scan`
 
-### 3. 計画フェーズ（実装前・必須）
+**エラー時**: 自動修復を試みる（ループ対策あり）
 
-詳細: [ai-rules/WORKFLOW.md](./ai-rules/WORKFLOW.md)
+### ③ まとめフェーズ（自動実行）
 
-1. **Explore**: 関連ファイルを読む
-2. **Analyze**: 影響範囲を分析
-3. **Plan**: TodoWriteで実装計画作成
-4. **Approve**: ユーザーに計画提示して承認
+1. **達成内容サマリー作成**
+2. **KPI記録**（Pass Rate、Test Debt Ratio等）
+3. **学んだこと整理**
+4. **次回推奨タスク作成**
+5. **Serenaメモリ更新**
+6. **Git commit & PR作成**
+
+**完了音**: ピポパ♪（600Hz → 800Hz → 1000Hz）
 
 ---
 
@@ -58,19 +70,29 @@ mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 
 ---
 
-## セッション完了時
+## ユーザー介入が必要な場合
 
-詳細: [ai-rules/SESSION_COMPLETION.md](./ai-rules/SESSION_COMPLETION.md)
+基本的にセッションは自律実行されますが、以下の場合のみユーザーに相談します：
 
-1. **Serenaメモリ更新**（Session KPI含む）
-2. **システム状態更新**（system_state.md, tech_stack.md等 - 技術スタック変更時）
-3. **next_session_prompt.md更新**
-4. **MCP設定**（新サービス追加時のみ）
-5. **Git commit & PR作成**（`/pre-commit-check` 実行）
+1. **Critical問題が7回試行後も解決しない**
+   - 選択肢: 続行（最大10回）/ Technical Debt登録 / 停止
 
-**⚠️ 重要**:
+2. **同一バグが3回連続失敗**
+   - 選択肢: 続行（最大6回）/ 手動修正 / Technical Debt登録
+
+3. **QUARANTINE（隔離）発生**
+   - E2Eテストを一時的に隔離（推奨: 3日）
+
+詳細: [ai-rules/SESSION_START.md](./ai-rules/SESSION_START.md#ユーザー介入が必要な場合)
+
+---
+
+## テンプレート開発時の注意
+
+**⚠️ 重要**: 必ず両リポジトリ（`claude-code-template/` + `claude-code-dev/`）にコミット&プッシュ
+
 - mainブランチへの直接pushは禁止
-- **テンプレート開発時**: 必ず両リポジトリ（`claude-code-template/` + `claude-code-dev/`）にコミット&プッシュ
+- テンプレート開発時は両リポジトリへのコミットが必須
 
 ---
 

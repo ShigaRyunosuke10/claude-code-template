@@ -40,20 +40,23 @@
 
 ## 共通ワークフロー（Case A/B共通）
 
-### セッション開始時（必須）
+### セッション開始時（自律実行）
 
-#### 0. 計画フェーズ（実装前・必須）
+詳細: [SESSION_START.md](./SESSION_START.md)
+
+#### 0. 計画フェーズ（自動実行）
 
 **目的**: 手戻り防止、見通しの良い開発
 
-**手順**:
-1. **Explore（探索）**: 関連ファイルを読む（Read）
-2. **Analyze（分析）**: 影響範囲を分析
-3. **Plan（計画）**: TodoWriteで詳細な実装計画を作成
+**自動実行手順**:
+1. **Load（読み込み）**: next_session_prompt.md から推奨タスクを自動選択
+2. **Explore（探索）**: 関連ファイルを読む（Read）
+3. **Analyze（分析）**: 影響範囲を分析
+4. **Plan（計画）**: TodoWriteで詳細な実装計画を作成
    - 実装ステップをリスト化
    - 予想される変更ファイル列挙
    - テスト戦略策定
-4. **Approve（承認）**: ユーザーに計画を提示して承認を得る
+5. **AutoStart（自動開始）**: 承認不要、自動的に実装フェーズへ
 
 **計画例**:
 ```
@@ -62,17 +65,25 @@ TodoWrite:
 2. backend/tests/test_users.py のテスト作成（TDD）
 3. frontend/src/app/users/page.tsx のUI実装
 4. E2Eテスト実行・確認
+5. code-reviewer実行
+6. sec-scan実行
+7. Git commit & PR作成
 ```
 
-#### 1. 引き継ぎ情報確認
+**重要**: ユーザー承認は不要。計画作成後、自動的に実装を開始します。
 
-**優先順位**:
+#### 1. 引き継ぎ情報の自動読み込み
+
+**優先順位**（自動判定）:
 1. `next_session_prompt.md` があれば読む
 2. なければSerenaメモリ確認
 
 ```bash
-# Serenaメモリ確認
-mcp__serena__activate_project(project: "nissei")
+# next_session_prompt.md を読む
+Read: next_session_prompt.md
+
+# ない場合はSerenaメモリ確認
+mcp__serena__activate_project(project: "{{PROJECT_NAME}}")
 mcp__serena__read_memory(memory_file_name: "project/current_context.md")
 ```
 
